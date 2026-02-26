@@ -171,6 +171,45 @@
         .clear-btn:hover {
             background: #616161;
         }
+        .settlement-card {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+        }
+        .settlement-card h2 {
+            color: #2e7d32;
+            border-bottom-color: #4caf50;
+        }
+        .settlement-table th {
+            background: #c8e6c9;
+            color: #1b5e20;
+        }
+        .settlement-table tfoot th,
+        .settlement-table tfoot td {
+            background: #a5d6a7;
+            font-weight: 600;
+        }
+        .reconciliation {
+            background: #fff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            border: 1px solid #c8e6c9;
+        }
+        .reconciliation h3 {
+            margin-top: 0;
+            color: #2e7d32;
+        }
+        .reconciliation p {
+            margin: 8px 0;
+        }
+        .reconciliation .match {
+            color: #2e7d32;
+            font-weight: 600;
+        }
+        .reconciliation .mismatch {
+            color: #d32f2f;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -286,6 +325,11 @@
         <div id="allocationList"></div>
     </div>
 
+    <div class="card settlement-card">
+        <h2>Settlement Summary</h2>
+        <div id="settlementSummary"></div>
+    </div>
+
     <script>
         // Data storage
         let coffees = [];
@@ -370,6 +414,7 @@
         const markupValueInput = document.getElementById('markupValue');
         const markupError = document.getElementById('markupError');
         const markupSummaryDiv = document.getElementById('markupSummary');
+        const settlementSummaryDiv = document.getElementById('settlementSummary');
 
         // Add coffee product
         coffeeForm.addEventListener('submit', function(e) {
@@ -397,6 +442,7 @@
             saveToStorage();
             renderCoffeeList();
             updateAllocationDropdowns();
+            renderSettlementSummary();
 
             // Reset form
             coffeeForm.reset();
@@ -411,6 +457,7 @@
             renderCoffeeList();
             renderAllocationList();
             updateAllocationDropdowns();
+            renderSettlementSummary();
         }
 
         // Render coffee list
@@ -499,6 +546,7 @@
             updateAllocationDropdowns();
             renderFreightSummary();
             renderMarkupSummary();
+            renderSettlementSummary();
 
             // Reset form
             participantForm.reset();
@@ -515,6 +563,7 @@
             updateAllocationDropdowns();
             renderFreightSummary();
             renderMarkupSummary();
+            renderSettlementSummary();
         }
 
         // Render participant list
@@ -634,6 +683,7 @@
             renderAllocationList();
             updateAllocationDropdowns();
             renderMarkupSummary();
+            renderSettlementSummary();
 
             // Reset form
             allocationForm.reset();
@@ -646,6 +696,7 @@
             renderAllocationList();
             updateAllocationDropdowns();
             renderMarkupSummary();
+            renderSettlementSummary();
         }
 
         // Render allocation list
@@ -736,6 +787,7 @@
             freightTotal = cost;
             saveToStorage();
             renderFreightSummary();
+            renderSettlementSummary();
         });
 
         // Render freight summary
@@ -811,6 +863,7 @@
             markup = { type: type, value: value };
             saveToStorage();
             renderMarkupSummary();
+            renderSettlementSummary();
         });
 
         // Clear markup
@@ -822,6 +875,7 @@
             markupError.textContent = '';
             saveToStorage();
             renderMarkupSummary();
+            renderSettlementSummary();
         }
 
         // Get total allocation value (sum of all coffee allocations)
@@ -885,6 +939,114 @@
             markupSummaryDiv.innerHTML = html;
         }
 
+        // Get participant's coffee allocation total
+        function getParticipantCoffeeTotal(participantId) {
+            return allocations
+                .filter(a => a.participantId === participantId)
+                .reduce((sum, a) => sum + a.value, 0);
+        }
+
+        // Get freight per person
+        function getFreightPerPerson() {
+            if (participants.length === 0) return 0;
+            return Math.round((freightTotal / participants.length) * 100) / 100;
+        }
+
+        // Get markup per person
+        function getMarkupPerPerson() {
+            if (participants.length === 0) return 0;
+            const markupAmount = getMarkupAmount();
+            return Math.round((markupAmount / participants.length) * 100) / 100;
+        }
+
+        // Render settlement summary
+        function renderSettlementSummary() {
+            if (participants.length === 0) {
+                settlementSummaryDiv.innerHTML = '<p class="empty-message">Add participants to see settlement summary.</p>';
+                return;
+            }
+
+            if (allocations.length === 0) {
+                settlementSummaryDiv.innerHTML = '<p class="empty-message">Add allocations to see settlement summary.</p>';
+                return;
+            }
+
+            const freightPP = getFreightPerPerson();
+            const markupPP = getMarkupPerPerson();
+            const markupAmount = getMarkupAmount();
+            const totalAllocations = getTotalAllocationValue();
+
+            let html = `
+                <table class="settlement-table">
+                    <thead>
+                        <tr>
+                            <th>Participant</th>
+                            <th>Coffee</th>
+                            <th>Freight</th>
+                            <th>Markup</th>
+                            <th>Total Owed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            let grandTotalOwed = 0;
+
+            participants.forEach(participant => {
+                const coffeeTotal = getParticipantCoffeeTotal(participant.id);
+                const totalOwed = Math.round((coffeeTotal + freightPP + markupPP) * 100) / 100;
+                grandTotalOwed += totalOwed;
+
+                html += `
+                    <tr>
+                        <td>${escapeHtml(participant.name)}</td>
+                        <td>$${coffeeTotal.toFixed(2)}</td>
+                        <td>$${freightPP.toFixed(2)}</td>
+                        <td>$${markupPP.toFixed(2)}</td>
+                        <td><strong>$${totalOwed.toFixed(2)}</strong></td>
+                    </tr>
+                `;
+            });
+
+            // Round grand total for display
+            grandTotalOwed = Math.round(grandTotalOwed * 100) / 100;
+
+            html += `
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Total</th>
+                            <td>$${totalAllocations.toFixed(2)}</td>
+                            <td>$${freightTotal.toFixed(2)}</td>
+                            <td>$${markupAmount.toFixed(2)}</td>
+                            <th>$${grandTotalOwed.toFixed(2)}</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+
+            // Reconciliation check
+            const expectedTotal = Math.round((totalAllocations + freightTotal + markupAmount) * 100) / 100;
+            const difference = Math.abs(grandTotalOwed - expectedTotal);
+            const isMatch = difference < 0.01; // Allow for tiny floating point differences
+
+            html += `
+                <div class="reconciliation">
+                    <h3>Reconciliation</h3>
+                    <p>Sum of Coffee Allocations: <strong>$${totalAllocations.toFixed(2)}</strong></p>
+                    <p>Freight Total: <strong>$${freightTotal.toFixed(2)}</strong></p>
+                    <p>Markup Total: <strong>$${markupAmount.toFixed(2)}</strong></p>
+                    <p>Expected Total: <strong>$${expectedTotal.toFixed(2)}</strong></p>
+                    <p>Sum of Participant Totals: <strong>$${grandTotalOwed.toFixed(2)}</strong></p>
+                    <p class="${isMatch ? 'match' : 'mismatch'}">
+                        ${isMatch ? 'Totals match!' : `Difference: $${difference.toFixed(2)} (rounding)`}
+                    </p>
+                </div>
+            `;
+
+            settlementSummaryDiv.innerHTML = html;
+        }
+
         // Initial render
         renderCoffeeList();
         renderParticipantList();
@@ -892,6 +1054,7 @@
         updateAllocationDropdowns();
         renderFreightSummary();
         renderMarkupSummary();
+        renderSettlementSummary();
     </script>
 </body>
 </html>
