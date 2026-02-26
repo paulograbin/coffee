@@ -291,7 +291,7 @@
                             <input type="number" id="coffeeWeight" step="0.01" min="0.01" placeholder="0.00" required>
                         </div>
                         <div class="form-group">
-                            <label for="coffeeCost">Cost (R$)</label>
+                            <label for="coffeeCost">R$/kg</label>
                             <input type="number" id="coffeeCost" step="0.01" min="0.01" placeholder="0.00" required>
                         </div>
                     </div>
@@ -601,7 +601,7 @@
                 allocations.forEach(a => {
                     if (a.coffeeId === id) {
                         a.fraction = a.grams / newTotalGrams;
-                        a.value = coffee.cost * a.fraction;
+                        a.value = coffee.cost * (a.grams / 1000);
                     }
                 });
 
@@ -621,17 +621,17 @@
                 return;
             }
 
-            const totalCost = coffees.reduce((sum, c) => sum + c.cost, 0);
             const totalWeight = coffees.reduce((sum, c) => sum + (c.weight || 0), 0);
+            const totalValue = coffees.reduce((sum, c) => sum + (c.cost * (c.weight || 0)), 0);
 
             let html = `
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Coffee Name</th>
                             <th>Weight</th>
-                            <th>Cost</th>
+                            <th>R$/kg</th>
+                            <th>Total</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -639,12 +639,13 @@
             `;
 
             coffees.forEach(coffee => {
+                const totalCost = coffee.cost * (coffee.weight || 0);
                 html += `
                     <tr id="coffee-row-${coffee.id}">
-                        <td>${coffee.id}</td>
                         <td>${escapeHtml(coffee.name)}</td>
                         <td id="coffee-weight-${coffee.id}">${(coffee.weight || 0).toFixed(2)} kg</td>
                         <td id="coffee-cost-${coffee.id}">R$${coffee.cost.toFixed(2)}</td>
+                        <td>R$${totalCost.toFixed(2)}</td>
                         <td>
                             <button class="edit-btn" onclick="editCoffee(${coffee.id})">Edit</button>
                             <button class="delete-btn" onclick="deleteCoffee(${coffee.id})">Delete</button>
@@ -657,9 +658,10 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colspan="2">Total</th>
+                            <th>Total</th>
                             <th>${totalWeight.toFixed(2)} kg</th>
-                            <th>R$${totalCost.toFixed(2)}</th>
+                            <th></th>
+                            <th>R$${totalValue.toFixed(2)}</th>
                             <th></th>
                         </tr>
                     </tfoot>
@@ -881,9 +883,10 @@
                 return;
             }
 
-            // Calculate value based on weight proportion
+            // Calculate value based on price per kg
             const fraction = grams / totalGrams;
-            const allocationValue = coffee.cost * fraction;
+            const allocationKg = grams / 1000;
+            const allocationValue = coffee.cost * allocationKg;
 
             // Create allocation
             const allocation = {
@@ -964,7 +967,7 @@
             // Update allocation
             allocation.grams = newGrams;
             allocation.fraction = newGrams / totalGrams;
-            allocation.value = coffee.cost * allocation.fraction;
+            allocation.value = coffee.cost * (newGrams / 1000);
 
             saveToStorage();
             renderAllocationList();
