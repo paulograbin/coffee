@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee Settlement Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #4a2c2a;
+        }
+        h2 {
+            color: #6b4423;
+            border-bottom: 2px solid #d4a574;
+            padding-bottom: 8px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #d4a574;
+        }
+        button {
+            background: #6b4423;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #4a2c2a;
+        }
+        .error {
+            color: #d32f2f;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #f8f4f0;
+            color: #4a2c2a;
+        }
+        .empty-message {
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+            text-align: center;
+        }
+        .delete-btn {
+            background: #d32f2f;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        .delete-btn:hover {
+            background: #b71c1c;
+        }
+    </style>
+</head>
+<body>
+    <h1>Coffee Settlement Calculator</h1>
+
+    <div class="card">
+        <h2>Add Coffee Product</h2>
+        <form id="coffeeForm">
+            <div class="form-group">
+                <label for="coffeeName">Coffee Name</label>
+                <input type="text" id="coffeeName" placeholder="e.g., Colombian Dark Roast" required>
+            </div>
+            <div class="form-group">
+                <label for="coffeeCost">Package Cost ($)</label>
+                <input type="number" id="coffeeCost" step="0.01" min="0.01" placeholder="0.00" required>
+                <div id="costError" class="error"></div>
+            </div>
+            <button type="submit">Add Coffee</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Coffee Products</h2>
+        <div id="coffeeList"></div>
+    </div>
+
+    <div class="card">
+        <h2>Add Participant</h2>
+        <form id="participantForm">
+            <div class="form-group">
+                <label for="participantName">Participant Name</label>
+                <input type="text" id="participantName" placeholder="e.g., John" required>
+                <div id="participantError" class="error"></div>
+            </div>
+            <button type="submit">Add Participant</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Participants</h2>
+        <div id="participantList"></div>
+    </div>
+
+    <script>
+        // Data storage
+        let coffees = [];
+        let nextCoffeeId = 1;
+        let participants = [];
+        let nextParticipantId = 1;
+
+        // DOM elements
+        const coffeeForm = document.getElementById('coffeeForm');
+        const coffeeNameInput = document.getElementById('coffeeName');
+        const coffeeCostInput = document.getElementById('coffeeCost');
+        const costError = document.getElementById('costError');
+        const coffeeListDiv = document.getElementById('coffeeList');
+        const participantForm = document.getElementById('participantForm');
+        const participantNameInput = document.getElementById('participantName');
+        const participantError = document.getElementById('participantError');
+        const participantListDiv = document.getElementById('participantList');
+
+        // Add coffee product
+        coffeeForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = coffeeNameInput.value.trim();
+            const cost = parseFloat(coffeeCostInput.value);
+
+            // Validation
+            costError.textContent = '';
+
+            if (cost <= 0 || isNaN(cost)) {
+                costError.textContent = 'Cost must be greater than 0';
+                return;
+            }
+
+            // Create coffee object with unique ID
+            const coffee = {
+                id: nextCoffeeId++,
+                name: name,
+                cost: cost
+            };
+
+            coffees.push(coffee);
+            renderCoffeeList();
+
+            // Reset form
+            coffeeForm.reset();
+            coffeeNameInput.focus();
+        });
+
+        // Delete coffee
+        function deleteCoffee(id) {
+            coffees = coffees.filter(c => c.id !== id);
+            renderCoffeeList();
+        }
+
+        // Render coffee list
+        function renderCoffeeList() {
+            if (coffees.length === 0) {
+                coffeeListDiv.innerHTML = '<p class="empty-message">No coffee products added yet.</p>';
+                return;
+            }
+
+            const total = coffees.reduce((sum, c) => sum + c.cost, 0);
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Coffee Name</th>
+                            <th>Cost</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            coffees.forEach(coffee => {
+                html += `
+                    <tr>
+                        <td>${coffee.id}</td>
+                        <td>${escapeHtml(coffee.name)}</td>
+                        <td>$${coffee.cost.toFixed(2)}</td>
+                        <td><button class="delete-btn" onclick="deleteCoffee(${coffee.id})">Delete</button></td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="2">Total</th>
+                            <th>$${total.toFixed(2)}</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+
+            coffeeListDiv.innerHTML = html;
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Add participant
+        participantForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = participantNameInput.value.trim();
+
+            // Clear previous error
+            participantError.textContent = '';
+
+            // Check for duplicate names (case-insensitive)
+            const isDuplicate = participants.some(
+                p => p.name.toLowerCase() === name.toLowerCase()
+            );
+
+            if (isDuplicate) {
+                participantError.textContent = 'A participant with this name already exists';
+                return;
+            }
+
+            // Create participant object with unique ID
+            const participant = {
+                id: nextParticipantId++,
+                name: name
+            };
+
+            participants.push(participant);
+            renderParticipantList();
+
+            // Reset form
+            participantForm.reset();
+            participantNameInput.focus();
+        });
+
+        // Delete participant
+        function deleteParticipant(id) {
+            participants = participants.filter(p => p.id !== id);
+            renderParticipantList();
+        }
+
+        // Render participant list
+        function renderParticipantList() {
+            if (participants.length === 0) {
+                participantListDiv.innerHTML = '<p class="empty-message">No participants added yet. Add participants before allocation.</p>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            participants.forEach(participant => {
+                html += `
+                    <tr>
+                        <td>${participant.id}</td>
+                        <td>${escapeHtml(participant.name)}</td>
+                        <td><button class="delete-btn" onclick="deleteParticipant(${participant.id})">Delete</button></td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="3">Total: ${participants.length} participant(s)</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+
+            participantListDiv.innerHTML = html;
+        }
+
+        // Initial render
+        renderCoffeeList();
+        renderParticipantList();
+    </script>
+</body>
+</html>
