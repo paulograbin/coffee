@@ -126,6 +126,20 @@
             background: #ffebee;
             color: #c62828;
         }
+        .freight-summary {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+        .freight-summary p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        .freight-summary .highlight {
+            font-weight: 600;
+            color: #1565c0;
+        }
     </style>
 </head>
 <body>
@@ -170,6 +184,19 @@
     </div>
 
     <div class="card">
+        <h2>Freight Cost</h2>
+        <form id="freightForm">
+            <div class="form-group">
+                <label for="freightCost">Freight Total ($)</label>
+                <input type="number" id="freightCost" step="0.01" min="0" placeholder="0.00" required>
+                <div id="freightError" class="error"></div>
+            </div>
+            <button type="submit">Set Freight</button>
+        </form>
+        <div id="freightSummary"></div>
+    </div>
+
+    <div class="card">
         <h2>Allocate Coffee</h2>
         <form id="allocationForm">
             <div class="form-group">
@@ -210,6 +237,7 @@
         let nextParticipantId = 1;
         let allocations = [];
         let nextAllocationId = 1;
+        let freightTotal = 0;
 
         // LocalStorage keys
         const STORAGE_KEYS = {
@@ -218,7 +246,8 @@
             allocations: 'coffee_settlement_allocations',
             nextCoffeeId: 'coffee_settlement_nextCoffeeId',
             nextParticipantId: 'coffee_settlement_nextParticipantId',
-            nextAllocationId: 'coffee_settlement_nextAllocationId'
+            nextAllocationId: 'coffee_settlement_nextAllocationId',
+            freightTotal: 'coffee_settlement_freightTotal'
         };
 
         // Save all data to localStorage
@@ -229,6 +258,7 @@
             localStorage.setItem(STORAGE_KEYS.nextCoffeeId, nextCoffeeId);
             localStorage.setItem(STORAGE_KEYS.nextParticipantId, nextParticipantId);
             localStorage.setItem(STORAGE_KEYS.nextAllocationId, nextAllocationId);
+            localStorage.setItem(STORAGE_KEYS.freightTotal, freightTotal);
         }
 
         // Load all data from localStorage
@@ -246,6 +276,8 @@
             if (storedNextCoffeeId) nextCoffeeId = parseInt(storedNextCoffeeId);
             if (storedNextParticipantId) nextParticipantId = parseInt(storedNextParticipantId);
             if (storedNextAllocationId) nextAllocationId = parseInt(storedNextAllocationId);
+            const storedFreightTotal = localStorage.getItem(STORAGE_KEYS.freightTotal);
+            if (storedFreightTotal) freightTotal = parseFloat(storedFreightTotal);
         }
 
         // Load data on startup
@@ -267,6 +299,10 @@
         const allocationFractionSelect = document.getElementById('allocationFraction');
         const allocationError = document.getElementById('allocationError');
         const allocationListDiv = document.getElementById('allocationList');
+        const freightForm = document.getElementById('freightForm');
+        const freightCostInput = document.getElementById('freightCost');
+        const freightError = document.getElementById('freightError');
+        const freightSummaryDiv = document.getElementById('freightSummary');
 
         // Add coffee product
         coffeeForm.addEventListener('submit', function(e) {
@@ -394,6 +430,7 @@
             saveToStorage();
             renderParticipantList();
             updateAllocationDropdowns();
+            renderFreightSummary();
 
             // Reset form
             participantForm.reset();
@@ -408,6 +445,7 @@
             renderParticipantList();
             renderAllocationList();
             updateAllocationDropdowns();
+            renderFreightSummary();
         }
 
         // Render participant list
@@ -611,11 +649,63 @@
             allocationListDiv.innerHTML = html;
         }
 
+        // Freight form handler
+        freightForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            freightError.textContent = '';
+
+            const cost = parseFloat(freightCostInput.value);
+
+            if (cost < 0 || isNaN(cost)) {
+                freightError.textContent = 'Freight must be 0 or greater';
+                return;
+            }
+
+            freightTotal = cost;
+            saveToStorage();
+            renderFreightSummary();
+        });
+
+        // Render freight summary
+        function renderFreightSummary() {
+            // Update input field with current value
+            freightCostInput.value = freightTotal > 0 ? freightTotal.toFixed(2) : '';
+
+            if (freightTotal === 0) {
+                freightSummaryDiv.innerHTML = '';
+                return;
+            }
+
+            const numParticipants = participants.length;
+
+            if (numParticipants === 0) {
+                freightSummaryDiv.innerHTML = `
+                    <div class="freight-summary">
+                        <p>Freight Total: <span class="highlight">$${freightTotal.toFixed(2)}</span></p>
+                        <p style="color: #ef6c00;">Add participants to calculate freight per person.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const freightPerPerson = Math.round((freightTotal / numParticipants) * 100) / 100;
+
+            freightSummaryDiv.innerHTML = `
+                <div class="freight-summary">
+                    <p>Freight Total: <span class="highlight">$${freightTotal.toFixed(2)}</span></p>
+                    <p>Participants: <span class="highlight">${numParticipants}</span></p>
+                    <p>Freight per Person: <span class="highlight">$${freightPerPerson.toFixed(2)}</span></p>
+                </div>
+            `;
+        }
+
         // Initial render
         renderCoffeeList();
         renderParticipantList();
         renderAllocationList();
         updateAllocationDropdowns();
+        renderFreightSummary();
     </script>
 </body>
 </html>
