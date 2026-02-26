@@ -171,6 +171,37 @@
         .clear-btn:hover {
             background: #616161;
         }
+        .edit-btn {
+            background: #1976d2;
+            padding: 6px 12px;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+        .edit-btn:hover {
+            background: #1565c0;
+        }
+        .save-btn {
+            background: #388e3c;
+            padding: 6px 12px;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+        .save-btn:hover {
+            background: #2e7d32;
+        }
+        .cancel-btn {
+            background: #757575;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        .cancel-btn:hover {
+            background: #616161;
+        }
+        .edit-input {
+            width: 80px;
+            padding: 5px;
+            font-size: 14px;
+        }
         .settlement-card {
             background: #e8f5e9;
             border: 2px solid #4caf50;
@@ -467,6 +498,51 @@
             renderSettlementSummary();
         }
 
+        // Edit coffee price - show input
+        function editCoffeePrice(id) {
+            const coffee = coffees.find(c => c.id === id);
+            if (!coffee) return;
+
+            const costCell = document.getElementById(`coffee-cost-${id}`);
+            costCell.innerHTML = `
+                <input type="number" class="edit-input" id="edit-cost-${id}"
+                       value="${coffee.cost.toFixed(2)}" step="0.01" min="0.01">
+                <button class="save-btn" onclick="saveCoffeePrice(${id})">Save</button>
+                <button class="cancel-btn" onclick="renderCoffeeList()">Cancel</button>
+            `;
+            document.getElementById(`edit-cost-${id}`).focus();
+        }
+
+        // Save coffee price
+        function saveCoffeePrice(id) {
+            const input = document.getElementById(`edit-cost-${id}`);
+            const newCost = parseFloat(input.value);
+
+            if (isNaN(newCost) || newCost <= 0) {
+                alert('Cost must be greater than 0');
+                return;
+            }
+
+            const coffee = coffees.find(c => c.id === id);
+            if (coffee) {
+                coffee.cost = newCost;
+
+                // Update allocation values for this coffee
+                allocations.forEach(a => {
+                    if (a.coffeeId === id) {
+                        a.value = coffee.cost * a.fraction;
+                    }
+                });
+
+                saveToStorage();
+                renderCoffeeList();
+                renderAllocationList();
+                updateAllocationDropdowns();
+                renderMarkupSummary();
+                renderSettlementSummary();
+            }
+        }
+
         // Render coffee list
         function renderCoffeeList() {
             if (coffees.length === 0) {
@@ -493,12 +569,15 @@
 
             coffees.forEach(coffee => {
                 html += `
-                    <tr>
+                    <tr id="coffee-row-${coffee.id}">
                         <td>${coffee.id}</td>
                         <td>${escapeHtml(coffee.name)}</td>
                         <td>${(coffee.weight || 0).toFixed(2)} kg</td>
-                        <td>R$${coffee.cost.toFixed(2)}</td>
-                        <td><button class="delete-btn" onclick="deleteCoffee(${coffee.id})">Delete</button></td>
+                        <td id="coffee-cost-${coffee.id}">R$${coffee.cost.toFixed(2)}</td>
+                        <td>
+                            <button class="edit-btn" onclick="editCoffeePrice(${coffee.id})">Edit</button>
+                            <button class="delete-btn" onclick="deleteCoffee(${coffee.id})">Delete</button>
+                        </td>
                     </tr>
                 `;
             });
@@ -577,6 +656,52 @@
             renderSettlementSummary();
         }
 
+        // Edit participant name - show input
+        function editParticipantName(id) {
+            const participant = participants.find(p => p.id === id);
+            if (!participant) return;
+
+            const nameCell = document.getElementById(`participant-name-${id}`);
+            nameCell.innerHTML = `
+                <input type="text" class="edit-input" id="edit-name-${id}"
+                       value="${escapeHtml(participant.name)}" style="width: 120px;">
+                <button class="save-btn" onclick="saveParticipantName(${id})">Save</button>
+                <button class="cancel-btn" onclick="renderParticipantList()">Cancel</button>
+            `;
+            document.getElementById(`edit-name-${id}`).focus();
+        }
+
+        // Save participant name
+        function saveParticipantName(id) {
+            const input = document.getElementById(`edit-name-${id}`);
+            const newName = input.value.trim();
+
+            if (!newName) {
+                alert('Name cannot be empty');
+                return;
+            }
+
+            // Check for duplicate names (excluding current participant)
+            const isDuplicate = participants.some(
+                p => p.id !== id && p.name.toLowerCase() === newName.toLowerCase()
+            );
+
+            if (isDuplicate) {
+                alert('A participant with this name already exists');
+                return;
+            }
+
+            const participant = participants.find(p => p.id === id);
+            if (participant) {
+                participant.name = newName;
+                saveToStorage();
+                renderParticipantList();
+                renderAllocationList();
+                updateAllocationDropdowns();
+                renderSettlementSummary();
+            }
+        }
+
         // Render participant list
         function renderParticipantList() {
             if (participants.length === 0) {
@@ -600,8 +725,11 @@
                 html += `
                     <tr>
                         <td>${participant.id}</td>
-                        <td>${escapeHtml(participant.name)}</td>
-                        <td><button class="delete-btn" onclick="deleteParticipant(${participant.id})">Delete</button></td>
+                        <td id="participant-name-${participant.id}">${escapeHtml(participant.name)}</td>
+                        <td>
+                            <button class="edit-btn" onclick="editParticipantName(${participant.id})">Edit</button>
+                            <button class="delete-btn" onclick="deleteParticipant(${participant.id})">Delete</button>
+                        </td>
                     </tr>
                 `;
             });
@@ -717,6 +845,63 @@
             renderSettlementSummary();
         }
 
+        // Edit allocation amount - show select
+        function editAllocationAmount(id) {
+            const allocation = allocations.find(a => a.id === id);
+            if (!allocation) return;
+
+            const amountCell = document.getElementById(`allocation-amount-${id}`);
+            const currentGrams = allocation.grams || (allocation.fraction * 1000);
+
+            amountCell.innerHTML = `
+                <select class="edit-input" id="edit-amount-${id}" style="width: 80px;">
+                    <option value="500" ${currentGrams === 500 ? 'selected' : ''}>500g</option>
+                    <option value="1000" ${currentGrams === 1000 ? 'selected' : ''}>1000g</option>
+                </select>
+                <button class="save-btn" onclick="saveAllocationAmount(${id})">Save</button>
+                <button class="cancel-btn" onclick="renderAllocationList()">Cancel</button>
+            `;
+        }
+
+        // Save allocation amount
+        function saveAllocationAmount(id) {
+            const select = document.getElementById(`edit-amount-${id}`);
+            const newGrams = parseInt(select.value);
+
+            const allocation = allocations.find(a => a.id === id);
+            if (!allocation) return;
+
+            const coffee = coffees.find(c => c.id === allocation.coffeeId);
+            if (!coffee) return;
+
+            const totalGrams = (coffee.weight || 0) * 1000;
+            const currentGrams = allocation.grams || (allocation.fraction * 1000);
+
+            // Calculate other allocations for this coffee (excluding current)
+            const otherAllocatedGrams = allocations
+                .filter(a => a.coffeeId === allocation.coffeeId && a.id !== id)
+                .reduce((sum, a) => sum + (a.grams || (a.fraction * 1000)), 0);
+
+            const newTotalGrams = otherAllocatedGrams + newGrams;
+
+            if (newTotalGrams > totalGrams) {
+                const available = totalGrams - otherAllocatedGrams;
+                alert(`Cannot allocate ${newGrams}g. Only ${available}g available for this coffee.`);
+                return;
+            }
+
+            // Update allocation
+            allocation.grams = newGrams;
+            allocation.fraction = newGrams / totalGrams;
+            allocation.value = coffee.cost * allocation.fraction;
+
+            saveToStorage();
+            renderAllocationList();
+            updateAllocationDropdowns();
+            renderMarkupSummary();
+            renderSettlementSummary();
+        }
+
         // Render allocation list
         function renderAllocationList() {
             if (allocations.length === 0) {
@@ -746,9 +931,12 @@
                     <tr>
                         <td>${coffee ? escapeHtml(coffee.name) : 'Unknown'}</td>
                         <td>${participant ? escapeHtml(participant.name) : 'Unknown'}</td>
-                        <td>${allocation.grams || (allocation.fraction * 1000)}g</td>
+                        <td id="allocation-amount-${allocation.id}">${allocation.grams || (allocation.fraction * 1000)}g</td>
                         <td>R$${allocation.value.toFixed(2)}</td>
-                        <td><button class="delete-btn" onclick="deleteAllocation(${allocation.id})">Delete</button></td>
+                        <td>
+                            <button class="edit-btn" onclick="editAllocationAmount(${allocation.id})">Edit</button>
+                            <button class="delete-btn" onclick="deleteAllocation(${allocation.id})">Delete</button>
+                        </td>
                     </tr>
                 `;
             });
