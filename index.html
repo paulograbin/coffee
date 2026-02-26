@@ -95,6 +95,37 @@
         .delete-btn:hover {
             background: #b71c1c;
         }
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            background: white;
+        }
+        select:focus {
+            outline: none;
+            border-color: #d4a574;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-full {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+        .status-partial {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        .status-none {
+            background: #ffebee;
+            color: #c62828;
+        }
     </style>
 </head>
 <body>
@@ -138,12 +169,47 @@
         <div id="participantList"></div>
     </div>
 
+    <div class="card">
+        <h2>Allocate Coffee</h2>
+        <form id="allocationForm">
+            <div class="form-group">
+                <label for="allocationCoffee">Coffee</label>
+                <select id="allocationCoffee" required>
+                    <option value="">-- Select Coffee --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="allocationParticipant">Participant</label>
+                <select id="allocationParticipant" required>
+                    <option value="">-- Select Participant --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="allocationFraction">Fraction</label>
+                <select id="allocationFraction" required>
+                    <option value="">-- Select Fraction --</option>
+                    <option value="0.5">Half (0.5)</option>
+                    <option value="1.0">Whole (1.0)</option>
+                </select>
+            </div>
+            <div id="allocationError" class="error"></div>
+            <button type="submit">Add Allocation</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Allocations</h2>
+        <div id="allocationList"></div>
+    </div>
+
     <script>
         // Data storage
         let coffees = [];
         let nextCoffeeId = 1;
         let participants = [];
         let nextParticipantId = 1;
+        let allocations = [];
+        let nextAllocationId = 1;
 
         // DOM elements
         const coffeeForm = document.getElementById('coffeeForm');
@@ -155,6 +221,12 @@
         const participantNameInput = document.getElementById('participantName');
         const participantError = document.getElementById('participantError');
         const participantListDiv = document.getElementById('participantList');
+        const allocationForm = document.getElementById('allocationForm');
+        const allocationCoffeeSelect = document.getElementById('allocationCoffee');
+        const allocationParticipantSelect = document.getElementById('allocationParticipant');
+        const allocationFractionSelect = document.getElementById('allocationFraction');
+        const allocationError = document.getElementById('allocationError');
+        const allocationListDiv = document.getElementById('allocationList');
 
         // Add coffee product
         coffeeForm.addEventListener('submit', function(e) {
@@ -180,6 +252,7 @@
 
             coffees.push(coffee);
             renderCoffeeList();
+            updateAllocationDropdowns();
 
             // Reset form
             coffeeForm.reset();
@@ -189,7 +262,10 @@
         // Delete coffee
         function deleteCoffee(id) {
             coffees = coffees.filter(c => c.id !== id);
+            allocations = allocations.filter(a => a.coffeeId !== id);
             renderCoffeeList();
+            renderAllocationList();
+            updateAllocationDropdowns();
         }
 
         // Render coffee list
@@ -274,6 +350,7 @@
 
             participants.push(participant);
             renderParticipantList();
+            updateAllocationDropdowns();
 
             // Reset form
             participantForm.reset();
@@ -283,7 +360,10 @@
         // Delete participant
         function deleteParticipant(id) {
             participants = participants.filter(p => p.id !== id);
+            allocations = allocations.filter(a => a.participantId !== id);
             renderParticipantList();
+            renderAllocationList();
+            updateAllocationDropdowns();
         }
 
         // Render participant list
@@ -328,9 +408,168 @@
             participantListDiv.innerHTML = html;
         }
 
+        // Get total allocated fraction for a coffee
+        function getAllocatedFraction(coffeeId) {
+            return allocations
+                .filter(a => a.coffeeId === coffeeId)
+                .reduce((sum, a) => sum + a.fraction, 0);
+        }
+
+        // Update allocation dropdowns
+        function updateAllocationDropdowns() {
+            // Update coffee dropdown
+            allocationCoffeeSelect.innerHTML = '<option value="">-- Select Coffee --</option>';
+            coffees.forEach(coffee => {
+                const allocated = getAllocatedFraction(coffee.id);
+                const status = allocated >= 1 ? ' (Fully Allocated)' : allocated > 0 ? ` (${allocated * 100}% allocated)` : '';
+                const option = document.createElement('option');
+                option.value = coffee.id;
+                option.textContent = `${coffee.name} - $${coffee.cost.toFixed(2)}${status}`;
+                option.disabled = allocated >= 1;
+                allocationCoffeeSelect.appendChild(option);
+            });
+
+            // Update participant dropdown
+            allocationParticipantSelect.innerHTML = '<option value="">-- Select Participant --</option>';
+            participants.forEach(participant => {
+                const option = document.createElement('option');
+                option.value = participant.id;
+                option.textContent = participant.name;
+                allocationParticipantSelect.appendChild(option);
+            });
+        }
+
+        // Add allocation
+        allocationForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            allocationError.textContent = '';
+
+            const coffeeId = parseInt(allocationCoffeeSelect.value);
+            const participantId = parseInt(allocationParticipantSelect.value);
+            const fraction = parseFloat(allocationFractionSelect.value);
+
+            if (!coffeeId || !participantId || !fraction) {
+                allocationError.textContent = 'Please select all fields';
+                return;
+            }
+
+            // Get current allocation for this coffee
+            const currentAllocated = getAllocatedFraction(coffeeId);
+            const newTotal = currentAllocated + fraction;
+
+            // Validate sum doesn't exceed 1.0
+            if (newTotal > 1.0) {
+                const remaining = 1.0 - currentAllocated;
+                allocationError.textContent = `Cannot allocate ${fraction}. Only ${remaining} remaining for this coffee.`;
+                return;
+            }
+
+            // Get coffee details for calculating value
+            const coffee = coffees.find(c => c.id === coffeeId);
+            const allocationValue = coffee.cost * fraction;
+
+            // Create allocation
+            const allocation = {
+                id: nextAllocationId++,
+                coffeeId: coffeeId,
+                participantId: participantId,
+                fraction: fraction,
+                value: allocationValue
+            };
+
+            allocations.push(allocation);
+            renderAllocationList();
+            updateAllocationDropdowns();
+
+            // Reset form
+            allocationForm.reset();
+        });
+
+        // Delete allocation
+        function deleteAllocation(id) {
+            allocations = allocations.filter(a => a.id !== id);
+            renderAllocationList();
+            updateAllocationDropdowns();
+        }
+
+        // Render allocation list
+        function renderAllocationList() {
+            if (allocations.length === 0) {
+                allocationListDiv.innerHTML = '<p class="empty-message">No allocations yet. Add coffees and participants first.</p>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Coffee</th>
+                            <th>Participant</th>
+                            <th>Fraction</th>
+                            <th>Value</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            allocations.forEach(allocation => {
+                const coffee = coffees.find(c => c.id === allocation.coffeeId);
+                const participant = participants.find(p => p.id === allocation.participantId);
+
+                html += `
+                    <tr>
+                        <td>${coffee ? escapeHtml(coffee.name) : 'Unknown'}</td>
+                        <td>${participant ? escapeHtml(participant.name) : 'Unknown'}</td>
+                        <td>${allocation.fraction === 1 ? 'Whole' : 'Half'} (${allocation.fraction})</td>
+                        <td>$${allocation.value.toFixed(2)}</td>
+                        <td><button class="delete-btn" onclick="deleteAllocation(${allocation.id})">Delete</button></td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            // Add coffee allocation status summary
+            html += '<h3 style="margin-top: 20px;">Coffee Allocation Status</h3><table><thead><tr><th>Coffee</th><th>Allocated</th><th>Status</th></tr></thead><tbody>';
+
+            coffees.forEach(coffee => {
+                const allocated = getAllocatedFraction(coffee.id);
+                let statusClass, statusText;
+                if (allocated >= 1) {
+                    statusClass = 'status-full';
+                    statusText = 'Fully Allocated';
+                } else if (allocated > 0) {
+                    statusClass = 'status-partial';
+                    statusText = 'Partially Allocated';
+                } else {
+                    statusClass = 'status-none';
+                    statusText = 'Not Allocated';
+                }
+
+                html += `
+                    <tr>
+                        <td>${escapeHtml(coffee.name)}</td>
+                        <td>${(allocated * 100).toFixed(0)}%</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+
+            allocationListDiv.innerHTML = html;
+        }
+
         // Initial render
         renderCoffeeList();
         renderParticipantList();
+        renderAllocationList();
+        updateAllocationDropdowns();
     </script>
 </body>
 </html>
