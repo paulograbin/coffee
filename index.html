@@ -337,16 +337,8 @@
                 <form id="markupForm" style="margin-top: 15px;">
                     <div class="inline-form">
                         <div class="form-group">
-                            <label for="markupType">Markup</label>
-                            <select id="markupType">
-                                <option value="">No Markup</option>
-                                <option value="percentage">Percentage (%)</option>
-                                <option value="fixed">Fixed (R$)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="markupValue">Value</label>
-                            <input type="number" id="markupValue" step="0.01" min="0" placeholder="0" disabled>
+                            <label for="markupValue">Markup (R$/kg)</label>
+                            <input type="number" id="markupValue" step="0.01" min="0" placeholder="0.00">
                         </div>
                         <div class="form-group" style="flex: 0;">
                             <label>&nbsp;</label>
@@ -498,7 +490,6 @@
         const freightError = document.getElementById('freightError');
         const freightSummaryDiv = document.getElementById('freightSummary');
         const markupForm = document.getElementById('markupForm');
-        const markupTypeSelect = document.getElementById('markupType');
         const markupValueInput = document.getElementById('markupValue');
         const markupError = document.getElementById('markupError');
         const markupSummaryDiv = document.getElementById('markupSummary');
@@ -550,25 +541,39 @@
             renderSettlementSummary();
         }
 
-        // Edit coffee price - show input
-        function editCoffeePrice(id) {
+        // Edit coffee - show inputs for weight and cost
+        function editCoffee(id) {
             const coffee = coffees.find(c => c.id === id);
             if (!coffee) return;
 
+            const weightCell = document.getElementById(`coffee-weight-${id}`);
             const costCell = document.getElementById(`coffee-cost-${id}`);
+
+            weightCell.innerHTML = `
+                <input type="number" class="edit-input" id="edit-weight-${id}"
+                       value="${(coffee.weight || 0).toFixed(2)}" step="0.01" min="0.01" style="width: 60px;">
+            `;
+
             costCell.innerHTML = `
                 <input type="number" class="edit-input" id="edit-cost-${id}"
-                       value="${coffee.cost.toFixed(2)}" step="0.01" min="0.01">
-                <button class="save-btn" onclick="saveCoffeePrice(${id})">Save</button>
-                <button class="cancel-btn" onclick="renderCoffeeList()">Cancel</button>
+                       value="${coffee.cost.toFixed(2)}" step="0.01" min="0.01" style="width: 70px;">
+                <button class="save-btn" onclick="saveCoffee(${id})">Save</button>
+                <button class="cancel-btn" onclick="renderCoffeeList()">X</button>
             `;
-            document.getElementById(`edit-cost-${id}`).focus();
+            document.getElementById(`edit-weight-${id}`).focus();
         }
 
-        // Save coffee price
-        function saveCoffeePrice(id) {
-            const input = document.getElementById(`edit-cost-${id}`);
-            const newCost = parseFloat(input.value);
+        // Save coffee weight and price
+        function saveCoffee(id) {
+            const weightInput = document.getElementById(`edit-weight-${id}`);
+            const costInput = document.getElementById(`edit-cost-${id}`);
+            const newWeight = parseFloat(weightInput.value);
+            const newCost = parseFloat(costInput.value);
+
+            if (isNaN(newWeight) || newWeight <= 0) {
+                alert('Weight must be greater than 0');
+                return;
+            }
 
             if (isNaN(newCost) || newCost <= 0) {
                 alert('Cost must be greater than 0');
@@ -577,11 +582,25 @@
 
             const coffee = coffees.find(c => c.id === id);
             if (coffee) {
+                const oldWeight = coffee.weight || 0;
+                coffee.weight = newWeight;
                 coffee.cost = newCost;
+
+                // Check if allocations exceed new weight
+                const allocatedGrams = getAllocatedGrams(id);
+                const newTotalGrams = newWeight * 1000;
+
+                if (allocatedGrams > newTotalGrams) {
+                    alert(`Cannot reduce weight to ${newWeight}kg. ${allocatedGrams}g already allocated.`);
+                    coffee.weight = oldWeight;
+                    renderCoffeeList();
+                    return;
+                }
 
                 // Update allocation values for this coffee
                 allocations.forEach(a => {
                     if (a.coffeeId === id) {
+                        a.fraction = a.grams / newTotalGrams;
                         a.value = coffee.cost * a.fraction;
                     }
                 });
@@ -624,10 +643,10 @@
                     <tr id="coffee-row-${coffee.id}">
                         <td>${coffee.id}</td>
                         <td>${escapeHtml(coffee.name)}</td>
-                        <td>${(coffee.weight || 0).toFixed(2)} kg</td>
+                        <td id="coffee-weight-${coffee.id}">${(coffee.weight || 0).toFixed(2)} kg</td>
                         <td id="coffee-cost-${coffee.id}">R$${coffee.cost.toFixed(2)}</td>
                         <td>
-                            <button class="edit-btn" onclick="editCoffeePrice(${coffee.id})">Edit</button>
+                            <button class="edit-btn" onclick="editCoffee(${coffee.id})">Edit</button>
                             <button class="delete-btn" onclick="deleteCoffee(${coffee.id})">Delete</button>
                         </td>
                     </tr>
@@ -1084,118 +1103,61 @@
             `;
         }
 
-        // Enable/disable markup value input based on type selection
-        markupTypeSelect.addEventListener('change', function() {
-            const hasType = markupTypeSelect.value !== '';
-            markupValueInput.disabled = !hasType;
-            if (!hasType) {
-                markupValueInput.value = '';
-            }
-            markupValueInput.placeholder = markupTypeSelect.value === 'percentage' ? 'e.g., 5' : '0.00';
-        });
-
         // Markup form handler
         markupForm.addEventListener('submit', function(e) {
             e.preventDefault();
 
             markupError.textContent = '';
 
-            const type = markupTypeSelect.value;
+            const value = parseFloat(markupValueInput.value) || 0;
 
-            if (!type) {
-                markup = { type: null, value: 0 };
-                saveToStorage();
-                renderMarkupSummary();
+            if (value < 0) {
+                markupError.textContent = 'Markup must be 0 or greater';
                 return;
             }
 
-            const value = parseFloat(markupValueInput.value);
-
-            if (isNaN(value) || value < 0) {
-                markupError.textContent = 'Please enter a valid value (0 or greater)';
-                return;
-            }
-
-            if (type === 'percentage' && value > 100) {
-                markupError.textContent = 'Percentage cannot exceed 100%';
-                return;
-            }
-
-            markup = { type: type, value: value };
+            markup = { type: 'perkg', value: value };
             saveToStorage();
             renderMarkupSummary();
             renderSettlementSummary();
         });
-
-        // Clear markup
-        function clearMarkup() {
-            markup = { type: null, value: 0 };
-            markupTypeSelect.value = '';
-            markupValueInput.value = '';
-            markupValueInput.disabled = true;
-            markupError.textContent = '';
-            saveToStorage();
-            renderMarkupSummary();
-            renderSettlementSummary();
-        }
 
         // Get total allocation value (sum of all coffee allocations)
         function getTotalAllocationValue() {
             return allocations.reduce((sum, a) => sum + a.value, 0);
         }
 
-        // Calculate markup amount
+        // Get total allocated grams across all allocations
+        function getTotalAllocatedGrams() {
+            return allocations.reduce((sum, a) => sum + (a.grams || 0), 0);
+        }
+
+        // Calculate total markup amount (markup per kg × total kg)
         function getMarkupAmount() {
-            if (!markup.type || markup.value === 0) {
+            if (!markup.value || markup.value === 0) {
                 return 0;
             }
-
-            if (markup.type === 'percentage') {
-                const totalAllocations = getTotalAllocationValue();
-                return Math.round((totalAllocations * markup.value / 100) * 100) / 100;
-            } else {
-                return markup.value;
-            }
+            const totalKg = getTotalAllocatedGrams() / 1000;
+            return Math.round((markup.value * totalKg) * 100) / 100;
         }
 
         // Render markup summary
         function renderMarkupSummary() {
-            // Update form fields with current values
-            if (markup.type) {
-                markupTypeSelect.value = markup.type;
-                markupValueInput.disabled = false;
-                markupValueInput.value = markup.value > 0 ? markup.value : '';
-                markupValueInput.placeholder = markup.type === 'percentage' ? 'e.g., 5' : '0.00';
-            }
+            // Update form field with current value
+            markupValueInput.value = markup.value > 0 ? markup.value : '';
 
-            if (!markup.type || markup.value === 0) {
+            if (!markup.value || markup.value === 0) {
                 markupSummaryDiv.innerHTML = '';
                 return;
             }
 
-            const totalAllocations = getTotalAllocationValue();
+            const totalKg = getTotalAllocatedGrams() / 1000;
             const markupAmount = getMarkupAmount();
-            const numParticipants = participants.length;
 
             let html = `<div class="markup-summary">`;
-
-            if (markup.type === 'percentage') {
-                html += `<p>Markup: <span class="highlight">${markup.value}%</span> of allocations</p>`;
-                html += `<p>Total Allocations: <span class="highlight">R$${totalAllocations.toFixed(2)}</span></p>`;
-            } else {
-                html += `<p>Markup: <span class="highlight">Fixed R$${markup.value.toFixed(2)}</span></p>`;
-            }
-
-            html += `<p>Markup Amount: <span class="highlight">R$${markupAmount.toFixed(2)}</span></p>`;
-
-            if (numParticipants === 0) {
-                html += `<p style="color: #ef6c00;">Add participants to calculate markup per person.</p>`;
-            } else {
-                const markupPerPerson = Math.round((markupAmount / numParticipants) * 100) / 100;
-                html += `<p>Participants: <span class="highlight">${numParticipants}</span></p>`;
-                html += `<p>Markup per Person: <span class="highlight">R$${markupPerPerson.toFixed(2)}</span></p>`;
-            }
-
+            html += `<p>Markup: <span class="highlight">R$${markup.value.toFixed(2)}/kg</span></p>`;
+            html += `<p>Total Weight: <span class="highlight">${totalKg.toFixed(2)} kg</span></p>`;
+            html += `<p>Total Markup: <span class="highlight">R$${markupAmount.toFixed(2)}</span></p>`;
             html += `</div>`;
             markupSummaryDiv.innerHTML = html;
         }
@@ -1213,22 +1175,19 @@
             return Math.round((freightTotal / participants.length) * 100) / 100;
         }
 
-        // Get markup for a specific participant based on their coffee allocation
+        // Get participant's allocated grams
+        function getParticipantGrams(participantId) {
+            return allocations
+                .filter(a => a.participantId === participantId)
+                .reduce((sum, a) => sum + (a.grams || 0), 0);
+        }
+
+        // Get markup for a specific participant based on their kg
         function getParticipantMarkup(participantId) {
-            if (!markup.type || markup.value === 0) return 0;
+            if (!markup.value || markup.value === 0) return 0;
 
-            const participantCoffee = getParticipantCoffeeTotal(participantId);
-
-            if (markup.type === 'percentage') {
-                // Apply percentage to participant's coffee total
-                return Math.round((participantCoffee * markup.value / 100) * 100) / 100;
-            } else {
-                // Fixed markup: distribute proportionally based on coffee allocation share
-                const totalAllocations = getTotalAllocationValue();
-                if (totalAllocations === 0) return 0;
-                const share = participantCoffee / totalAllocations;
-                return Math.round((markup.value * share) * 100) / 100;
-            }
+            const participantKg = getParticipantGrams(participantId) / 1000;
+            return Math.round((markup.value * participantKg) * 100) / 100;
         }
 
         // Render settlement summary
