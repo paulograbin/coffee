@@ -140,6 +140,37 @@
             font-weight: 600;
             color: #1565c0;
         }
+        .markup-summary {
+            background: #f3e5f5;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+        .markup-summary p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        .markup-summary .highlight {
+            font-weight: 600;
+            color: #7b1fa2;
+        }
+        .inline-form {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        .inline-form .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        .clear-btn {
+            background: #757575;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        .clear-btn:hover {
+            background: #616161;
+        }
     </style>
 </head>
 <body>
@@ -197,6 +228,32 @@
     </div>
 
     <div class="card">
+        <h2>Markup (Optional)</h2>
+        <form id="markupForm">
+            <div class="inline-form">
+                <div class="form-group">
+                    <label for="markupType">Type</label>
+                    <select id="markupType">
+                        <option value="">-- No Markup --</option>
+                        <option value="percentage">Percentage (%)</option>
+                        <option value="fixed">Fixed Value ($)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="markupValue">Value</label>
+                    <input type="number" id="markupValue" step="0.01" min="0" placeholder="0.00" disabled>
+                </div>
+            </div>
+            <div id="markupError" class="error"></div>
+            <div style="margin-top: 15px;">
+                <button type="submit">Set Markup</button>
+                <button type="button" class="clear-btn" onclick="clearMarkup()">Clear Markup</button>
+            </div>
+        </form>
+        <div id="markupSummary"></div>
+    </div>
+
+    <div class="card">
         <h2>Allocate Coffee</h2>
         <form id="allocationForm">
             <div class="form-group">
@@ -238,6 +295,7 @@
         let allocations = [];
         let nextAllocationId = 1;
         let freightTotal = 0;
+        let markup = { type: null, value: 0 };
 
         // LocalStorage keys
         const STORAGE_KEYS = {
@@ -247,7 +305,8 @@
             nextCoffeeId: 'coffee_settlement_nextCoffeeId',
             nextParticipantId: 'coffee_settlement_nextParticipantId',
             nextAllocationId: 'coffee_settlement_nextAllocationId',
-            freightTotal: 'coffee_settlement_freightTotal'
+            freightTotal: 'coffee_settlement_freightTotal',
+            markup: 'coffee_settlement_markup'
         };
 
         // Save all data to localStorage
@@ -259,6 +318,7 @@
             localStorage.setItem(STORAGE_KEYS.nextParticipantId, nextParticipantId);
             localStorage.setItem(STORAGE_KEYS.nextAllocationId, nextAllocationId);
             localStorage.setItem(STORAGE_KEYS.freightTotal, freightTotal);
+            localStorage.setItem(STORAGE_KEYS.markup, JSON.stringify(markup));
         }
 
         // Load all data from localStorage
@@ -278,6 +338,8 @@
             if (storedNextAllocationId) nextAllocationId = parseInt(storedNextAllocationId);
             const storedFreightTotal = localStorage.getItem(STORAGE_KEYS.freightTotal);
             if (storedFreightTotal) freightTotal = parseFloat(storedFreightTotal);
+            const storedMarkup = localStorage.getItem(STORAGE_KEYS.markup);
+            if (storedMarkup) markup = JSON.parse(storedMarkup);
         }
 
         // Load data on startup
@@ -303,6 +365,11 @@
         const freightCostInput = document.getElementById('freightCost');
         const freightError = document.getElementById('freightError');
         const freightSummaryDiv = document.getElementById('freightSummary');
+        const markupForm = document.getElementById('markupForm');
+        const markupTypeSelect = document.getElementById('markupType');
+        const markupValueInput = document.getElementById('markupValue');
+        const markupError = document.getElementById('markupError');
+        const markupSummaryDiv = document.getElementById('markupSummary');
 
         // Add coffee product
         coffeeForm.addEventListener('submit', function(e) {
@@ -431,6 +498,7 @@
             renderParticipantList();
             updateAllocationDropdowns();
             renderFreightSummary();
+            renderMarkupSummary();
 
             // Reset form
             participantForm.reset();
@@ -446,6 +514,7 @@
             renderAllocationList();
             updateAllocationDropdowns();
             renderFreightSummary();
+            renderMarkupSummary();
         }
 
         // Render participant list
@@ -564,6 +633,7 @@
             saveToStorage();
             renderAllocationList();
             updateAllocationDropdowns();
+            renderMarkupSummary();
 
             // Reset form
             allocationForm.reset();
@@ -575,6 +645,7 @@
             saveToStorage();
             renderAllocationList();
             updateAllocationDropdowns();
+            renderMarkupSummary();
         }
 
         // Render allocation list
@@ -700,12 +771,127 @@
             `;
         }
 
+        // Enable/disable markup value input based on type selection
+        markupTypeSelect.addEventListener('change', function() {
+            const hasType = markupTypeSelect.value !== '';
+            markupValueInput.disabled = !hasType;
+            if (!hasType) {
+                markupValueInput.value = '';
+            }
+            markupValueInput.placeholder = markupTypeSelect.value === 'percentage' ? 'e.g., 5' : '0.00';
+        });
+
+        // Markup form handler
+        markupForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            markupError.textContent = '';
+
+            const type = markupTypeSelect.value;
+
+            if (!type) {
+                markup = { type: null, value: 0 };
+                saveToStorage();
+                renderMarkupSummary();
+                return;
+            }
+
+            const value = parseFloat(markupValueInput.value);
+
+            if (isNaN(value) || value < 0) {
+                markupError.textContent = 'Please enter a valid value (0 or greater)';
+                return;
+            }
+
+            if (type === 'percentage' && value > 100) {
+                markupError.textContent = 'Percentage cannot exceed 100%';
+                return;
+            }
+
+            markup = { type: type, value: value };
+            saveToStorage();
+            renderMarkupSummary();
+        });
+
+        // Clear markup
+        function clearMarkup() {
+            markup = { type: null, value: 0 };
+            markupTypeSelect.value = '';
+            markupValueInput.value = '';
+            markupValueInput.disabled = true;
+            markupError.textContent = '';
+            saveToStorage();
+            renderMarkupSummary();
+        }
+
+        // Get total allocation value (sum of all coffee allocations)
+        function getTotalAllocationValue() {
+            return allocations.reduce((sum, a) => sum + a.value, 0);
+        }
+
+        // Calculate markup amount
+        function getMarkupAmount() {
+            if (!markup.type || markup.value === 0) {
+                return 0;
+            }
+
+            if (markup.type === 'percentage') {
+                const totalAllocations = getTotalAllocationValue();
+                return Math.round((totalAllocations * markup.value / 100) * 100) / 100;
+            } else {
+                return markup.value;
+            }
+        }
+
+        // Render markup summary
+        function renderMarkupSummary() {
+            // Update form fields with current values
+            if (markup.type) {
+                markupTypeSelect.value = markup.type;
+                markupValueInput.disabled = false;
+                markupValueInput.value = markup.value > 0 ? markup.value : '';
+                markupValueInput.placeholder = markup.type === 'percentage' ? 'e.g., 5' : '0.00';
+            }
+
+            if (!markup.type || markup.value === 0) {
+                markupSummaryDiv.innerHTML = '';
+                return;
+            }
+
+            const totalAllocations = getTotalAllocationValue();
+            const markupAmount = getMarkupAmount();
+            const numParticipants = participants.length;
+
+            let html = `<div class="markup-summary">`;
+
+            if (markup.type === 'percentage') {
+                html += `<p>Markup: <span class="highlight">${markup.value}%</span> of allocations</p>`;
+                html += `<p>Total Allocations: <span class="highlight">$${totalAllocations.toFixed(2)}</span></p>`;
+            } else {
+                html += `<p>Markup: <span class="highlight">Fixed $${markup.value.toFixed(2)}</span></p>`;
+            }
+
+            html += `<p>Markup Amount: <span class="highlight">$${markupAmount.toFixed(2)}</span></p>`;
+
+            if (numParticipants === 0) {
+                html += `<p style="color: #ef6c00;">Add participants to calculate markup per person.</p>`;
+            } else {
+                const markupPerPerson = Math.round((markupAmount / numParticipants) * 100) / 100;
+                html += `<p>Participants: <span class="highlight">${numParticipants}</span></p>`;
+                html += `<p>Markup per Person: <span class="highlight">$${markupPerPerson.toFixed(2)}</span></p>`;
+            }
+
+            html += `</div>`;
+            markupSummaryDiv.innerHTML = html;
+        }
+
         // Initial render
         renderCoffeeList();
         renderParticipantList();
         renderAllocationList();
         updateAllocationDropdowns();
         renderFreightSummary();
+        renderMarkupSummary();
     </script>
 </body>
 </html>
