@@ -223,7 +223,7 @@
                 <input type="text" id="coffeeName" placeholder="e.g., Colombian Dark Roast" required>
             </div>
             <div class="form-group">
-                <label for="coffeeCost">Package Cost ($)</label>
+                <label for="coffeeCost">Package Cost (R$)</label>
                 <input type="number" id="coffeeCost" step="0.01" min="0.01" placeholder="0.00" required>
                 <div id="costError" class="error"></div>
             </div>
@@ -257,7 +257,7 @@
         <h2>Freight Cost</h2>
         <form id="freightForm">
             <div class="form-group">
-                <label for="freightCost">Freight Total ($)</label>
+                <label for="freightCost">Freight Total (R$)</label>
                 <input type="number" id="freightCost" step="0.01" min="0" placeholder="0.00" required>
                 <div id="freightError" class="error"></div>
             </div>
@@ -275,7 +275,7 @@
                     <select id="markupType">
                         <option value="">-- No Markup --</option>
                         <option value="percentage">Percentage (%)</option>
-                        <option value="fixed">Fixed Value ($)</option>
+                        <option value="fixed">Fixed Value (R$)</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -487,7 +487,7 @@
                     <tr>
                         <td>${coffee.id}</td>
                         <td>${escapeHtml(coffee.name)}</td>
-                        <td>$${coffee.cost.toFixed(2)}</td>
+                        <td>R$${coffee.cost.toFixed(2)}</td>
                         <td><button class="delete-btn" onclick="deleteCoffee(${coffee.id})">Delete</button></td>
                     </tr>
                 `;
@@ -498,7 +498,7 @@
                     <tfoot>
                         <tr>
                             <th colspan="2">Total</th>
-                            <th>$${total.toFixed(2)}</th>
+                            <th>R$${total.toFixed(2)}</th>
                             <th></th>
                         </tr>
                     </tfoot>
@@ -624,7 +624,7 @@
                 const status = allocated >= 1 ? ' (Fully Allocated)' : allocated > 0 ? ` (${allocated * 100}% allocated)` : '';
                 const option = document.createElement('option');
                 option.value = coffee.id;
-                option.textContent = `${coffee.name} - $${coffee.cost.toFixed(2)}${status}`;
+                option.textContent = `${coffee.name} - R$${coffee.cost.toFixed(2)}${status}`;
                 option.disabled = allocated >= 1;
                 allocationCoffeeSelect.appendChild(option);
             });
@@ -729,7 +729,7 @@
                         <td>${coffee ? escapeHtml(coffee.name) : 'Unknown'}</td>
                         <td>${participant ? escapeHtml(participant.name) : 'Unknown'}</td>
                         <td>${allocation.fraction === 1 ? 'Whole' : 'Half'} (${allocation.fraction})</td>
-                        <td>$${allocation.value.toFixed(2)}</td>
+                        <td>R$${allocation.value.toFixed(2)}</td>
                         <td><button class="delete-btn" onclick="deleteAllocation(${allocation.id})">Delete</button></td>
                     </tr>
                 `;
@@ -805,7 +805,7 @@
             if (numParticipants === 0) {
                 freightSummaryDiv.innerHTML = `
                     <div class="freight-summary">
-                        <p>Freight Total: <span class="highlight">$${freightTotal.toFixed(2)}</span></p>
+                        <p>Freight Total: <span class="highlight">R$${freightTotal.toFixed(2)}</span></p>
                         <p style="color: #ef6c00;">Add participants to calculate freight per person.</p>
                     </div>
                 `;
@@ -816,9 +816,9 @@
 
             freightSummaryDiv.innerHTML = `
                 <div class="freight-summary">
-                    <p>Freight Total: <span class="highlight">$${freightTotal.toFixed(2)}</span></p>
+                    <p>Freight Total: <span class="highlight">R$${freightTotal.toFixed(2)}</span></p>
                     <p>Participants: <span class="highlight">${numParticipants}</span></p>
-                    <p>Freight per Person: <span class="highlight">$${freightPerPerson.toFixed(2)}</span></p>
+                    <p>Freight per Person: <span class="highlight">R$${freightPerPerson.toFixed(2)}</span></p>
                 </div>
             `;
         }
@@ -920,19 +920,19 @@
 
             if (markup.type === 'percentage') {
                 html += `<p>Markup: <span class="highlight">${markup.value}%</span> of allocations</p>`;
-                html += `<p>Total Allocations: <span class="highlight">$${totalAllocations.toFixed(2)}</span></p>`;
+                html += `<p>Total Allocations: <span class="highlight">R$${totalAllocations.toFixed(2)}</span></p>`;
             } else {
-                html += `<p>Markup: <span class="highlight">Fixed $${markup.value.toFixed(2)}</span></p>`;
+                html += `<p>Markup: <span class="highlight">Fixed R$${markup.value.toFixed(2)}</span></p>`;
             }
 
-            html += `<p>Markup Amount: <span class="highlight">$${markupAmount.toFixed(2)}</span></p>`;
+            html += `<p>Markup Amount: <span class="highlight">R$${markupAmount.toFixed(2)}</span></p>`;
 
             if (numParticipants === 0) {
                 html += `<p style="color: #ef6c00;">Add participants to calculate markup per person.</p>`;
             } else {
                 const markupPerPerson = Math.round((markupAmount / numParticipants) * 100) / 100;
                 html += `<p>Participants: <span class="highlight">${numParticipants}</span></p>`;
-                html += `<p>Markup per Person: <span class="highlight">$${markupPerPerson.toFixed(2)}</span></p>`;
+                html += `<p>Markup per Person: <span class="highlight">R$${markupPerPerson.toFixed(2)}</span></p>`;
             }
 
             html += `</div>`;
@@ -1000,10 +1000,10 @@
                 html += `
                     <tr>
                         <td>${escapeHtml(participant.name)}</td>
-                        <td>$${coffeeTotal.toFixed(2)}</td>
-                        <td>$${freightPP.toFixed(2)}</td>
-                        <td>$${markupPP.toFixed(2)}</td>
-                        <td><strong>$${totalOwed.toFixed(2)}</strong></td>
+                        <td>R$${coffeeTotal.toFixed(2)}</td>
+                        <td>R$${freightPP.toFixed(2)}</td>
+                        <td>R$${markupPP.toFixed(2)}</td>
+                        <td><strong>R$${totalOwed.toFixed(2)}</strong></td>
                     </tr>
                 `;
             });
@@ -1016,10 +1016,10 @@
                     <tfoot>
                         <tr>
                             <th>Total</th>
-                            <td>$${totalAllocations.toFixed(2)}</td>
-                            <td>$${freightTotal.toFixed(2)}</td>
-                            <td>$${markupAmount.toFixed(2)}</td>
-                            <th>$${grandTotalOwed.toFixed(2)}</th>
+                            <td>R$${totalAllocations.toFixed(2)}</td>
+                            <td>R$${freightTotal.toFixed(2)}</td>
+                            <td>R$${markupAmount.toFixed(2)}</td>
+                            <th>R$${grandTotalOwed.toFixed(2)}</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -1033,13 +1033,13 @@
             html += `
                 <div class="reconciliation">
                     <h3>Reconciliation</h3>
-                    <p>Sum of Coffee Allocations: <strong>$${totalAllocations.toFixed(2)}</strong></p>
-                    <p>Freight Total: <strong>$${freightTotal.toFixed(2)}</strong></p>
-                    <p>Markup Total: <strong>$${markupAmount.toFixed(2)}</strong></p>
-                    <p>Expected Total: <strong>$${expectedTotal.toFixed(2)}</strong></p>
-                    <p>Sum of Participant Totals: <strong>$${grandTotalOwed.toFixed(2)}</strong></p>
+                    <p>Sum of Coffee Allocations: <strong>R$${totalAllocations.toFixed(2)}</strong></p>
+                    <p>Freight Total: <strong>R$${freightTotal.toFixed(2)}</strong></p>
+                    <p>Markup Total: <strong>R$${markupAmount.toFixed(2)}</strong></p>
+                    <p>Expected Total: <strong>R$${expectedTotal.toFixed(2)}</strong></p>
+                    <p>Sum of Participant Totals: <strong>R$${grandTotalOwed.toFixed(2)}</strong></p>
                     <p class="${isMatch ? 'match' : 'mismatch'}">
-                        ${isMatch ? 'Totals match!' : `Difference: $${difference.toFixed(2)} (rounding)`}
+                        ${isMatch ? 'Totals match!' : `Difference: R$${difference.toFixed(2)} (rounding)`}
                     </p>
                 </div>
             `;
