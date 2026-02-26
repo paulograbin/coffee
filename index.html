@@ -312,11 +312,11 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="allocationFraction">Fraction</label>
-                <select id="allocationFraction" required>
-                    <option value="">-- Select Fraction --</option>
-                    <option value="0.5">Half (0.5)</option>
-                    <option value="1.0">Whole (1.0)</option>
+                <label for="allocationAmount">Amount</label>
+                <select id="allocationAmount" required>
+                    <option value="">-- Select Amount --</option>
+                    <option value="500">500g</option>
+                    <option value="1000">1000g</option>
                 </select>
             </div>
             <div id="allocationError" class="error"></div>
@@ -407,7 +407,7 @@
         const allocationForm = document.getElementById('allocationForm');
         const allocationCoffeeSelect = document.getElementById('allocationCoffee');
         const allocationParticipantSelect = document.getElementById('allocationParticipant');
-        const allocationFractionSelect = document.getElementById('allocationFraction');
+        const allocationAmountSelect = document.getElementById('allocationAmount');
         const allocationError = document.getElementById('allocationError');
         const allocationListDiv = document.getElementById('allocationList');
         const freightForm = document.getElementById('freightForm');
@@ -619,11 +619,11 @@
             participantListDiv.innerHTML = html;
         }
 
-        // Get total allocated fraction for a coffee
-        function getAllocatedFraction(coffeeId) {
+        // Get total allocated grams for a coffee
+        function getAllocatedGrams(coffeeId) {
             return allocations
                 .filter(a => a.coffeeId === coffeeId)
-                .reduce((sum, a) => sum + a.fraction, 0);
+                .reduce((sum, a) => sum + a.grams, 0);
         }
 
         // Update allocation dropdowns
@@ -631,12 +631,14 @@
             // Update coffee dropdown
             allocationCoffeeSelect.innerHTML = '<option value="">-- Select Coffee --</option>';
             coffees.forEach(coffee => {
-                const allocated = getAllocatedFraction(coffee.id);
-                const status = allocated >= 1 ? ' (Fully Allocated)' : allocated > 0 ? ` (${allocated * 100}% allocated)` : '';
+                const allocatedGrams = getAllocatedGrams(coffee.id);
+                const totalGrams = (coffee.weight || 0) * 1000;
+                const remainingGrams = totalGrams - allocatedGrams;
+                const status = remainingGrams <= 0 ? ' (Fully Allocated)' : allocatedGrams > 0 ? ` (${allocatedGrams}g/${totalGrams}g allocated)` : '';
                 const option = document.createElement('option');
                 option.value = coffee.id;
-                option.textContent = `${coffee.name} - R$${coffee.cost.toFixed(2)}${status}`;
-                option.disabled = allocated >= 1;
+                option.textContent = `${coffee.name} - ${coffee.weight}kg - R$${coffee.cost.toFixed(2)}${status}`;
+                option.disabled = remainingGrams <= 0;
                 allocationCoffeeSelect.appendChild(option);
             });
 
@@ -658,26 +660,30 @@
 
             const coffeeId = parseInt(allocationCoffeeSelect.value);
             const participantId = parseInt(allocationParticipantSelect.value);
-            const fraction = parseFloat(allocationFractionSelect.value);
+            const grams = parseInt(allocationAmountSelect.value);
 
-            if (!coffeeId || !participantId || !fraction) {
+            if (!coffeeId || !participantId || !grams) {
                 allocationError.textContent = 'Please select all fields';
                 return;
             }
 
-            // Get current allocation for this coffee
-            const currentAllocated = getAllocatedFraction(coffeeId);
-            const newTotal = currentAllocated + fraction;
+            // Get coffee details
+            const coffee = coffees.find(c => c.id === coffeeId);
+            const totalGrams = (coffee.weight || 0) * 1000;
 
-            // Validate sum doesn't exceed 1.0
-            if (newTotal > 1.0) {
-                const remaining = 1.0 - currentAllocated;
-                allocationError.textContent = `Cannot allocate ${fraction}. Only ${remaining} remaining for this coffee.`;
+            // Get current allocation for this coffee
+            const currentAllocatedGrams = getAllocatedGrams(coffeeId);
+            const newTotalGrams = currentAllocatedGrams + grams;
+
+            // Validate sum doesn't exceed total weight
+            if (newTotalGrams > totalGrams) {
+                const remainingGrams = totalGrams - currentAllocatedGrams;
+                allocationError.textContent = `Cannot allocate ${grams}g. Only ${remainingGrams}g remaining for this coffee.`;
                 return;
             }
 
-            // Get coffee details for calculating value
-            const coffee = coffees.find(c => c.id === coffeeId);
+            // Calculate value based on weight proportion
+            const fraction = grams / totalGrams;
             const allocationValue = coffee.cost * fraction;
 
             // Create allocation
@@ -685,6 +691,7 @@
                 id: nextAllocationId++,
                 coffeeId: coffeeId,
                 participantId: participantId,
+                grams: grams,
                 fraction: fraction,
                 value: allocationValue
             };
@@ -723,7 +730,7 @@
                         <tr>
                             <th>Coffee</th>
                             <th>Participant</th>
-                            <th>Fraction</th>
+                            <th>Amount</th>
                             <th>Value</th>
                             <th>Action</th>
                         </tr>
@@ -739,7 +746,7 @@
                     <tr>
                         <td>${coffee ? escapeHtml(coffee.name) : 'Unknown'}</td>
                         <td>${participant ? escapeHtml(participant.name) : 'Unknown'}</td>
-                        <td>${allocation.fraction === 1 ? 'Whole' : 'Half'} (${allocation.fraction})</td>
+                        <td>${allocation.grams || (allocation.fraction * 1000)}g</td>
                         <td>R$${allocation.value.toFixed(2)}</td>
                         <td><button class="delete-btn" onclick="deleteAllocation(${allocation.id})">Delete</button></td>
                     </tr>
@@ -752,15 +759,17 @@
             `;
 
             // Add coffee allocation status summary
-            html += '<h3 style="margin-top: 20px;">Coffee Allocation Status</h3><table><thead><tr><th>Coffee</th><th>Allocated</th><th>Status</th></tr></thead><tbody>';
+            html += '<h3 style="margin-top: 20px;">Coffee Allocation Status</h3><table><thead><tr><th>Coffee</th><th>Allocated</th><th>Remaining</th><th>Status</th></tr></thead><tbody>';
 
             coffees.forEach(coffee => {
-                const allocated = getAllocatedFraction(coffee.id);
+                const allocatedGrams = getAllocatedGrams(coffee.id);
+                const totalGrams = (coffee.weight || 0) * 1000;
+                const remainingGrams = totalGrams - allocatedGrams;
                 let statusClass, statusText;
-                if (allocated >= 1) {
+                if (remainingGrams <= 0) {
                     statusClass = 'status-full';
                     statusText = 'Fully Allocated';
-                } else if (allocated > 0) {
+                } else if (allocatedGrams > 0) {
                     statusClass = 'status-partial';
                     statusText = 'Partially Allocated';
                 } else {
@@ -771,7 +780,8 @@
                 html += `
                     <tr>
                         <td>${escapeHtml(coffee.name)}</td>
-                        <td>${(allocated * 100).toFixed(0)}%</td>
+                        <td>${allocatedGrams}g / ${totalGrams}g</td>
+                        <td>${remainingGrams}g</td>
                         <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                     </tr>
                 `;
