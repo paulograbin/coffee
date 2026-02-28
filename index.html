@@ -348,23 +348,17 @@
                     <div id="costError" class="error"></div>
                     <button type="submit" style="margin-top: 10px;">Add Coffee</button>
                 </form>
-            </div>
-
-            <div class="card card-compact">
-                <h2>Add Participant</h2>
-                <form id="participantForm">
-                    <div class="inline-form">
-                        <div class="form-group" style="flex: 2;">
-                            <label for="participantName">Name</label>
-                            <input type="text" id="participantName" placeholder="Participant name" required>
-                        </div>
-                        <div class="form-group" style="flex: 0;">
-                            <label>&nbsp;</label>
-                            <button type="submit">Add</button>
-                        </div>
+                <details style="margin-top: 10px;">
+                    <summary style="cursor: pointer; color: #6b4423; font-size: 12px;">Import from CSV/Spreadsheet
+                    </summary>
+                    <div style="margin-top: 8px;">
+                        <textarea id="coffeeImport" rows="3" style="width: 100%; font-size: 12px;"
+                            placeholder="Paste: Name, Weight(kg), Price/kg (one per line)"></textarea>
+                        <button type="button" onclick="importCoffees()"
+                            style="margin-top: 5px; font-size: 12px; padding: 5px 10px;">Import</button>
+                        <span id="importError" class="error"></span>
                     </div>
-                    <div id="participantError" class="error"></div>
-                </form>
+                </details>
             </div>
 
             <div class="card card-compact">
@@ -400,32 +394,31 @@
                 <div id="markupSummary"></div>
             </div>
 
+        </div>
+
+        <!-- Right Column: Lists -->
+        <div class="section-group">
             <div class="card card-compact">
-                <h2>Allocate Coffee</h2>
-                <form id="allocationForm">
+                <h2>Participants</h2>
+                <form id="participantForm">
                     <div class="inline-form">
                         <div class="form-group" style="flex: 2;">
+                            <label for="participantName">Names (comma-separated)</label>
+                            <input type="text" id="participantName" placeholder="John, Maria, Pedro" required>
                         </div>
                         <div class="form-group" style="flex: 0;">
                             <label>&nbsp;</label>
                             <button type="submit">Add</button>
                         </div>
                     </div>
-                    <div id="allocationError" class="error"></div>
+                    <div id="participantError" class="error"></div>
                 </form>
+                <div id="participantList"></div>
             </div>
-        </div>
 
-        <!-- Right Column: Lists -->
-        <div class="section-group">
             <div class="card card-compact">
                 <h2>Coffee Products</h2>
                 <div id="coffeeList"></div>
-            </div>
-
-            <div class="card card-compact">
-                <h2>Participants</h2>
-                <div id="participantList"></div>
             </div>
 
             <div class="card card-compact">
@@ -773,42 +766,57 @@
             return div.innerHTML;
         }
 
-        // Add participant
-        participantForm.addEventListener('submit', function(e) {
+        // Add participant(s) - supports comma-separated names
+        participantForm.addEventListener('submit', function (e) {
             e.preventDefault();
 
-            const name = participantNameInput.value.trim();
+            const input = participantNameInput.value.trim();
+            const names = input.split(',').map(n => n.trim()).filter(n => n.length > 0);
 
             // Clear previous error
             participantError.textContent = '';
 
-            // Check for duplicate names (case-insensitive)
-            const isDuplicate = participants.some(
-                p => p.name.toLowerCase() === name.toLowerCase()
-            );
-
-            if (isDuplicate) {
-                participantError.textContent = 'A participant with this name already exists';
+            if (names.length === 0) {
+                participantError.textContent = 'Please enter at least one name';
                 return;
             }
 
-            // Create participant object with unique ID
-            const participant = {
-                id: nextParticipantId++,
-                name: name
-            };
+            // Check for duplicates
+            const duplicates = [];
+            const added = [];
 
-            participants.push(participant);
-            saveToStorage();
-            renderParticipantList();
-            updateAllocationDropdowns();
-            renderFreightSummary();
-            renderMarkupSummary();
-            renderSettlementSummary();
+            names.forEach(name => {
+                const isDuplicate = participants.some(
+                    p => p.name.toLowerCase() === name.toLowerCase()
+                ) || added.some(n => n.toLowerCase() === name.toLowerCase());
+
+                if (isDuplicate) {
+                    duplicates.push(name);
+                } else {
+                    participants.push({
+                        id: nextParticipantId++,
+                        name: name
+                    });
+                    added.push(name);
+                }
+            });
+
+            if (added.length > 0) {
+                saveToStorage();
+                renderParticipantList();
+                renderFreightSummary();
+                renderMarkupSummary();
+                renderSettlementSummary();
+                renderAllocationMatrix();
+            }
 
             // Reset form
             participantForm.reset();
             participantNameInput.focus();
+
+            if (duplicates.length > 0) {
+                participantError.textContent = `Skipped duplicates: ${duplicates.join(', ')}`;
+            }
         });
 
         // Delete participant
