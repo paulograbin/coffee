@@ -405,24 +405,6 @@
                 <form id="allocationForm">
                     <div class="inline-form">
                         <div class="form-group" style="flex: 2;">
-                            <label for="allocationCoffee">Coffee</label>
-                            <select id="allocationCoffee" required>
-                                <option value="">-- Select --</option>
-                            </select>
-                        </div>
-                        <div class="form-group" style="flex: 2;">
-                            <label for="allocationParticipant">Participant</label>
-                            <select id="allocationParticipant" required>
-                                <option value="">-- Select --</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="allocationAmount">Amount</label>
-                            <select id="allocationAmount" required>
-                                <option value="">--</option>
-                                <option value="500">500g</option>
-                                <option value="1000">1kg</option>
-                            </select>
                         </div>
                         <div class="form-group" style="flex: 0;">
                             <label>&nbsp;</label>
@@ -529,7 +511,6 @@
         const participantNameInput = document.getElementById('participantName');
         const participantError = document.getElementById('participantError');
         const participantListDiv = document.getElementById('participantList');
-        const allocationForm = document.getElementById('allocationForm');
         const allocationCoffeeSelect = document.getElementById('allocationCoffee');
         const allocationParticipantSelect = document.getElementById('allocationParticipant');
         const allocationAmountSelect = document.getElementById('allocationAmount');
@@ -572,7 +553,6 @@
             coffees.push(coffee);
             saveToStorage();
             renderCoffeeList();
-            updateAllocationDropdowns();
             renderSettlementSummary();
 
             // Reset form
@@ -587,7 +567,6 @@
             saveToStorage();
             renderCoffeeList();
             renderAllocationList();
-            updateAllocationDropdowns();
             renderSettlementSummary();
         }
 
@@ -658,7 +637,6 @@
                 saveToStorage();
                 renderCoffeeList();
                 renderAllocationList();
-                updateAllocationDropdowns();
                 renderMarkupSummary();
                 renderSettlementSummary();
             }
@@ -773,7 +751,6 @@
             saveToStorage();
             renderParticipantList();
             renderAllocationList();
-            updateAllocationDropdowns();
             renderFreightSummary();
             renderMarkupSummary();
             renderSettlementSummary();
@@ -820,8 +797,8 @@
                 saveToStorage();
                 renderParticipantList();
                 renderAllocationList();
-                updateAllocationDropdowns();
                 renderSettlementSummary();
+                renderAllocationMatrix();
             }
         }
 
@@ -877,94 +854,12 @@
                 .reduce((sum, a) => sum + a.grams, 0);
         }
 
-        // Update allocation dropdowns
-        function updateAllocationDropdowns() {
-            // Update coffee dropdown
-            allocationCoffeeSelect.innerHTML = '<option value="">-- Select Coffee --</option>';
-            coffees.forEach(coffee => {
-                const allocatedGrams = getAllocatedGrams(coffee.id);
-                const totalGrams = (coffee.weight || 0) * 1000;
-                const remainingGrams = totalGrams - allocatedGrams;
-                const status = remainingGrams <= 0 ? ' (Fully Allocated)' : allocatedGrams > 0 ? ` (${allocatedGrams}g/${totalGrams}g allocated)` : '';
-                const option = document.createElement('option');
-                option.value = coffee.id;
-                option.textContent = `${coffee.name} - ${coffee.weight}kg - R$${coffee.cost.toFixed(2)}${status}`;
-                option.disabled = remainingGrams <= 0;
-                allocationCoffeeSelect.appendChild(option);
-            });
-
-            // Update participant dropdown
-            allocationParticipantSelect.innerHTML = '<option value="">-- Select Participant --</option>';
-            participants.forEach(participant => {
-                const option = document.createElement('option');
-                option.value = participant.id;
-                option.textContent = participant.name;
-                allocationParticipantSelect.appendChild(option);
-            });
-        }
-
-        // Add allocation
-        allocationForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            allocationError.textContent = '';
-
-            const coffeeId = parseInt(allocationCoffeeSelect.value);
-            const participantId = parseInt(allocationParticipantSelect.value);
-            const grams = parseInt(allocationAmountSelect.value);
-
-            if (!coffeeId || !participantId || !grams) {
-                allocationError.textContent = 'Please select all fields';
-                return;
-            }
-
-            // Get coffee details
-            const coffee = coffees.find(c => c.id === coffeeId);
-            const totalGrams = (coffee.weight || 0) * 1000;
-
-            // Get current allocation for this coffee
-            const currentAllocatedGrams = getAllocatedGrams(coffeeId);
-            const newTotalGrams = currentAllocatedGrams + grams;
-
-            // Validate sum doesn't exceed total weight
-            if (newTotalGrams > totalGrams) {
-                const remainingGrams = totalGrams - currentAllocatedGrams;
-                allocationError.textContent = `Cannot allocate ${grams}g. Only ${remainingGrams}g remaining for this coffee.`;
-                return;
-            }
-
-            // Calculate value based on price per kg
-            const fraction = grams / totalGrams;
-            const allocationKg = grams / 1000;
-            const allocationValue = coffee.cost * allocationKg;
-
-            // Create allocation
-            const allocation = {
-                id: nextAllocationId++,
-                coffeeId: coffeeId,
-                participantId: participantId,
-                grams: grams,
-                fraction: fraction,
-                value: allocationValue
-            };
-
-            allocations.push(allocation);
-            saveToStorage();
-            renderAllocationList();
-            updateAllocationDropdowns();
-            renderMarkupSummary();
-            renderSettlementSummary();
-
-            // Reset form
-            allocationForm.reset();
-        });
 
         // Delete allocation
         function deleteAllocation(id) {
             allocations = allocations.filter(a => a.id !== id);
             saveToStorage();
             renderAllocationList();
-            updateAllocationDropdowns();
             renderMarkupSummary();
             renderSettlementSummary();
         }
@@ -1021,7 +916,6 @@
 
             saveToStorage();
             renderAllocationList();
-            updateAllocationDropdowns();
             renderMarkupSummary();
             renderSettlementSummary();
         }
@@ -1339,7 +1233,6 @@
         renderCoffeeList();
         renderParticipantList();
         renderAllocationList();
-        updateAllocationDropdowns();
         renderFreightSummary();
         renderMarkupSummary();
         renderSettlementSummary();
