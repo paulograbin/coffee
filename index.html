@@ -320,10 +320,172 @@
             color: #d32f2f;
             font-weight: 600;
         }
+
+        /* Dashboard Cards */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .dashboard-card {
+            background: white;
+            border-radius: 8px;
+            padding: 12px 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .dashboard-card .label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .dashboard-card .value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #4a2c2a;
+        }
+        .dashboard-card.highlight {
+            background: linear-gradient(135deg, #4a2c2a, #6b4423);
+        }
+        .dashboard-card.highlight .label {
+            color: rgba(255,255,255,0.8);
+        }
+        .dashboard-card.highlight .value {
+            color: white;
+        }
+
+        /* Progress Bars */
+        .progress-bar {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            position: relative;
+            min-width: 100px;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        .progress-fill.full {
+            background: linear-gradient(90deg, #4caf50, #66bb6a);
+        }
+        .progress-fill.partial {
+            background: linear-gradient(90deg, #ff9800, #ffb74d);
+        }
+        .progress-fill.none {
+            background: #e0e0e0;
+        }
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 11px;
+            font-weight: 600;
+            color: #333;
+            white-space: nowrap;
+        }
+
+        /* Contribution Chart */
+        .contribution-chart {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fafafa;
+            border-radius: 8px;
+        }
+        .contribution-chart h3 {
+            margin: 0 0 15px 0;
+            font-size: 14px;
+        }
+        .chart-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .chart-label {
+            width: 80px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            flex-shrink: 0;
+        }
+        .chart-bar-container {
+            flex: 1;
+            height: 24px;
+            background: #e8e8e8;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+        }
+        .chart-segment {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+            font-weight: 600;
+            min-width: 0;
+            overflow: hidden;
+        }
+        .chart-segment.coffee {
+            background: #6b4423;
+        }
+        .chart-segment.freight {
+            background: #1976d2;
+        }
+        .chart-segment.markup {
+            background: #7b1fa2;
+        }
+        .chart-total {
+            width: 70px;
+            text-align: right;
+            font-size: 12px;
+            font-weight: 700;
+            color: #2e7d32;
+            flex-shrink: 0;
+            margin-left: 8px;
+        }
+        .chart-legend {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 11px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* Settlement Table Enhancements */
+        .settlement-table .top-contributor {
+            background: #fff8e1;
+        }
+        .settlement-table td .mini-bar {
+            display: inline-block;
+            height: 8px;
+            background: #4caf50;
+            border-radius: 4px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
     <h1>Coffee Settlement Calculator</h1>
+
+    <div class="dashboard" id="dashboard"></div>
 
     <div class="container">
         <!-- Left Column: Forms -->
@@ -1042,31 +1204,34 @@
                 </table>
             `;
 
-            // Add coffee allocation status summary
-            html += '<h3 style="margin-top: 20px;">Coffee Allocation Status</h3><table><thead><tr><th>Coffee</th><th>Allocated</th><th>Remaining</th><th>Status</th></tr></thead><tbody>';
+            // Add coffee allocation status summary with progress bars
+            html += '<h3 style="margin-top: 20px;">Coffee Allocation Status</h3><table><thead><tr><th>Coffee</th><th>Progress</th><th>Remaining</th></tr></thead><tbody>';
 
             coffees.forEach(coffee => {
                 const allocatedGrams = getAllocatedGrams(coffee.id);
                 const totalGrams = (coffee.weight || 0) * 1000;
                 const remainingGrams = totalGrams - allocatedGrams;
-                let statusClass, statusText;
-                if (remainingGrams <= 0) {
-                    statusClass = 'status-full';
-                    statusText = 'Fully Allocated';
-                } else if (allocatedGrams > 0) {
-                    statusClass = 'status-partial';
-                    statusText = 'Partially Allocated';
+                const percentage = totalGrams > 0 ? Math.round((allocatedGrams / totalGrams) * 100) : 0;
+
+                let fillClass;
+                if (percentage >= 100) {
+                    fillClass = 'full';
+                } else if (percentage > 0) {
+                    fillClass = 'partial';
                 } else {
-                    statusClass = 'status-none';
-                    statusText = 'Not Allocated';
+                    fillClass = 'none';
                 }
 
                 html += `
                     <tr>
                         <td>${escapeHtml(coffee.name)}</td>
-                        <td>${allocatedGrams}g / ${totalGrams}g</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill ${fillClass}" style="width: ${percentage}%;"></div>
+                                <span class="progress-text">${allocatedGrams}g / ${totalGrams}g (${percentage}%)</span>
+                            </div>
+                        </td>
                         <td>${remainingGrams}g</td>
-                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                     </tr>
                 `;
             });
@@ -1217,6 +1382,8 @@
 
         // Render settlement summary
         function renderSettlementSummary() {
+            renderDashboard();
+
             if (participants.length === 0) {
                 settlementSummaryDiv.innerHTML = '<p class="empty-message">Add participants to see settlement summary.</p>';
                 return;
@@ -1230,6 +1397,16 @@
             const freightPP = getFreightPerPerson();
             const markupAmount = getMarkupAmount();
             const totalAllocations = getTotalAllocationValue();
+
+            // Pre-calculate all participant data to find max
+            const participantData = participants.map(p => {
+                const coffeeTotal = getParticipantCoffeeTotal(p.id);
+                const participantMarkup = getParticipantMarkup(p.id);
+                const totalOwed = Math.round((coffeeTotal + freightPP + participantMarkup) * 100) / 100;
+                return { id: p.id, name: p.name, coffeeTotal, freight: freightPP, markup: participantMarkup, totalOwed };
+            });
+
+            const maxOwed = Math.max(...participantData.map(p => p.totalOwed));
 
             let html = `
                 <table class="settlement-table">
@@ -1248,27 +1425,24 @@
             let grandTotalOwed = 0;
             let totalMarkupApplied = 0;
 
-            participants.forEach(participant => {
-                const coffeeTotal = getParticipantCoffeeTotal(participant.id);
-                const participantMarkup = getParticipantMarkup(participant.id);
-                totalMarkupApplied += participantMarkup;
-                const totalOwed = Math.round((coffeeTotal + freightPP + participantMarkup) * 100) / 100;
-                grandTotalOwed += totalOwed;
+            participantData.forEach(p => {
+                totalMarkupApplied += p.markup;
+                grandTotalOwed += p.totalOwed;
+                const isTopContributor = p.totalOwed === maxOwed && participantData.length > 1;
+                const barWidth = maxOwed > 0 ? Math.round((p.totalOwed / maxOwed) * 60) : 0;
 
                 html += `
-                    <tr>
-                        <td>${escapeHtml(participant.name)}</td>
-                        <td>R$${coffeeTotal.toFixed(2)}</td>
-                        <td>R$${freightPP.toFixed(2)}</td>
-                        <td>R$${participantMarkup.toFixed(2)}</td>
-                        <td><strong>R$${totalOwed.toFixed(2)}</strong></td>
+                    <tr class="${isTopContributor ? 'top-contributor' : ''}">
+                        <td>${escapeHtml(p.name)}</td>
+                        <td>R$${p.coffeeTotal.toFixed(2)}</td>
+                        <td>R$${p.freight.toFixed(2)}</td>
+                        <td>R$${p.markup.toFixed(2)}</td>
+                        <td><span class="mini-bar" style="width: ${barWidth}px;"></span><strong>R$${p.totalOwed.toFixed(2)}</strong></td>
                     </tr>
                 `;
             });
 
             totalMarkupApplied = Math.round(totalMarkupApplied * 100) / 100;
-
-            // Round grand total for display
             grandTotalOwed = Math.round(grandTotalOwed * 100) / 100;
 
             html += `
@@ -1285,10 +1459,43 @@
                 </table>
             `;
 
+            // Contribution Chart
+            html += `
+                <div class="contribution-chart">
+                    <h3>Contribution Breakdown</h3>
+            `;
+
+            participantData.forEach(p => {
+                const coffeeWidth = grandTotalOwed > 0 ? (p.coffeeTotal / grandTotalOwed) * 100 : 0;
+                const freightWidth = grandTotalOwed > 0 ? (p.freight / grandTotalOwed) * 100 : 0;
+                const markupWidth = grandTotalOwed > 0 ? (p.markup / grandTotalOwed) * 100 : 0;
+
+                html += `
+                    <div class="chart-row">
+                        <div class="chart-label">${escapeHtml(p.name)}</div>
+                        <div class="chart-bar-container">
+                            <div class="chart-segment coffee" style="width: ${coffeeWidth}%;" title="Coffee: R$${p.coffeeTotal.toFixed(2)}"></div>
+                            <div class="chart-segment freight" style="width: ${freightWidth}%;" title="Freight: R$${p.freight.toFixed(2)}"></div>
+                            <div class="chart-segment markup" style="width: ${markupWidth}%;" title="Markup: R$${p.markup.toFixed(2)}"></div>
+                        </div>
+                        <div class="chart-total">R$${p.totalOwed.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    <div class="chart-legend">
+                        <div class="legend-item"><div class="legend-color" style="background: #6b4423;"></div>Coffee</div>
+                        <div class="legend-item"><div class="legend-color" style="background: #1976d2;"></div>Freight</div>
+                        <div class="legend-item"><div class="legend-color" style="background: #7b1fa2;"></div>Markup</div>
+                    </div>
+                </div>
+            `;
+
             // Reconciliation check
             const expectedTotal = Math.round((totalAllocations + freightTotal + totalMarkupApplied) * 100) / 100;
             const difference = Math.abs(grandTotalOwed - expectedTotal);
-            const isMatch = difference < 0.01; // Allow for tiny floating point differences
+            const isMatch = difference < 0.01;
 
             html += `
                 <div class="reconciliation">
@@ -1394,7 +1601,41 @@
             renderAllocationMatrix();
         }
 
+        // Dashboard render
+        const dashboardDiv = document.getElementById('dashboard');
+
+        function renderDashboard() {
+            const totalCoffeeValue = coffees.reduce((sum, c) => sum + (c.cost * (c.weight || 0)), 0);
+            const totalAllocatedValue = getTotalAllocationValue();
+            const markupAmount = getMarkupAmount();
+            const grandTotal = totalAllocatedValue + freightTotal + markupAmount;
+
+            dashboardDiv.innerHTML = `
+                <div class="dashboard-card">
+                    <div class="label">Coffee Value</div>
+                    <div class="value">R$${totalCoffeeValue.toFixed(0)}</div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="label">Freight</div>
+                    <div class="value">R$${freightTotal.toFixed(0)}</div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="label">Markup</div>
+                    <div class="value">R$${markupAmount.toFixed(0)}</div>
+                </div>
+                <div class="dashboard-card highlight">
+                    <div class="label">Grand Total</div>
+                    <div class="value">R$${grandTotal.toFixed(0)}</div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="label">Participants</div>
+                    <div class="value">${participants.length}</div>
+                </div>
+            `;
+        }
+
         // Initial render
+        renderDashboard();
         renderCoffeeList();
         renderParticipantList();
         renderAllocationList();
