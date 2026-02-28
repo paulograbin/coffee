@@ -554,11 +554,70 @@
             saveToStorage();
             renderCoffeeList();
             renderSettlementSummary();
+            renderAllocationMatrix();
 
             // Reset form
             coffeeForm.reset();
             coffeeNameInput.focus();
         });
+
+        // Import coffees from CSV/pasted data
+        function importCoffees() {
+            const textarea = document.getElementById('coffeeImport');
+            const errorSpan = document.getElementById('importError');
+            errorSpan.textContent = '';
+
+            const lines = textarea.value.trim().split('\n').filter(l => l.trim());
+            if (lines.length === 0) {
+                errorSpan.textContent = 'No data to import';
+                return;
+            }
+
+            let imported = 0;
+            let errors = [];
+
+            lines.forEach((line, idx) => {
+                // Support both comma and tab separated
+                const parts = line.split(',');
+                if (parts.length < 3) {
+                    errors.push(`Line ${idx + 1}: need 3 values`);
+                    return;
+                }
+
+                const name = parts[0].trim();
+                const weight = parseFloat(parts[1].trim().replace(',', '.'));
+                const cost = parseFloat(parts[2].trim().replace(',', '.'));
+
+                if (!name || isNaN(weight) || isNaN(cost) || weight <= 0 || cost <= 0) {
+                    errors.push(`Line ${idx + 1}: invalid data`);
+                    return;
+                }
+
+                coffees.push({
+                    id: nextCoffeeId++,
+                    name: name,
+                    weight: weight,
+                    cost: cost
+                });
+                imported++;
+            });
+
+            if (imported > 0) {
+                saveToStorage();
+                renderCoffeeList();
+                renderSettlementSummary();
+                renderAllocationMatrix();
+                textarea.value = '';
+            }
+
+            if (errors.length > 0) {
+                errorSpan.textContent = `Imported ${imported}. Errors: ${errors.slice(0, 3).join('; ')}`;
+            } else {
+                errorSpan.textContent = `Imported ${imported} coffee(s)`;
+                errorSpan.style.color = '#2e7d32';
+                setTimeout(() => { errorSpan.textContent = ''; errorSpan.style.color = ''; }, 3000);
+            }
+        }
 
         // Delete coffee
         function deleteCoffee(id) {
