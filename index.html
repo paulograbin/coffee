@@ -480,6 +480,36 @@
             margin-right: 8px;
             vertical-align: middle;
         }
+
+        /* Costs Card Layout */
+        .costs-layout {
+            display: flex;
+            gap: 15px;
+        }
+        .costs-forms {
+            flex: 1;
+            min-width: 0;
+        }
+        .costs-summary {
+            flex: 1;
+            min-width: 0;
+        }
+        .costs-summary .freight-summary,
+        .costs-summary .markup-summary {
+            margin-top: 0;
+            padding: 10px;
+            font-size: 13px;
+        }
+        .costs-summary .freight-summary p,
+        .costs-summary .markup-summary p {
+            margin: 3px 0;
+            font-size: 13px;
+        }
+        @media (max-width: 600px) {
+            .costs-layout {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
@@ -525,35 +555,41 @@
 
             <div class="card card-compact">
                 <h2>Costs</h2>
-                <form id="freightForm">
-                    <div class="inline-form">
-                        <div class="form-group">
-                            <label for="freightCost">Freight (R$)</label>
-                            <input type="number" id="freightCost" step="0.01" min="0" placeholder="0.00" required>
-                        </div>
-                        <div class="form-group" style="flex: 0;">
-                            <label>&nbsp;</label>
-                            <button type="submit">Set</button>
-                        </div>
-                    </div>
-                    <div id="freightError" class="error"></div>
-                </form>
-                <div id="freightSummary"></div>
+                <div class="costs-layout">
+                    <div class="costs-forms">
+                        <form id="freightForm">
+                            <div class="inline-form">
+                                <div class="form-group">
+                                    <label for="freightCost">Freight (R$)</label>
+                                    <input type="number" id="freightCost" step="0.01" min="0" placeholder="0.00" required>
+                                </div>
+                                <div class="form-group" style="flex: 0;">
+                                    <label>&nbsp;</label>
+                                    <button type="submit">Set</button>
+                                </div>
+                            </div>
+                            <div id="freightError" class="error"></div>
+                        </form>
 
-                <form id="markupForm" style="margin-top: 15px;">
-                    <div class="inline-form">
-                        <div class="form-group">
-                            <label for="markupValue">Markup (R$/kg)</label>
-                            <input type="number" id="markupValue" step="0.01" min="0" placeholder="0.00">
-                        </div>
-                        <div class="form-group" style="flex: 0;">
-                            <label>&nbsp;</label>
-                            <button type="submit">Set</button>
-                        </div>
+                        <form id="markupForm" style="margin-top: 10px;">
+                            <div class="inline-form">
+                                <div class="form-group">
+                                    <label for="markupValue">Markup (R$/kg)</label>
+                                    <input type="number" id="markupValue" step="0.01" min="0" placeholder="0.00">
+                                </div>
+                                <div class="form-group" style="flex: 0;">
+                                    <label>&nbsp;</label>
+                                    <button type="submit">Set</button>
+                                </div>
+                            </div>
+                            <div id="markupError" class="error"></div>
+                        </form>
                     </div>
-                    <div id="markupError" class="error"></div>
-                </form>
-                <div id="markupSummary"></div>
+                    <div class="costs-summary">
+                        <div id="freightSummary"></div>
+                        <div id="markupSummary"></div>
+                    </div>
+                </div>
             </div>
 
         </div>
