@@ -434,6 +434,12 @@
             </div>
         </div>
 
+        <!-- Full Width: Allocation Matrix -->
+        <div class="card matrix-card full-width">
+            <h2>Allocation Matrix</h2>
+            <div id="allocationMatrix"></div>
+        </div>
+
         <!-- Full Width: Settlement -->
         <div class="card settlement-card full-width">
             <h2>Settlement Summary</h2>
@@ -627,6 +633,7 @@
             renderCoffeeList();
             renderAllocationList();
             renderSettlementSummary();
+            renderAllocationMatrix();
         }
 
         // Edit coffee - show inputs for weight and cost
@@ -698,6 +705,7 @@
                 renderAllocationList();
                 renderMarkupSummary();
                 renderSettlementSummary();
+                renderAllocationMatrix();
             }
         }
 
@@ -813,6 +821,7 @@
             renderFreightSummary();
             renderMarkupSummary();
             renderSettlementSummary();
+            renderAllocationMatrix();
         }
 
         // Edit participant name - show input
@@ -921,6 +930,7 @@
             renderAllocationList();
             renderMarkupSummary();
             renderSettlementSummary();
+            renderAllocationMatrix();
         }
 
         // Edit allocation amount - show select
@@ -977,6 +987,7 @@
             renderAllocationList();
             renderMarkupSummary();
             renderSettlementSummary();
+            renderAllocationMatrix();
         }
 
         // Render allocation list
@@ -1288,6 +1299,93 @@
             settlementSummaryDiv.innerHTML = html;
         }
 
+        // Allocation Matrix
+        const allocationMatrixDiv = document.getElementById('allocationMatrix');
+
+        function renderAllocationMatrix() {
+            if (coffees.length === 0 || participants.length === 0) {
+                allocationMatrixDiv.innerHTML = '<p class="empty-message">Add coffees and participants to use the allocation matrix.</p>';
+                return;
+            }
+
+            let html = `<table class="matrix-table"><thead><tr><th>Coffee</th><th>Available</th>`;
+            participants.forEach(p => {
+                html += `<th>${escapeHtml(p.name)}</th>`;
+            });
+            html += `</tr></thead><tbody>`;
+
+            coffees.forEach(coffee => {
+                const totalGrams = (coffee.weight || 0) * 1000;
+                const allocatedGrams = getAllocatedGrams(coffee.id);
+                const remainingGrams = totalGrams - allocatedGrams;
+
+                html += `<tr><td><strong>${escapeHtml(coffee.name)}</strong></td>`;
+                html += `<td>${remainingGrams}g</td>`;
+
+                participants.forEach(p => {
+                    const allocation = allocations.find(a => a.coffeeId === coffee.id && a.participantId === p.id);
+                    const grams = allocation ? allocation.grams : 0;
+                    const hasAllocation = grams > 0;
+
+                    html += `<td class="matrix-cell ${hasAllocation ? 'has-allocation' : ''}" id="matrix-${coffee.id}-${p.id}">`;
+                    if (hasAllocation) {
+                        html += `${grams}g<br>`;
+                        html += `<button class="matrix-btn delete-btn" onclick="removeMatrixAllocation(${coffee.id}, ${p.id})">-</button>`;
+                    } else {
+                        html += `<button class="matrix-btn" onclick="addMatrixAllocation(${coffee.id}, ${p.id}, 500)" ${remainingGrams < 500 ? 'disabled' : ''}>+500g</button>`;
+                        html += `<button class="matrix-btn" onclick="addMatrixAllocation(${coffee.id}, ${p.id}, 1000)" ${remainingGrams < 1000 ? 'disabled' : ''}>+1kg</button>`;
+                    }
+                    html += `</td>`;
+                });
+
+                html += `</tr>`;
+            });
+
+            html += `</tbody></table>`;
+            allocationMatrixDiv.innerHTML = html;
+        }
+
+        function addMatrixAllocation(coffeeId, participantId, grams) {
+            const coffee = coffees.find(c => c.id === coffeeId);
+            if (!coffee) return;
+
+            const totalGrams = (coffee.weight || 0) * 1000;
+            const currentAllocated = getAllocatedGrams(coffeeId);
+
+            if (currentAllocated + grams > totalGrams) {
+                alert('Not enough coffee available');
+                return;
+            }
+
+            const fraction = grams / totalGrams;
+            const allocationKg = grams / 1000;
+            const value = coffee.cost * allocationKg;
+
+            allocations.push({
+                id: nextAllocationId++,
+                coffeeId: coffeeId,
+                participantId: participantId,
+                grams: grams,
+                fraction: fraction,
+                value: value
+            });
+
+            saveToStorage();
+            renderAllocationList();
+            renderMarkupSummary();
+            renderSettlementSummary();
+            renderAllocationMatrix();
+        }
+
+        function removeMatrixAllocation(coffeeId, participantId) {
+            allocations = allocations.filter(a => !(a.coffeeId === coffeeId && a.participantId === participantId));
+            saveToStorage();
+            renderAllocationList();
+            renderMarkupSummary();
+            renderSettlementSummary();
+            renderAllocationMatrix();
+        }
+
         // Initial render
         renderCoffeeList();
         renderParticipantList();
@@ -1295,6 +1393,8 @@
         renderFreightSummary();
         renderMarkupSummary();
         renderSettlementSummary();
+        renderAllocationMatrix();
     </script>
 </body>
+
 </html>
