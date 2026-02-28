@@ -615,9 +615,71 @@
         .sidebar-btn:hover {
             background: #c49464;
         }
+        .sidebar-btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            margin-top: 5px;
+        }
+        .sidebar-btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .sidebar-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
         .main-content {
             flex: 1;
             min-width: 0;
+        }
+        .import-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .import-modal.show {
+            display: flex;
+        }
+        .import-modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+        }
+        .import-modal-content h3 {
+            margin-top: 0;
+            color: #4a2c2a;
+        }
+        .import-modal-content textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            resize: vertical;
+        }
+        .import-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .import-modal-actions .sidebar-btn {
+            flex: 1;
+        }
+        .import-modal-actions .sidebar-btn-secondary {
+            background: #757575;
+        }
+        .import-modal-actions .sidebar-btn-secondary:hover {
+            background: #616161;
         }
         @media (max-width: 900px) {
             .sidebar {
@@ -651,6 +713,24 @@
                 <h3>Purchases</h3>
                 <ul class="purchase-list" id="purchaseList"></ul>
                 <button class="sidebar-btn" onclick="createNewPurchase()">+ New Purchase</button>
+
+                <div class="sidebar-section">
+                    <h3>Backup</h3>
+                    <button class="sidebar-btn sidebar-btn-secondary" onclick="exportPurchase()">Export Current</button>
+                    <button class="sidebar-btn sidebar-btn-secondary" onclick="showImportDialog()">Import</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="import-modal" id="importModal">
+            <div class="import-modal-content">
+                <h3>Import Purchase</h3>
+                <textarea id="importData" rows="6" placeholder="Paste the exported backup string here..."></textarea>
+                <div class="import-modal-actions">
+                    <button class="sidebar-btn" onclick="importPurchase()">Import</button>
+                    <button class="sidebar-btn sidebar-btn-secondary" onclick="hideImportDialog()">Cancel</button>
+                </div>
+                <div id="importError" class="error"></div>
             </div>
         </div>
 
@@ -949,6 +1029,86 @@
         // Toggle sidebar
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('collapsed');
+        }
+
+        // Export current purchase to base64 string
+        function exportPurchase() {
+            // Save current state first
+            saveToStorage();
+
+            const purchase = purchases.find(p => p.id === activePurchaseId);
+            if (!purchase) return;
+
+            const exportData = {
+                version: 1,
+                name: purchase.name,
+                exportedAt: new Date().toISOString(),
+                data: purchase.data
+            };
+
+            const json = JSON.stringify(exportData);
+            const base64 = btoa(unescape(encodeURIComponent(json)));
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(base64).then(() => {
+                alert(`Backup copied to clipboard!\n\nPurchase: ${purchase.name}\n\nSave this string somewhere safe to restore later.`);
+            }).catch(() => {
+                // Fallback: show in prompt
+                prompt('Copy this backup string:', base64);
+            });
+        }
+
+        // Show import dialog
+        function showImportDialog() {
+            document.getElementById('importModal').classList.add('show');
+            document.getElementById('importData').value = '';
+            document.getElementById('importError').textContent = '';
+        }
+
+        // Hide import dialog
+        function hideImportDialog() {
+            document.getElementById('importModal').classList.remove('show');
+        }
+
+        // Import purchase from base64 string
+        function importPurchase() {
+            const input = document.getElementById('importData').value.trim();
+            const errorDiv = document.getElementById('importError');
+            errorDiv.textContent = '';
+
+            if (!input) {
+                errorDiv.textContent = 'Please paste a backup string';
+                return;
+            }
+
+            try {
+                const json = decodeURIComponent(escape(atob(input)));
+                const importData = JSON.parse(json);
+
+                if (!importData.data || importData.version !== 1) {
+                    throw new Error('Invalid backup format');
+                }
+
+                // Create new purchase with imported data
+                const id = Date.now().toString();
+                const newPurchase = {
+                    id,
+                    name: importData.name + ' (imported)',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    data: importData.data
+                };
+
+                purchases.push(newPurchase);
+                switchToPurchase(id);
+                savePurchasesList();
+                renderPurchaseList();
+                hideImportDialog();
+
+                alert(`Successfully imported: ${newPurchase.name}`);
+            } catch (e) {
+                errorDiv.textContent = 'Invalid backup string. Please check and try again.';
+            }
         }
 
         // Render all UI components
