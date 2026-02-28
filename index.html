@@ -510,14 +510,154 @@
                 flex-direction: column;
             }
         }
+
+        /* Sidebar */
+        .app-layout {
+            display: flex;
+            gap: 0;
+        }
+        .sidebar {
+            width: 250px;
+            background: #4a2c2a;
+            color: white;
+            padding: 15px;
+            border-radius: 8px 0 0 8px;
+            flex-shrink: 0;
+            transition: width 0.3s, padding 0.3s;
+            overflow: hidden;
+        }
+        .sidebar.collapsed {
+            width: 40px;
+            padding: 15px 8px;
+        }
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .sidebar-toggle:hover {
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+        .sidebar.collapsed .sidebar-content {
+            display: none;
+        }
+        .sidebar h3 {
+            margin: 0 0 15px 0;
+            font-size: 14px;
+            color: #d4a574;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .purchase-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 15px 0;
+        }
+        .purchase-item {
+            padding: 8px 10px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.1);
+        }
+        .purchase-item:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .purchase-item.active {
+            background: #d4a574;
+            color: #4a2c2a;
+            font-weight: 600;
+        }
+        .purchase-item .purchase-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .purchase-item .purchase-actions {
+            display: flex;
+            gap: 4px;
+            margin-left: 8px;
+        }
+        .purchase-item .purchase-actions button {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 2px 5px;
+            font-size: 11px;
+            opacity: 0.7;
+        }
+        .purchase-item .purchase-actions button:hover {
+            opacity: 1;
+        }
+        .sidebar-btn {
+            width: 100%;
+            background: #d4a574;
+            color: #4a2c2a;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .sidebar-btn:hover {
+            background: #c49464;
+        }
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 200px;
+            }
+            .sidebar.collapsed {
+                width: 40px;
+            }
+        }
+        @media (max-width: 600px) {
+            .app-layout {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                border-radius: 8px 8px 0 0;
+            }
+            .sidebar.collapsed {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
     <h1>Coffee Settlement Calculator</h1>
 
-    <div class="dashboard" id="dashboard"></div>
+    <div class="app-layout">
+        <div class="sidebar" id="sidebar">
+            <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">☰</button>
+            <div class="sidebar-content">
+                <h3>Purchases</h3>
+                <ul class="purchase-list" id="purchaseList"></ul>
+                <button class="sidebar-btn" onclick="createNewPurchase()">+ New Purchase</button>
+            </div>
+        </div>
 
-    <div class="container">
+        <div class="main-content">
+            <div class="dashboard" id="dashboard"></div>
+
+            <div class="container">
         <!-- Left Column: Forms -->
         <div class="section-group">
             <div class="card card-compact">
@@ -637,9 +777,17 @@
             <div id="settlementSummary"></div>
         </div>
     </div>
+        </div>
+    </div>
 
     <script>
-        // Data storage
+        // Purchase management
+        const PURCHASES_KEY = 'coffee_settlement_purchases';
+        const ACTIVE_PURCHASE_KEY = 'coffee_settlement_active';
+        let purchases = [];
+        let activePurchaseId = null;
+
+        // Current purchase data
         let coffees = [];
         let nextCoffeeId = 1;
         let participants = [];
@@ -649,53 +797,231 @@
         let freightTotal = 0;
         let markup = { type: null, value: 0 };
 
-        // LocalStorage keys
-        const STORAGE_KEYS = {
-            coffees: 'coffee_settlement_coffees',
-            participants: 'coffee_settlement_participants',
-            allocations: 'coffee_settlement_allocations',
-            nextCoffeeId: 'coffee_settlement_nextCoffeeId',
-            nextParticipantId: 'coffee_settlement_nextParticipantId',
-            nextAllocationId: 'coffee_settlement_nextAllocationId',
-            freightTotal: 'coffee_settlement_freightTotal',
-            markup: 'coffee_settlement_markup'
-        };
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
 
-        // Save all data to localStorage
+        // Generate date-based name
+        function generatePurchaseName() {
+            const now = new Date();
+            const date = now.toISOString().split('T')[0];
+            const existing = purchases.filter(p => p.name.startsWith(`Purchase ${date}`));
+            if (existing.length === 0) {
+                return `Purchase ${date}`;
+            }
+            return `Purchase ${date} (${existing.length + 1})`;
+        }
+
+        // Save purchases list
+        function savePurchasesList() {
+            localStorage.setItem(PURCHASES_KEY, JSON.stringify(purchases));
+            localStorage.setItem(ACTIVE_PURCHASE_KEY, activePurchaseId);
+        }
+
+        // Save current purchase data
         function saveToStorage() {
-            localStorage.setItem(STORAGE_KEYS.coffees, JSON.stringify(coffees));
-            localStorage.setItem(STORAGE_KEYS.participants, JSON.stringify(participants));
-            localStorage.setItem(STORAGE_KEYS.allocations, JSON.stringify(allocations));
-            localStorage.setItem(STORAGE_KEYS.nextCoffeeId, nextCoffeeId);
-            localStorage.setItem(STORAGE_KEYS.nextParticipantId, nextParticipantId);
-            localStorage.setItem(STORAGE_KEYS.nextAllocationId, nextAllocationId);
-            localStorage.setItem(STORAGE_KEYS.freightTotal, freightTotal);
-            localStorage.setItem(STORAGE_KEYS.markup, JSON.stringify(markup));
+            if (!activePurchaseId) return;
+
+            const purchase = purchases.find(p => p.id === activePurchaseId);
+            if (purchase) {
+                purchase.data = {
+                    coffees,
+                    nextCoffeeId,
+                    participants,
+                    nextParticipantId,
+                    allocations,
+                    nextAllocationId,
+                    freightTotal,
+                    markup
+                };
+                purchase.updatedAt = new Date().toISOString();
+                savePurchasesList();
+            }
         }
 
-        // Load all data from localStorage
-        function loadFromStorage() {
-            const storedCoffees = localStorage.getItem(STORAGE_KEYS.coffees);
-            const storedParticipants = localStorage.getItem(STORAGE_KEYS.participants);
-            const storedAllocations = localStorage.getItem(STORAGE_KEYS.allocations);
-            const storedNextCoffeeId = localStorage.getItem(STORAGE_KEYS.nextCoffeeId);
-            const storedNextParticipantId = localStorage.getItem(STORAGE_KEYS.nextParticipantId);
-            const storedNextAllocationId = localStorage.getItem(STORAGE_KEYS.nextAllocationId);
-
-            if (storedCoffees) coffees = JSON.parse(storedCoffees);
-            if (storedParticipants) participants = JSON.parse(storedParticipants);
-            if (storedAllocations) allocations = JSON.parse(storedAllocations);
-            if (storedNextCoffeeId) nextCoffeeId = parseInt(storedNextCoffeeId);
-            if (storedNextParticipantId) nextParticipantId = parseInt(storedNextParticipantId);
-            if (storedNextAllocationId) nextAllocationId = parseInt(storedNextAllocationId);
-            const storedFreightTotal = localStorage.getItem(STORAGE_KEYS.freightTotal);
-            if (storedFreightTotal) freightTotal = parseFloat(storedFreightTotal);
-            const storedMarkup = localStorage.getItem(STORAGE_KEYS.markup);
-            if (storedMarkup) markup = JSON.parse(storedMarkup);
+        // Load purchase data
+        function loadPurchaseData(purchaseId) {
+            const purchase = purchases.find(p => p.id === purchaseId);
+            if (purchase && purchase.data) {
+                coffees = purchase.data.coffees || [];
+                nextCoffeeId = purchase.data.nextCoffeeId || 1;
+                participants = purchase.data.participants || [];
+                nextParticipantId = purchase.data.nextParticipantId || 1;
+                allocations = purchase.data.allocations || [];
+                nextAllocationId = purchase.data.nextAllocationId || 1;
+                freightTotal = purchase.data.freightTotal || 0;
+                markup = purchase.data.markup || { type: null, value: 0 };
+            } else {
+                // Reset to empty state
+                coffees = [];
+                nextCoffeeId = 1;
+                participants = [];
+                nextParticipantId = 1;
+                allocations = [];
+                nextAllocationId = 1;
+                freightTotal = 0;
+                markup = { type: null, value: 0 };
+            }
         }
 
-        // Load data on startup
-        loadFromStorage();
+        // Create new purchase
+        function createNewPurchase() {
+            const id = Date.now().toString();
+            const newPurchase = {
+                id,
+                name: generatePurchaseName(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                data: null
+            };
+            purchases.push(newPurchase);
+            switchToPurchase(id);
+            savePurchasesList();
+            renderPurchaseList();
+        }
+
+        // Switch to purchase
+        function switchToPurchase(id) {
+            // Save current before switching
+            if (activePurchaseId) {
+                saveToStorage();
+            }
+
+            activePurchaseId = id;
+            loadPurchaseData(id);
+            savePurchasesList();
+            renderPurchaseList();
+            renderAll();
+        }
+
+        // Rename purchase
+        function renamePurchase(id) {
+            const purchase = purchases.find(p => p.id === id);
+            if (!purchase) return;
+
+            const newName = prompt('Enter new name:', purchase.name);
+            if (newName && newName.trim()) {
+                purchase.name = newName.trim();
+                savePurchasesList();
+                renderPurchaseList();
+            }
+        }
+
+        // Delete purchase
+        function deletePurchase(id) {
+            if (purchases.length <= 1) {
+                alert('Cannot delete the last purchase');
+                return;
+            }
+
+            const purchase = purchases.find(p => p.id === id);
+            if (!confirm(`Delete "${purchase.name}"?`)) return;
+
+            purchases = purchases.filter(p => p.id !== id);
+
+            if (activePurchaseId === id) {
+                activePurchaseId = purchases[0].id;
+                loadPurchaseData(activePurchaseId);
+                renderAll();
+            }
+
+            savePurchasesList();
+            renderPurchaseList();
+        }
+
+        // Render purchase list in sidebar
+        function renderPurchaseList() {
+            const list = document.getElementById('purchaseList');
+            list.innerHTML = purchases.map(p => `
+                <li class="purchase-item ${p.id === activePurchaseId ? 'active' : ''}" onclick="switchToPurchase('${p.id}')">
+                    <span class="purchase-name">${escapeHtml(p.name)}</span>
+                    <span class="purchase-actions" onclick="event.stopPropagation()">
+                        <button onclick="renamePurchase('${p.id}')" title="Rename">✎</button>
+                        <button onclick="deletePurchase('${p.id}')" title="Delete">×</button>
+                    </span>
+                </li>
+            `).join('');
+        }
+
+        // Toggle sidebar
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        }
+
+        // Render all UI components
+        function renderAll() {
+            renderDashboard();
+            renderCoffeeList();
+            renderParticipantList();
+            renderAllocationList();
+            renderFreightSummary();
+            renderMarkupSummary();
+            renderSettlementSummary();
+            renderAllocationMatrix();
+        }
+
+        // Migrate old data if exists
+        function migrateOldData() {
+            const oldCoffees = localStorage.getItem('coffee_settlement_coffees');
+            if (oldCoffees && purchases.length === 0) {
+                // Migrate old single-purchase data
+                const id = Date.now().toString();
+                const migrated = {
+                    id,
+                    name: 'Migrated Purchase',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    data: {
+                        coffees: JSON.parse(oldCoffees),
+                        nextCoffeeId: parseInt(localStorage.getItem('coffee_settlement_nextCoffeeId') || '1'),
+                        participants: JSON.parse(localStorage.getItem('coffee_settlement_participants') || '[]'),
+                        nextParticipantId: parseInt(localStorage.getItem('coffee_settlement_nextParticipantId') || '1'),
+                        allocations: JSON.parse(localStorage.getItem('coffee_settlement_allocations') || '[]'),
+                        nextAllocationId: parseInt(localStorage.getItem('coffee_settlement_nextAllocationId') || '1'),
+                        freightTotal: parseFloat(localStorage.getItem('coffee_settlement_freightTotal') || '0'),
+                        markup: JSON.parse(localStorage.getItem('coffee_settlement_markup') || '{"type":null,"value":0}')
+                    }
+                };
+                purchases.push(migrated);
+                activePurchaseId = id;
+
+                // Clean up old keys
+                ['coffees', 'participants', 'allocations', 'nextCoffeeId', 'nextParticipantId', 'nextAllocationId', 'freightTotal', 'markup'].forEach(key => {
+                    localStorage.removeItem('coffee_settlement_' + key);
+                });
+
+                savePurchasesList();
+            }
+        }
+
+        // Initialize purchases
+        function initPurchases() {
+            const stored = localStorage.getItem(PURCHASES_KEY);
+            const storedActive = localStorage.getItem(ACTIVE_PURCHASE_KEY);
+
+            if (stored) {
+                purchases = JSON.parse(stored);
+            }
+
+            migrateOldData();
+
+            if (purchases.length === 0) {
+                createNewPurchase();
+            } else {
+                activePurchaseId = storedActive && purchases.find(p => p.id === storedActive)
+                    ? storedActive
+                    : purchases[0].id;
+                loadPurchaseData(activePurchaseId);
+            }
+
+            renderPurchaseList();
+        }
+
+        // Initialize on load
+        initPurchases();
 
         // DOM elements
         const coffeeForm = document.getElementById('coffeeForm');
@@ -955,13 +1281,6 @@
             `;
 
             coffeeListDiv.innerHTML = html;
-        }
-
-        // Escape HTML to prevent XSS
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
         }
 
         // Add participant(s) - supports comma-separated names
@@ -1671,14 +1990,7 @@
         }
 
         // Initial render
-        renderDashboard();
-        renderCoffeeList();
-        renderParticipantList();
-        renderAllocationList();
-        renderFreightSummary();
-        renderMarkupSummary();
-        renderSettlementSummary();
-        renderAllocationMatrix();
+        renderAll();
     </script>
 </body>
 
