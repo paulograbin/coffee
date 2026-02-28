@@ -8,6 +8,7 @@
         * {
             box-sizing: border-box;
         }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             max-width: 1400px;
@@ -231,6 +232,55 @@
             padding: 5px;
             font-size: 14px;
         }
+
+        .matrix-card {
+            background: #fff8e1;
+            border: 2px solid #ffc107;
+        }
+
+        .matrix-card h2 {
+            color: #f57c00;
+            border-bottom-color: #ffc107;
+        }
+
+        .matrix-table {
+            font-size: 12px;
+        }
+
+        .matrix-table th {
+            background: #fff3e0;
+            color: #e65100;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .matrix-table td {
+            text-align: center;
+            padding: 4px;
+        }
+
+        .matrix-cell {
+            cursor: pointer;
+            min-width: 50px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .matrix-cell:hover {
+            background: #ffe0b2;
+        }
+
+        .matrix-cell.has-allocation {
+            background: #c8e6c9;
+            font-weight: 600;
+        }
+
+        .matrix-btn {
+            padding: 2px 6px;
+            font-size: 11px;
+            margin: 1px;
+        }
+
         .settlement-card {
             background: #e8f5e9;
             border: 2px solid #4caf50;
