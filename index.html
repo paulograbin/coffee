@@ -2058,7 +2058,7 @@
                     const hasAllocation = grams > 0;
 
                     html += `<td class="matrix-cell ${hasAllocation ? 'has-allocation' : ''}" id="matrix-${coffee.id}-${p.id}">`;
-                    if (hasAllocation) {
+                    if (remainingGrams == 0) {
                         html += `${grams}g<br>`;
                         html += `<button class="matrix-btn delete-btn" onclick="removeMatrixAllocation(${coffee.id}, ${p.id})">-</button>`;
                     } else {
