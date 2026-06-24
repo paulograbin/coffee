@@ -5,22 +5,20 @@ import { useParticipantsStore } from '@/stores/participants'
 const store = useParticipantsStore()
 const newName = ref('')
 
-function add() {
-  store.addParticipant(newName.value)
+function addParticipant() {
+  newName.value.trim().split(',').forEach(name => store.addParticipant(name))
   newName.value = ''
 }
 </script>
 
 <template>
-  <div class="participant-table">
-    <h2>Participants</h2>
+  <div class="participant-table card">
+    <h2 class="cardDescription">Participants</h2>
 
-    <form @submit.prevent="add" class="add-form">
-      <input
-        v-model="newName"
-        placeholder="Participant name"
-        type="text"
-      />
+    <h2>Names</h2>
+
+    <form @submit.prevent="addParticipant" class="add-form">
+      <input v-model="newName" placeholder="Participant name" type="text" />
       <button type="submit">Add</button>
     </form>
 
@@ -37,6 +35,14 @@ function add() {
 <style scoped>
 .participant-table {
   padding: 1rem;
+}
+
+.card {
+  background-color: white;
+  border-style: solid;
+}
+.cardDescription {
+  border-bottom: 2px solid #d4a574;
 }
 
 .add-form {
