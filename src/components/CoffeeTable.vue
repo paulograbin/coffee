@@ -3,10 +3,10 @@ import { useCoffeeStore} from '@/stores/coffee-store.ts'
 
 const store = useCoffeeStore()
 
-function add() {
-  const random = crypto.randomUUID()
-  store.addCoffee(random)
-}
+// function add() {
+  // const random = crypto.randomUUID()
+  // store.addCoffee(random)
+// }
 
 </script>
 

@@ -1,0 +1,2311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee Settlement Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        h1 {
+            color: #4a2c2a;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #6b4423;
+            border-bottom: 2px solid #d4a574;
+            padding-bottom: 8px;
+            font-size: 1.1em;
+            margin-top: 0;
+        }
+
+        h3 {
+            font-size: 1em;
+            color: #6b4423;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-compact {
+            padding: 12px;
+        }
+
+        .section-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #d4a574;
+        }
+
+        button {
+            background: #6b4423;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #4a2c2a;
+        }
+
+        .error {
+            color: #d32f2f;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #f8f4f0;
+            color: #4a2c2a;
+        }
+
+        .empty-message {
+            color: #666;
+            font-style: italic;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .delete-btn {
+            background: #d32f2f;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        .delete-btn:hover {
+            background: #b71c1c;
+        }
+
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background: white;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #d4a574;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-full {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .status-partial {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .status-none {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .freight-summary {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+
+        .freight-summary p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
+        .freight-summary .highlight {
+            font-weight: 600;
+            color: #1565c0;
+        }
+
+        .markup-summary {
+            background: #f3e5f5;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+
+        .markup-summary p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
+        .markup-summary .highlight {
+            font-weight: 600;
+            color: #7b1fa2;
+        }
+
+        .inline-form {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .inline-form .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .clear-btn {
+            background: #757575;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        .clear-btn:hover {
+            background: #616161;
+        }
+
+        .edit-btn {
+            background: #1976d2;
+            padding: 6px 12px;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+
+        .edit-btn:hover {
+            background: #1565c0;
+        }
+
+        .save-btn {
+            background: #388e3c;
+            padding: 6px 12px;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+
+        .save-btn:hover {
+            background: #2e7d32;
+        }
+
+        .cancel-btn {
+            background: #757575;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        .cancel-btn:hover {
+            background: #616161;
+        }
+
+        .edit-input {
+            width: 80px;
+            padding: 5px;
+            font-size: 14px;
+        }
+
+        .matrix-card {
+            background: #fff8e1;
+            border: 2px solid #ffc107;
+        }
+
+        .matrix-card h2 {
+            color: #f57c00;
+            border-bottom-color: #ffc107;
+        }
+
+        .matrix-table {
+            font-size: 12px;
+        }
+
+        .matrix-table th {
+            background: #fff3e0;
+            color: #e65100;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .matrix-table td {
+            text-align: center;
+            padding: 4px;
+        }
+
+        .matrix-cell {
+            cursor: pointer;
+            min-width: 50px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .matrix-cell:hover {
+            background: #ffe0b2;
+        }
+
+        .matrix-cell.has-allocation {
+            background: #c8e6c9;
+            font-weight: 600;
+        }
+
+        .matrix-btn {
+            padding: 2px 6px;
+            font-size: 11px;
+            margin: 1px;
+        }
+
+        .settlement-card {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+        }
+
+        .settlement-card h2 {
+            color: #2e7d32;
+            border-bottom-color: #4caf50;
+        }
+
+        .settlement-table th {
+            background: #c8e6c9;
+            color: #1b5e20;
+        }
+
+        .settlement-table tfoot th,
+        .settlement-table tfoot td {
+            background: #a5d6a7;
+            font-weight: 600;
+        }
+
+        .reconciliation {
+            background: #fff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            border: 1px solid #c8e6c9;
+        }
+
+        .reconciliation h3 {
+            margin-top: 0;
+            color: #2e7d32;
+        }
+
+        .reconciliation p {
+            margin: 8px 0;
+        }
+
+        .reconciliation .match {
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        .reconciliation .mismatch {
+            color: #d32f2f;
+            font-weight: 600;
+        }
+
+        /* Dashboard Cards */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 8px;
+            padding: 12px 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .dashboard-card .label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .dashboard-card .value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #4a2c2a;
+        }
+
+        .dashboard-card.highlight {
+            background: linear-gradient(135deg, #4a2c2a, #6b4423);
+        }
+
+        .dashboard-card.highlight .label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .dashboard-card.highlight .value {
+            color: white;
+        }
+
+        /* Progress Bars */
+        .progress-bar {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            position: relative;
+            min-width: 100px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-fill.full {
+            background: linear-gradient(90deg, #4caf50, #66bb6a);
+        }
+
+        .progress-fill.partial {
+            background: linear-gradient(90deg, #ff9800, #ffb74d);
+        }
+
+        .progress-fill.none {
+            background: #e0e0e0;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 11px;
+            font-weight: 600;
+            color: #333;
+            white-space: nowrap;
+        }
+
+        /* Contribution Chart */
+        .contribution-chart {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fafafa;
+            border-radius: 8px;
+        }
+
+        .contribution-chart h3 {
+            margin: 0 0 15px 0;
+            font-size: 14px;
+        }
+
+        .chart-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .chart-label {
+            width: 80px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            flex-shrink: 0;
+        }
+
+        .chart-bar-container {
+            flex: 1;
+            height: 24px;
+            background: #e8e8e8;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .chart-segment {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+            font-weight: 600;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .chart-segment.coffee {
+            background: #6b4423;
+        }
+
+        .chart-segment.freight {
+            background: #1976d2;
+        }
+
+        .chart-segment.markup {
+            background: #7b1fa2;
+        }
+
+        .chart-total {
+            width: 70px;
+            text-align: right;
+            font-size: 12px;
+            font-weight: 700;
+            color: #2e7d32;
+            flex-shrink: 0;
+            margin-left: 8px;
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 11px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* Settlement Table Enhancements */
+        .settlement-table .top-contributor {
+            background: #fff8e1;
+        }
+
+        .settlement-table td .mini-bar {
+            display: inline-block;
+            height: 8px;
+            background: #4caf50;
+            border-radius: 4px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        /* Costs Card Layout */
+        .costs-layout {
+            display: flex;
+            gap: 15px;
+        }
+
+        .costs-forms {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .costs-summary {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .costs-summary .freight-summary,
+        .costs-summary .markup-summary {
+            margin-top: 0;
+            padding: 10px;
+            font-size: 13px;
+        }
+
+        .costs-summary .freight-summary p,
+        .costs-summary .markup-summary p {
+            margin: 3px 0;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            .costs-layout {
+                flex-direction: column;
+            }
+        }
+
+        /* Sidebar */
+        .app-layout {
+            display: flex;
+            gap: 0;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #4a2c2a;
+            color: white;
+            padding: 15px;
+            border-radius: 8px 0 0 8px;
+            flex-shrink: 0;
+            transition: width 0.3s, padding 0.3s;
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed {
+            width: 40px;
+            padding: 15px 8px;
+        }
+
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .sidebar-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .sidebar.collapsed .sidebar-content {
+            display: none;
+        }
+
+        .sidebar h3 {
+            margin: 0 0 15px 0;
+            font-size: 14px;
+            color: #d4a574;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .purchase-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 15px 0;
+        }
+
+        .purchase-item {
+            padding: 8px 10px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .purchase-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .purchase-item.active {
+            background: #d4a574;
+            color: #4a2c2a;
+            font-weight: 600;
+        }
+
+        .purchase-item .purchase-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .purchase-item .purchase-actions {
+            display: flex;
+            gap: 4px;
+            margin-left: 8px;
+        }
+
+        .purchase-item .purchase-actions button {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 2px 5px;
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        .purchase-item .purchase-actions button:hover {
+            opacity: 1;
+        }
+
+        .sidebar-btn {
+            width: 100%;
+            background: #d4a574;
+            color: #4a2c2a;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .sidebar-btn:hover {
+            background: #c49464;
+        }
+
+        .sidebar-btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            margin-top: 5px;
+        }
+
+        .sidebar-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .sidebar-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .import-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .import-modal.show {
+            display: flex;
+        }
+
+        .import-modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .import-modal-content h3 {
+            margin-top: 0;
+            color: #4a2c2a;
+        }
+
+        .import-modal-content textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            resize: vertical;
+        }
+
+        .import-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .import-modal-actions .sidebar-btn {
+            flex: 1;
+        }
+
+        .import-modal-actions .sidebar-btn-secondary {
+            background: #757575;
+        }
+
+        .import-modal-actions .sidebar-btn-secondary:hover {
+            background: #616161;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .sidebar.collapsed {
+                width: 40px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .app-layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-radius: 8px 8px 0 0;
+            }
+
+            .sidebar.collapsed {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        <div class="sidebar" id="sidebar">
+            <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">☰</button>
+            <div class="sidebar-content">
+                <h3>Purchases</h3>
+                <ul class="purchase-list" id="purchaseList"></ul>
+                <button class="sidebar-btn" onclick="createNewPurchase()">+ New Purchase</button>
+
+                <div class="sidebar-section">
+                    <h3>Backup</h3>
+                    <button class="sidebar-btn sidebar-btn-secondary" onclick="exportPurchase()">Export Current</button>
+                    <button class="sidebar-btn sidebar-btn-secondary" onclick="showImportDialog()">Import</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="import-modal" id="importModal">
+            <div class="import-modal-content">
+                <h3>Import Purchase</h3>
+                <textarea id="importData" rows="6" placeholder="Paste the exported backup string here..."></textarea>
+                <div class="import-modal-actions">
+                    <button class="sidebar-btn" onclick="importPurchase()">Import</button>
+                    <button class="sidebar-btn sidebar-btn-secondary" onclick="hideImportDialog()">Cancel</button>
+                </div>
+                <div id="importError" class="error"></div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="dashboard" id="dashboard"></div>
+
+            <div class="container">
+                <!-- Left Column: Forms -->
+                <div class="section-group">
+                    <div class="card card-compact">
+                        <h2>Participants</h2>
+                        <form id="participantForm">
+                            <div class="inline-form">
+                                <div class="form-group" style="flex: 2;">
+                                    <label for="participantName">Names (comma-separated)</label>
+                                    <input type="text" id="participantName" placeholder="John, Maria, Pedro" required>
+                                </div>
+                                <div class="form-group" style="flex: 0;">
+                                    <label>&nbsp;</label>
+                                    <button type="submit">Add</button>
+                                </div>
+                            </div>
+                            <div id="participantError" class="error"></div>
+                        </form>
+                        <div id="participantList"></div>
+                    </div>
+
+                    <div class="card card-compact">
+
+
+                        <h2>Costs</h2>
+                        <div class="costs-layout">
+                            <div class="costs-forms">
+                                <form id="freightForm">
+                                    <div class="inline-form">
+                                        <div class="form-group">
+                                            <label for="freightCost">Freight (R$)</label>
+                                            <input type="number" id="freightCost" step="0.01" min="0" placeholder="0.00"
+                                                required>
+                                        </div>
+                                        <div class="form-group" style="flex: 0;">
+                                            <label>&nbsp;</label>
+                                            <button type="submit">Set</button>
+                                        </div>
+                                    </div>
+                                    <div id="freightError" class="error"></div>
+                                </form>
+
+                                <form id="markupForm" style="margin-top: 10px;">
+                                    <div class="inline-form">
+                                        <div class="form-group">
+                                            <label for="markupValue">Markup (R$/kg)</label>
+                                            <input type="number" id="markupValue" step="0.01" min="0"
+                                                placeholder="0.00">
+                                        </div>
+                                        <div class="form-group" style="flex: 0;">
+                                            <label>&nbsp;</label>
+                                            <button type="submit">Set</button>
+                                        </div>
+                                    </div>
+                                    <div id="markupError" class="error"></div>
+                                </form>
+                            </div>
+                            <div class="costs-summary">
+                                <div id="freightSummary"></div>
+                                <div id="markupSummary"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Column: Lists -->
+                <div class="section-group">
+
+
+                    <div class="card card-compact">
+                        <h2>Coffee Products</h2>
+
+                        <div class="card card-compact">
+                            <h2>Add Coffee</h2>
+                            <form id="coffeeForm">
+                                <div class="inline-form">
+                                    <div class="form-group" style="flex: 2;">
+                                        <label for="coffeeName">Name</label>
+                                        <input type="text" id="coffeeName" placeholder="Coffee name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="coffeeWeight">Weight (kg)</label>
+                                        <input type="number" id="coffeeWeight" step="0.01" min="0.01" placeholder="0.00"
+                                               required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="coffeeCost">R$/kg</label>
+                                        <input type="number" id="coffeeCost" step="0.01" min="0.01" placeholder="0.00"
+                                               required>
+                                    </div>
+                                </div>
+                                <div id="costError" class="error"></div>
+                                <button type="submit" style="margin-top: 10px;">Add Coffee</button>
+                            </form>
+                            <details style="margin-top: 10px;">
+                                <summary style="cursor: pointer; color: #6b4423; font-size: 12px;">Import from
+                                    CSV/Spreadsheet
+                                </summary>
+                                <div style="margin-top: 8px;">
+                                <textarea id="coffeeImport" rows="3" style="width: 100%; font-size: 12px;"
+                                          placeholder="Paste: Name, Weight(kg), Price/kg (one per line)"></textarea>
+                                    <button type="button" onclick="importCoffees()"
+                                            style="margin-top: 5px; font-size: 12px; padding: 5px 10px;">Import</button>
+                                    <span id="importError" class="error"></span>
+                                </div>
+                            </details>
+                        </div>
+
+                        <div id="coffeeList"></div>
+                    </div>
+
+                    <div class="card card-compact">
+                        <h2>Allocations</h2>
+                        <div id="allocationList"></div>
+                    </div>
+                </div>
+
+                <!-- Full Width: Allocation Matrix -->
+                <div class="card matrix-card full-width">
+                    <h2>Allocation Matrix</h2>
+                    <div id="allocationMatrix"></div>
+                </div>
+
+                <!-- Full Width: Settlement -->
+                <div class="card settlement-card full-width">
+                    <h2>Settlement Summary</h2>
+                    <div id="settlementSummary"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Purchase management
+        const PURCHASES_KEY = 'coffee_settlement_purchases';
+        const ACTIVE_PURCHASE_KEY = 'coffee_settlement_active';
+        const WINDOW_SIDEBAR_STATUS_KEY = 'window_sidebar_status';
+        let purchases = [];
+        let activePurchaseId = null;
+
+        // Sidebar status
+        let sidebarOpened = true;
+
+        // Current purchase data
+        let coffees = [];
+        let nextCoffeeId = 1;
+        let participants = [];
+        let nextParticipantId = 1;
+        let allocations = [];
+        let nextAllocationId = 1;
+        let freightTotal = 0;
+        let markup = { type: null, value: 0 };
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Generate date-based name
+        function generatePurchaseName() {
+            const now = new Date();
+            const date = now.toISOString().split('T')[0];
+            const existing = purchases.filter(p => p.name.startsWith(`Purchase ${date}`));
+            if (existing.length === 0) {
+                return `Purchase ${date}`;
+            }
+            return `Purchase ${date} (${existing.length + 1})`;
+        }
+
+        // Save purchases list
+        function savePurchasesList() {
+            localStorage.setItem(PURCHASES_KEY, JSON.stringify(purchases));
+            localStorage.setItem(ACTIVE_PURCHASE_KEY, activePurchaseId);
+            localStorage.setItem(WINDOW_SIDEBAR_STATUS_KEY, sidebarOpened);
+        }
+
+        // Save current purchase data
+        function saveToStorage() {
+            if (!activePurchaseId) return;
+
+            const purchase = purchases.find(p => p.id === activePurchaseId);
+            if (purchase) {
+                purchase.data = {
+                    coffees,
+                    nextCoffeeId,
+                    participants,
+                    nextParticipantId,
+                    allocations,
+                    nextAllocationId,
+                    freightTotal,
+                    markup
+                };
+                purchase.updatedAt = new Date().toISOString();
+                localStorage.setItem(WINDOW_SIDEBAR_STATUS_KEY, sidebarOpened);
+                savePurchasesList();
+            }
+        }
+
+        // Load purchase data
+        function loadPurchaseData(purchaseId) {
+            const purchase = purchases.find(p => p.id === purchaseId);
+            if (purchase && purchase.data) {
+                coffees = purchase.data.coffees || [];
+                nextCoffeeId = purchase.data.nextCoffeeId || 1;
+                participants = purchase.data.participants || [];
+                nextParticipantId = purchase.data.nextParticipantId || 1;
+                allocations = purchase.data.allocations || [];
+                nextAllocationId = purchase.data.nextAllocationId || 1;
+                freightTotal = purchase.data.freightTotal || 0;
+                markup = purchase.data.markup || { type: null, value: 0 };
+            } else {
+                // Reset to empty state
+                coffees = [];
+                nextCoffeeId = 1;
+                participants = [];
+                nextParticipantId = 1;
+                allocations = [];
+                nextAllocationId = 1;
+                freightTotal = 0;
+                markup = { type: null, value: 0 };
+            }
+        }
+
+        // Create new purchase
+        function createNewPurchase() {
+            const id = Date.now().toString();
+            const newPurchase = {
+                id,
+                name: generatePurchaseName(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                data: null
+            };
+            purchases.push(newPurchase);
+            switchToPurchase(id);
+            savePurchasesList();
+            renderPurchaseList();
+        }
+
+        // Switch to purchase
+        function switchToPurchase(id) {
+            // Save current before switching
+            if (activePurchaseId) {
+                saveToStorage();
+            }
+
+            activePurchaseId = id;
+            loadPurchaseData(id);
+            savePurchasesList();
+            renderPurchaseList();
+            renderAll();
+        }
+
+        // Rename purchase
+        function renamePurchase(id) {
+            const purchase = purchases.find(p => p.id === id);
+            if (!purchase) return;
+
+            const newName = prompt('Enter new name:', purchase.name);
+            if (newName && newName.trim()) {
+                purchase.name = newName.trim();
+                savePurchasesList();
+                renderPurchaseList();
+            }
+        }
+
+        // Delete purchase
+        function deletePurchase(id) {
+            if (purchases.length <= 1) {
+                alert('Cannot delete the last purchase');
+                return;
+            }
+
+            const purchase = purchases.find(p => p.id === id);
+            if (!confirm(`Delete "${purchase.name}"?`)) return;
+
+            purchases = purchases.filter(p => p.id !== id);
+
+            if (activePurchaseId === id) {
+                activePurchaseId = purchases[0].id;
+                loadPurchaseData(activePurchaseId);
+                renderAll();
+            }
+
+            savePurchasesList();
+            renderPurchaseList();
+        }
+
+        // Render purchase list in sidebar
+        function renderPurchaseList() {
+            const list = document.getElementById('purchaseList');
+            list.innerHTML = purchases.map(p => `
+                <li class="purchase-item ${p.id === activePurchaseId ? 'active' : ''}" onclick="switchToPurchase('${p.id}')">
+                    <span class="purchase-name">${escapeHtml(p.name)}</span>
+                    <span class="purchase-actions" onclick="event.stopPropagation()">
+                        <button onclick="renamePurchase('${p.id}')" title="Rename">✎</button>
+                        <button onclick="deletePurchase('${p.id}')" title="Delete">×</button>
+                    </span>
+                </li>
+            `).join('');
+        }
+
+        // Toggle sidebar
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            sidebarOpened = !sidebarOpened;
+
+            console.log('new status, sidebar open?', sidebarOpened);
+
+            saveToStorage();
+        }
+
+        // Export current purchase to base64 string
+        function exportPurchase() {
+            // Save current state first
+            saveToStorage();
+
+            const purchase = purchases.find(p => p.id === activePurchaseId);
+            if (!purchase) return;
+
+            const exportData = {
+                version: 1,
+                name: purchase.name,
+                exportedAt: new Date().toISOString(),
+                data: purchase.data
+            };
+
+            const json = JSON.stringify(exportData);
+            const base64 = btoa(unescape(encodeURIComponent(json)));
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(base64).then(() => {
+                alert(`Backup copied to clipboard!\n\nPurchase: ${purchase.name}\n\nSave this string somewhere safe to restore later.`);
+            }).catch(() => {
+                // Fallback: show in prompt
+                prompt('Copy this backup string:', base64);
+            });
+        }
+
+        // Show import dialog
+        function showImportDialog() {
+            document.getElementById('importModal').classList.add('show');
+            document.getElementById('importData').value = '';
+            document.getElementById('importError').textContent = '';
+        }
+
+        // Hide import dialog
+        function hideImportDialog() {
+            document.getElementById('importModal').classList.remove('show');
+        }
+
+        // Import purchase from base64 string
+        function importPurchase() {
+            const input = document.getElementById('importData').value.trim();
+            const errorDiv = document.getElementById('importError');
+            errorDiv.textContent = '';
+
+            if (!input) {
+                errorDiv.textContent = 'Please paste a backup string';
+                return;
+            }
+
+            try {
+                const json = decodeURIComponent(escape(atob(input)));
+                const importData = JSON.parse(json);
+
+                if (!importData.data || importData.version !== 1) {
+                    throw new Error('Invalid backup format');
+                }
+
+                // Create new purchase with imported data
+                const id = Date.now().toString();
+                const newPurchase = {
+                    id,
+                    name: importData.name + ' (imported)',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    data: importData.data
+                };
+
+                purchases.push(newPurchase);
+                switchToPurchase(id);
+                savePurchasesList();
+                renderPurchaseList();
+                hideImportDialog();
+
+                alert(`Successfully imported: ${newPurchase.name}`);
+            } catch (e) {
+                errorDiv.textContent = 'Invalid backup string. Please check and try again.';
+            }
+        }
+
+        // Render all UI components
+        function renderAll() {
+            renderDashboard();
+            renderCoffeeList();
+            renderParticipantList();
+            renderAllocationList();
+            renderFreightSummary();
+            renderMarkupSummary();
+            renderSettlementSummary();
+            renderAllocationMatrix();
+        }
+
+        // Migrate old data if exists
+        function migrateOldData() {
+            const oldCoffees = localStorage.getItem('coffee_settlement_coffees');
+            if (oldCoffees && purchases.length === 0) {
+                // Migrate old single-purchase data
+                const id = Date.now().toString();
+                const migrated = {
+                    id,
+                    name: 'Migrated Purchase',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    data: {
+                        coffees: JSON.parse(oldCoffees),
+                        nextCoffeeId: parseInt(localStorage.getItem('coffee_settlement_nextCoffeeId') || '1'),
+                        participants: JSON.parse(localStorage.getItem('coffee_settlement_participants') || '[]'),
+                        nextParticipantId: parseInt(localStorage.getItem('coffee_settlement_nextParticipantId') || '1'),
+                        allocations: JSON.parse(localStorage.getItem('coffee_settlement_allocations') || '[]'),
+                        nextAllocationId: parseInt(localStorage.getItem('coffee_settlement_nextAllocationId') || '1'),
+                        freightTotal: parseFloat(localStorage.getItem('coffee_settlement_freightTotal') || '0'),
+                        markup: JSON.parse(localStorage.getItem('coffee_settlement_markup') || '{"type":null,"value":0}')
+                    }
+                };
+                purchases.push(migrated);
+                activePurchaseId = id;
+
+                // Clean up old keys
+                ['coffees', 'participants', 'allocations', 'nextCoffeeId', 'nextParticipantId', 'nextAllocationId', 'freightTotal', 'markup'].forEach(key => {
+                    localStorage.removeItem('coffee_settlement_' + key);
+                });
+
+                savePurchasesList();
+            }
+        }
+
+        // Initialize purchases
+        function initPurchases() {
+            const stored = localStorage.getItem(PURCHASES_KEY);
+            const storedActive = localStorage.getItem(ACTIVE_PURCHASE_KEY);
+
+            if (stored) {
+                purchases = JSON.parse(stored);
+            }
+
+            migrateOldData();
+
+            if (purchases.length === 0) {
+                createNewPurchase();
+            } else {
+                activePurchaseId = storedActive && purchases.find(p => p.id === storedActive)
+                    ? storedActive
+                    : purchases[0].id;
+                loadPurchaseData(activePurchaseId);
+            }
+
+            renderPurchaseList();
+
+
+        }
+
+        // Initialize on load
+        initPurchases();
+
+        // DOM elements
+        const coffeeForm = document.getElementById('coffeeForm');
+        const coffeeNameInput = document.getElementById('coffeeName');
+        const coffeeWeightInput = document.getElementById('coffeeWeight');
+        const coffeeCostInput = document.getElementById('coffeeCost');
+        const costError = document.getElementById('costError');
+        const coffeeListDiv = document.getElementById('coffeeList');
+        const participantForm = document.getElementById('participantForm');
+        const participantNameInput = document.getElementById('participantName');
+        const participantError = document.getElementById('participantError');
+        const participantListDiv = document.getElementById('participantList');
+        const allocationCoffeeSelect = document.getElementById('allocationCoffee');
+        const allocationParticipantSelect = document.getElementById('allocationParticipant');
+        const allocationAmountSelect = document.getElementById('allocationAmount');
+        const allocationError = document.getElementById('allocationError');
+        const allocationListDiv = document.getElementById('allocationList');
+        const freightForm = document.getElementById('freightForm');
+        const freightCostInput = document.getElementById('freightCost');
+        const freightError = document.getElementById('freightError');
+        const freightSummaryDiv = document.getElementById('freightSummary');
+        const markupForm = document.getElementById('markupForm');
+        const markupValueInput = document.getElementById('markupValue');
+        const markupError = document.getElementById('markupError');
+        const markupSummaryDiv = document.getElementById('markupSummary');
+        const settlementSummaryDiv = document.getElementById('settlementSummary');
+        const sidebarElement = document.getElementById('sidebar');
+
+
+        console.log('checking sidebar...');
+        console.log('status loaded: ', localStorage.getItem(WINDOW_SIDEBAR_STATUS_KEY));
+        if (localStorage.getItem(WINDOW_SIDEBAR_STATUS_KEY) === "true") {
+            console.log('Keep it open...');
+            document.getElementById('sidebar').classList.remove('collapsed');
+        } else {
+            console.log('Keep it closed');
+            document.getElementById('sidebar').classList.add('collapsed');
+        }
+
+
+        // Add coffee product
+        coffeeForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const name = coffeeNameInput.value.trim();
+            const weight = parseFloat(coffeeWeightInput.value);
+            const cost = parseFloat(coffeeCostInput.value);
+
+            // Validation
+            costError.textContent = '';
+
+            if (cost <= 0 || isNaN(cost)) {
+                costError.textContent = 'Cost must be greater than 0';
+                return;
+            }
+
+            // Create coffee object with unique ID
+            const coffee = {
+                id: nextCoffeeId++,
+                name: name,
+                weight: weight,
+                cost: cost
+            };
+
+            coffees.push(coffee);
+            saveToStorage();
+            renderCoffeeList();
+            renderSettlementSummary();
+            renderAllocationMatrix();
+
+            // Reset form
+            coffeeForm.reset();
+            coffeeNameInput.focus();
+        });
+
+        // Import coffees from CSV/pasted data
+        function importCoffees() {
+            const textarea = document.getElementById('coffeeImport');
+            const errorSpan = document.getElementById('importError');
+            errorSpan.textContent = '';
+
+            const lines = textarea.value.trim().split('\n').filter(l => l.trim());
+            if (lines.length === 0) {
+                errorSpan.textContent = 'No data to import';
+                return;
+            }
+
+            let imported = 0;
+            let errors = [];
+
+            lines.forEach((line, idx) => {
+                // Support both comma and tab separated
+                const parts = line.split(',');
+                if (parts.length < 3) {
+                    errors.push(`Line ${idx + 1}: need 3 values`);
+                    return;
+                }
+
+                const name = parts[0].trim();
+                const weight = parseFloat(parts[1].trim().replace(',', '.'));
+                const cost = parseFloat(parts[2].trim().replace(',', '.'));
+
+                if (!name || isNaN(weight) || isNaN(cost) || weight <= 0 || cost <= 0) {
+                    errors.push(`Line ${idx + 1}: invalid data`);
+                    return;
+                }
+
+                coffees.push({
+                    id: nextCoffeeId++,
+                    name: name,
+                    weight: weight,
+                    cost: cost
+                });
+                imported++;
+            });
+
+            if (imported > 0) {
+                saveToStorage();
+                renderCoffeeList();
+                renderSettlementSummary();
+                renderAllocationMatrix();
+                textarea.value = '';
+            }
+
+            if (errors.length > 0) {
+                errorSpan.textContent = `Imported ${imported}. Errors: ${errors.slice(0, 3).join('; ')}`;
+            } else {
+                errorSpan.textContent = `Imported ${imported} coffee(s)`;
+                errorSpan.style.color = '#2e7d32';
+                setTimeout(() => { errorSpan.textContent = ''; errorSpan.style.color = ''; }, 3000);
+            }
+        }
+
+        // Delete coffee
+        function deleteCoffee(id) {
+            coffees = coffees.filter(c => c.id !== id);
+            allocations = allocations.filter(a => a.coffeeId !== id);
+            saveToStorage();
+            renderCoffeeList();
+            renderAllocationList();
+            renderSettlementSummary();
+            renderAllocationMatrix();
+        }
+
+        // Edit coffee - show inputs for weight and cost
+        function editCoffee(id) {
+            const coffee = coffees.find(c => c.id === id);
+            if (!coffee) return;
+
+            const weightCell = document.getElementById(`coffee-weight-${id}`);
+            const costCell = document.getElementById(`coffee-cost-${id}`);
+
+            weightCell.innerHTML = `
+                <input type="number" class="edit-input" id="edit-weight-${id}"
+                       value="${(coffee.weight || 0).toFixed(2)}" step="0.01" min="0.01" style="width: 60px;">
+            `;
+
+            costCell.innerHTML = `
+                <input type="number" class="edit-input" id="edit-cost-${id}"
+                       value="${coffee.cost.toFixed(2)}" step="0.01" min="0.01" style="width: 70px;">
+                <button class="save-btn" onclick="saveCoffee(${id})">Save</button>
+                <button class="cancel-btn" onclick="renderCoffeeList()">X</button>
+            `;
+            document.getElementById(`edit-weight-${id}`).focus();
+        }
+
+        // Save coffee weight and price
+        function saveCoffee(id) {
+            const weightInput = document.getElementById(`edit-weight-${id}`);
+            const costInput = document.getElementById(`edit-cost-${id}`);
+            const newWeight = parseFloat(weightInput.value);
+            const newCost = parseFloat(costInput.value);
+
+            if (isNaN(newWeight) || newWeight <= 0) {
+                alert('Weight must be greater than 0');
+                return;
+            }
+
+            if (isNaN(newCost) || newCost <= 0) {
+                alert('Cost must be greater than 0');
+                return;
+            }
+
+            const coffee = coffees.find(c => c.id === id);
+            if (coffee) {
+                const oldWeight = coffee.weight || 0;
+                coffee.weight = newWeight;
+                coffee.cost = newCost;
+
+                // Check if allocations exceed new weight
+                const allocatedGrams = getAllocatedGrams(id);
+                const newTotalGrams = newWeight * 1000;
+
+                if (allocatedGrams > newTotalGrams) {
+                    alert(`Cannot reduce weight to ${newWeight}kg. ${allocatedGrams}g already allocated.`);
+                    coffee.weight = oldWeight;
+                    renderCoffeeList();
+                    return;
+                }
+
+                // Update allocation values for this coffee
+                allocations.forEach(a => {
+                    if (a.coffeeId === id) {
+                        a.fraction = a.grams / newTotalGrams;
+                        a.value = coffee.cost * (a.grams / 1000);
+                    }
+                });
+
+                saveToStorage();
+                renderCoffeeList();
+                renderAllocationList();
+                renderMarkupSummary();
+                renderSettlementSummary();
+                renderAllocationMatrix();
+            }
+        }
+
+        // Render coffee list
+        function renderCoffeeList() {
+            if (coffees.length === 0) {
+                coffeeListDiv.innerHTML = '<p class="empty-message">No coffee products added yet.</p>';
+                return;
+            }
+
+            const totalWeight = coffees.reduce((sum, c) => sum + (c.weight || 0), 0);
+            const totalValue = coffees.reduce((sum, c) => sum + (c.cost * (c.weight || 0)), 0);
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Coffee Name</th>
+                            <th>Weight</th>
+                            <th>R$/kg</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            coffees.forEach(coffee => {
+                const totalCost = coffee.cost * (coffee.weight || 0);
+                html += `
+                    <tr id="coffee-row-${coffee.id}">
+                        <td>${escapeHtml(coffee.name)}</td>
+                        <td id="coffee-weight-${coffee.id}">${(coffee.weight || 0).toFixed(2)} kg</td>
+                        <td id="coffee-cost-${coffee.id}">R$${coffee.cost.toFixed(2)}</td>
+                        <td>R$${totalCost.toFixed(2)}</td>
+                        <td>
+                            <button class="edit-btn" onclick="editCoffee(${coffee.id})">Edit</button>
+                            <button class="delete-btn" onclick="deleteCoffee(${coffee.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Total</th>
+                            <th>${totalWeight.toFixed(2)} kg</th>
+                            <th></th>
+                            <th>R$${totalValue.toFixed(2)}</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+
+            coffeeListDiv.innerHTML = html;
+        }
+
+        // Add participant(s) - supports comma-separated names
+        participantForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const input = participantNameInput.value.trim();
+            const names = input.split(',').map(n => n.trim()).filter(n => n.length > 0);
+
+            // Clear previous error
+            participantError.textContent = '';
+
+            if (names.length === 0) {
+                participantError.textContent = 'Please enter at least one name';
+                return;
+            }
+
+            // Check for duplicates
+            const duplicates = [];
+            const added = [];
+
+            names.forEach(name => {
+                const isDuplicate = participants.some(
+                    p => p.name.toLowerCase() === name.toLowerCase()
+                ) || added.some(n => n.toLowerCase() === name.toLowerCase());
+
+                if (isDuplicate) {
+                    duplicates.push(name);
+                } else {
+                    participants.push({
+                        id: nextParticipantId++,
+                        name: name
+                    });
+                    added.push(name);
+                }
+            });
+
+            if (added.length > 0) {
+                saveToStorage();
+                renderParticipantList();
+                renderFreightSummary();
+                renderMarkupSummary();
+                renderSettlementSummary();
+                renderAllocationMatrix();
+            }
+
+            // Reset form
+            participantForm.reset();
+            participantNameInput.focus();
+
+            if (duplicates.length > 0) {
+                participantError.textContent = `Skipped duplicates: ${duplicates.join(', ')}`;
+            }
+        });
+
+        // Delete participant
+        function deleteParticipant(id) {
+            participants = participants.filter(p => p.id !== id);
+            allocations = allocations.filter(a => a.participantId !== id);
+            saveToStorage();
+            renderParticipantList();
+            renderAllocationList();
+            renderFreightSummary();
+            renderMarkupSummary();
+            renderSettlementSummary();
+            renderAllocationMatrix();
+        }
+
+        // Edit participant name - show input
+        function editParticipantName(id) {
+            const participant = participants.find(p => p.id === id);
+            if (!participant) return;
+
+            const nameCell = document.getElementById(`participant-name-${id}`);
+            nameCell.innerHTML = `
+                <input type="text" class="edit-input" id="edit-name-${id}"
+                       value="${escapeHtml(participant.name)}" style="width: 120px;">
+                <button class="save-btn" onclick="saveParticipantName(${id})">Save</button>
+                <button class="cancel-btn" onclick="renderParticipantList()">Cancel</button>
+            `;
+            document.getElementById(`edit-name-${id}`).focus();
+        }
+
+        // Save participant name
+        function saveParticipantName(id) {
+            const input = document.getElementById(`edit-name-${id}`);
+            const newName = input.value.trim();
+
+            if (!newName) {
+                alert('Name cannot be empty');
+                return;
+            }
+
+            // Check for duplicate names (excluding current participant)
+            const isDuplicate = participants.some(
+                p => p.id !== id && p.name.toLowerCase() === newName.toLowerCase()
+            );
+
+            if (isDuplicate) {
+                alert('A participant with this name already exists');
+                return;
+            }
+
+            const participant = participants.find(p => p.id === id);
+            if (participant) {
+                participant.name = newName;
+                saveToStorage();
+                renderParticipantList();
+                renderAllocationList();
+                renderSettlementSummary();
+                renderAllocationMatrix();
+            }
+        }
+
+        // Render participant list
+        function renderParticipantList() {
+            if (participants.length === 0) {
+                participantListDiv.innerHTML = '<p class="empty-message">No participants added yet. Add participants before allocation.</p>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            participants.forEach(participant => {
+                html += `
+                    <tr>
+                        <td>${participant.id}</td>
+                        <td id="participant-name-${participant.id}">${escapeHtml(participant.name)}</td>
+                        <td>
+                            <button class="edit-btn" onclick="editParticipantName(${participant.id})">Edit</button>
+                            <button class="delete-btn" onclick="deleteParticipant(${participant.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="3">Total: ${participants.length} participant(s)</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+
+            participantListDiv.innerHTML = html;
+        }
+
+        // Get total allocated grams for a coffee
+        function getAllocatedGrams(coffeeId) {
+            return allocations
+                .filter(a => a.coffeeId === coffeeId)
+                .reduce((sum, a) => sum + a.grams, 0);
+        }
+
+
+        // Delete allocation
+        function deleteAllocation(id) {
+            allocations = allocations.filter(a => a.id !== id);
+            saveToStorage();
+            renderAllocationList();
+            renderMarkupSummary();
+            renderSettlementSummary();
+            renderAllocationMatrix();
+        }
+
+        // Edit allocation amount - show select
+        function editAllocationAmount(id) {
+            const allocation = allocations.find(a => a.id === id);
+            if (!allocation) return;
+
+            const amountCell = document.getElementById(`allocation-amount-${id}`);
+            const currentGrams = allocation.grams || (allocation.fraction * 1000);
+
+            amountCell.innerHTML = `
+                <select class="edit-input" id="edit-amount-${id}" style="width: 80px;">
+                    <option value="500" ${currentGrams === 500 ? 'selected' : ''}>500g</option>
+                    <option value="1000" ${currentGrams === 1000 ? 'selected' : ''}>1000g</option>
+                </select>
+                <button class="save-btn" onclick="saveAllocationAmount(${id})">Save</button>
+                <button class="cancel-btn" onclick="renderAllocationList()">Cancel</button>
+            `;
+        }
+
+        // Save allocation amount
+        function saveAllocationAmount(id) {
+            const select = document.getElementById(`edit-amount-${id}`);
+            const newGrams = parseInt(select.value);
+
+            const allocation = allocations.find(a => a.id === id);
+            if (!allocation) return;
+
+            const coffee = coffees.find(c => c.id === allocation.coffeeId);
+            if (!coffee) return;
+
+            const totalGrams = (coffee.weight || 0) * 1000;
+            const currentGrams = allocation.grams || (allocation.fraction * 1000);
+
+            // Calculate other allocations for this coffee (excluding current)
+            const otherAllocatedGrams = allocations
+                .filter(a => a.coffeeId === allocation.coffeeId && a.id !== id)
+                .reduce((sum, a) => sum + (a.grams || (a.fraction * 1000)), 0);
+
+            const newTotalGrams = otherAllocatedGrams + newGrams;
+
+            if (newTotalGrams > totalGrams) {
+                const available = totalGrams - otherAllocatedGrams;
+                alert(`Cannot allocate ${newGrams}g. Only ${available}g available for this coffee.`);
+                return;
+            }
+
+            // Update allocation
+            allocation.grams = newGrams;
+            allocation.fraction = newGrams / totalGrams;
+            allocation.value = coffee.cost * (newGrams / 1000);
+
+            saveToStorage();
+            renderAllocationList();
+            renderMarkupSummary();
+            renderSettlementSummary();
+            renderAllocationMatrix();
+        }
+
+        // Render allocation list
+        function renderAllocationList() {
+            if (allocations.length === 0) {
+                allocationListDiv.innerHTML = '<p class="empty-message">No allocations yet. Add coffees and participants first.</p>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Coffee</th>
+                            <th>Participant</th>
+                            <th>Amount</th>
+                            <th>Value</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            allocations.forEach(allocation => {
+                const coffee = coffees.find(c => c.id === allocation.coffeeId);
+                const participant = participants.find(p => p.id === allocation.participantId);
+
+                html += `
+                    <tr>
+                        <td>${coffee ? escapeHtml(coffee.name) : 'Unknown'}</td>
+                        <td>${participant ? escapeHtml(participant.name) : 'Unknown'}</td>
+                        <td id="allocation-amount-${allocation.id}">${allocation.grams || (allocation.fraction * 1000)}g</td>
+                        <td>R$${allocation.value.toFixed(2)}</td>
+                        <td>
+                            <button class="edit-btn" onclick="editAllocationAmount(${allocation.id})">Edit</button>
+                            <button class="delete-btn" onclick="deleteAllocation(${allocation.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            // Add coffee allocation status summary with progress bars
+            html += '<h3 style="margin-top: 20px;">Coffee Allocation Status</h3><table><thead><tr><th>Coffee</th><th>Progress</th><th>Remaining</th></tr></thead><tbody>';
+
+            coffees.forEach(coffee => {
+                const allocatedGrams = getAllocatedGrams(coffee.id);
+                const totalGrams = (coffee.weight || 0) * 1000;
+                const remainingGrams = totalGrams - allocatedGrams;
+                const percentage = totalGrams > 0 ? Math.round((allocatedGrams / totalGrams) * 100) : 0;
+
+                let fillClass;
+                if (percentage >= 100) {
+                    fillClass = 'full';
+                } else if (percentage > 0) {
+                    fillClass = 'partial';
+                } else {
+                    fillClass = 'none';
+                }
+
+                html += `
+                    <tr>
+                        <td>${escapeHtml(coffee.name)}</td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-fill ${fillClass}" style="width: ${percentage}%;"></div>
+                                <span class="progress-text">${allocatedGrams}g / ${totalGrams}g (${percentage}%)</span>
+                            </div>
+                        </td>
+                        <td>${remainingGrams}g</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+
+            allocationListDiv.innerHTML = html;
+        }
+
+        // Freight form handler
+        freightForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            freightError.textContent = '';
+
+            const cost = parseFloat(freightCostInput.value);
+            const costDecimals = parseFloat(freightCostInput.value);
+
+            if (cost < 0 || isNaN(cost)) {
+                freightError.textContent = 'Freight must be 0 or greater';
+                return;
+            }
+
+            freightTotal = cost;
+            saveToStorage();
+            renderFreightSummary();
+            renderSettlementSummary();
+        });
+
+        // Render freight summary
+        function renderFreightSummary() {
+            // Update input field with current value
+            freightCostInput.value = freightTotal > 0 ? freightTotal.toFixed(2) : '';
+
+            if (freightTotal === 0) {
+                freightSummaryDiv.innerHTML = '';
+                return;
+            }
+
+            const numParticipants = participants.length;
+
+            if (numParticipants === 0) {
+                freightSummaryDiv.innerHTML = `
+                    <div class="freight-summary">
+                        <p>Freight Total: <span class="highlight">R$${freightTotal.toFixed(2)}</span></p>
+                        <p style="color: #ef6c00;">Add participants to calculate freight per person.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const freightPerPerson = Math.round((freightTotal / numParticipants) * 100) / 100;
+
+            freightSummaryDiv.innerHTML = `
+                <div class="freight-summary">
+                    <p>Freight Total: <span class="highlight">R$${freightTotal.toFixed(2)}</span></p>
+                    <p>Participants: <span class="highlight">${numParticipants}</span></p>
+                    <p>Freight per Person: <span class="highlight">R$${freightPerPerson.toFixed(2)}</span></p>
+                </div>
+            `;
+        }
+
+        // Markup form handler
+        markupForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            markupError.textContent = '';
+
+            const value = parseFloat(markupValueInput.value) || 0;
+
+            if (value < 0) {
+                markupError.textContent = 'Markup must be 0 or greater';
+                return;
+            }
+
+            markup = { type: 'perkg', value: value };
+            saveToStorage();
+            renderMarkupSummary();
+            renderSettlementSummary();
+        });
+
+        // Get total allocation value (sum of all coffee allocations)
+        function getTotalAllocationValue() {
+            return allocations.reduce((sum, a) => sum + a.value, 0);
+        }
+
+        // Get total allocated grams across all allocations
+        function getTotalAllocatedGrams() {
+            return allocations.reduce((sum, a) => sum + (a.grams || 0), 0);
+        }
+
+        // Calculate total markup amount (markup per kg × total kg)
+        function getMarkupAmount() {
+            if (!markup.value || markup.value === 0) {
+                return 0;
+            }
+            const totalKg = getTotalAllocatedGrams() / 1000;
+            return Math.round((markup.value * totalKg) * 100) / 100;
+        }
+
+        // Render markup summary
+        function renderMarkupSummary() {
+            // Update form field with current value
+            markupValueInput.value = markup.value > 0 ? markup.value : '';
+
+            if (!markup.value || markup.value === 0) {
+                markupSummaryDiv.innerHTML = '';
+                return;
+            }
+
+            const totalKg = getTotalAllocatedGrams() / 1000;
+            const markupAmount = getMarkupAmount();
+
+            let html = `<div class="markup-summary">`;
+            html += `<p>Markup: <span class="highlight">R$${markup.value.toFixed(2)}/kg</span></p>`;
+            html += `<p>Total Weight: <span class="highlight">${totalKg.toFixed(2)} kg</span></p>`;
+            html += `<p>Total Markup: <span class="highlight">R$${markupAmount.toFixed(2)}</span></p>`;
+            html += `</div>`;
+            markupSummaryDiv.innerHTML = html;
+        }
+
+        // Get participant's coffee allocation total
+        function getParticipantCoffeeTotal(participantId) {
+            return allocations
+                .filter(a => a.participantId === participantId)
+                .reduce((sum, a) => sum + a.value, 0);
+        }
+
+        // Get freight per person
+        function getFreightPerPerson() {
+            if (participants.length === 0) return 0;
+            return Math.round((freightTotal / participants.length) * 100) / 100;
+        }
+
+        // Get participant's allocated grams
+        function getParticipantGrams(participantId) {
+            return allocations
+                .filter(a => a.participantId === participantId)
+                .reduce((sum, a) => sum + (a.grams || 0), 0);
+        }
+
+        // Get markup for a specific participant based on their kg
+        function getParticipantMarkup(participantId) {
+            if (!markup.value || markup.value === 0) return 0;
+
+            const participantKg = getParticipantGrams(participantId) / 1000;
+            return Math.round((markup.value * participantKg) * 100) / 100;
+        }
+
+        // Render settlement summary
+        function renderSettlementSummary() {
+            renderDashboard();
+
+            if (participants.length === 0) {
+                settlementSummaryDiv.innerHTML = '<p class="empty-message">Add participants to see settlement summary.</p>';
+                return;
+            }
+
+            if (allocations.length === 0) {
+                settlementSummaryDiv.innerHTML = '<p class="empty-message">Add allocations to see settlement summary.</p>';
+                return;
+            }
+
+            const freightPP = getFreightPerPerson();
+            const markupAmount = getMarkupAmount();
+            const totalAllocations = getTotalAllocationValue();
+
+            // Pre-calculate all participant data to find max
+            const participantData = participants.map(p => {
+                const coffeeTotal = getParticipantCoffeeTotal(p.id);
+                const participantMarkup = getParticipantMarkup(p.id);
+                const totalOwed = Math.round((coffeeTotal + freightPP + participantMarkup) * 100) / 100;
+                return { id: p.id, name: p.name, coffeeTotal, freight: freightPP, markup: participantMarkup, totalOwed };
+            });
+
+            const maxOwed = Math.max(...participantData.map(p => p.totalOwed));
+
+            let html = `
+                <table class="settlement-table">
+                    <thead>
+                        <tr>
+                            <th>Participant</th>
+                            <th>Coffee</th>
+                            <th>Freight</th>
+                            <th>Markup</th>
+                            <th>Total Owed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            let grandTotalOwed = 0;
+            let totalMarkupApplied = 0;
+
+            participantData.forEach(p => {
+                totalMarkupApplied += p.markup;
+                grandTotalOwed += p.totalOwed;
+                const isTopContributor = p.totalOwed === maxOwed && participantData.length > 1;
+                const barWidth = maxOwed > 0 ? Math.round((p.totalOwed / maxOwed) * 60) : 0;
+
+                html += `
+                    <tr class="${isTopContributor ? 'top-contributor' : ''}">
+                        <td>${escapeHtml(p.name)}</td>
+                        <td>R$${p.coffeeTotal.toFixed(2)}</td>
+                        <td>R$${p.freight.toFixed(2)}</td>
+                        <td>R$${p.markup.toFixed(2)}</td>
+                        <td><span class="mini-bar" style="width: ${barWidth}px;"></span><strong>R$${p.totalOwed.toFixed(2)}</strong></td>
+                    </tr>
+                `;
+            });
+
+            totalMarkupApplied = Math.round(totalMarkupApplied * 100) / 100;
+            grandTotalOwed = Math.round(grandTotalOwed * 100) / 100;
+
+            html += `
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Total</th>
+                            <td>R$${totalAllocations.toFixed(2)}</td>
+                            <td>R$${freightTotal.toFixed(2)}</td>
+                            <td>R$${totalMarkupApplied.toFixed(2)}</td>
+                            <th>R$${grandTotalOwed.toFixed(2)}</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+
+            // Contribution Chart
+            html += `
+                <div class="contribution-chart">
+                    <h3>Contribution Breakdown</h3>
+            `;
+
+            participantData.forEach(p => {
+                const coffeeWidth = grandTotalOwed > 0 ? (p.coffeeTotal / grandTotalOwed) * 100 : 0;
+                const freightWidth = grandTotalOwed > 0 ? (p.freight / grandTotalOwed) * 100 : 0;
+                const markupWidth = grandTotalOwed > 0 ? (p.markup / grandTotalOwed) * 100 : 0;
+
+                html += `
+                    <div class="chart-row">
+                        <div class="chart-label">${escapeHtml(p.name)}</div>
+                        <div class="chart-bar-container">
+                            <div class="chart-segment coffee" style="width: ${coffeeWidth}%;" title="Coffee: R$${p.coffeeTotal.toFixed(2)}"></div>
+                            <div class="chart-segment freight" style="width: ${freightWidth}%;" title="Freight: R$${p.freight.toFixed(2)}"></div>
+                            <div class="chart-segment markup" style="width: ${markupWidth}%;" title="Markup: R$${p.markup.toFixed(2)}"></div>
+                        </div>
+                        <div class="chart-total">R$${p.totalOwed.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    <div class="chart-legend">
+                        <div class="legend-item"><div class="legend-color" style="background: #6b4423;"></div>Coffee</div>
+                        <div class="legend-item"><div class="legend-color" style="background: #1976d2;"></div>Freight</div>
+                        <div class="legend-item"><div class="legend-color" style="background: #7b1fa2;"></div>Markup</div>
+                    </div>
+                </div>
+            `;
+
+            // Reconciliation check
+            const expectedTotal = Math.round((totalAllocations + freightTotal + totalMarkupApplied) * 100) / 100;
+            const difference = Math.abs(grandTotalOwed - expectedTotal);
+            const isMatch = difference < 0.01;
+
+            html += `
+                <div class="reconciliation">
+                    <h3>Reconciliation</h3>
+                    <p>Sum of Coffee Allocations: <strong>R$${totalAllocations.toFixed(2)}</strong></p>
+                    <p>Freight Total: <strong>R$${freightTotal.toFixed(2)}</strong></p>
+                    <p>Markup Total: <strong>R$${totalMarkupApplied.toFixed(2)}</strong></p>
+                    <p>Expected Total: <strong>R$${expectedTotal.toFixed(2)}</strong></p>
+                    <p>Sum of Participant Totals: <strong>R$${grandTotalOwed.toFixed(2)}</strong></p>
+                    <p class="${isMatch ? 'match' : 'mismatch'}">
+                        ${isMatch ? 'Totals match!' : `Difference: R$${difference.toFixed(2)} (rounding)`}
+                    </p>
+                </div>
+            `;
+
+            settlementSummaryDiv.innerHTML = html;
+        }
+
+        // Allocation Matrix
+        const allocationMatrixDiv = document.getElementById('allocationMatrix');
+
+        function renderAllocationMatrix() {
+            if (coffees.length === 0 || participants.length === 0) {
+                allocationMatrixDiv.innerHTML = '<p class="empty-message">Add coffees and participants to use the allocation matrix.</p>';
+                return;
+            }
+
+            let html = `<table class="matrix-table"><thead><tr><th>Coffee</th><th>Available</th>`;
+            participants.forEach(p => {
+                html += `<th>${escapeHtml(p.name)}</th>`;
+            });
+            html += `</tr></thead><tbody>`;
+
+            coffees.forEach(coffee => {
+                const totalGrams = (coffee.weight || 0) * 1000;
+                const allocatedGrams = getAllocatedGrams(coffee.id);
+                const remainingGrams = totalGrams - allocatedGrams;
+
+                html += `<tr><td><strong>${escapeHtml(coffee.name)}</strong></td>`;
+                html += `<td>${remainingGrams}g</td>`;
+
+                participants.forEach(p => {
+                    const allocation = allocations.find(a => a.coffeeId === coffee.id && a.participantId === p.id);
+                    const grams = allocation ? allocation.grams : 0;
+                    const hasAllocation = grams > 0;
+
+                    html += `<td class="matrix-cell ${hasAllocation ? 'has-allocation' : ''}" id="matrix-${coffee.id}-${p.id}">`;
+                    if (remainingGrams == 0) {
+                        html += `${grams}g<br>`;
+                        html += `<button class="matrix-btn delete-btn" onclick="removeMatrixAllocation(${coffee.id}, ${p.id})">-</button>`;
+                    } else {
+                        html += `<button class="matrix-btn" onclick="addMatrixAllocation(${coffee.id}, ${p.id}, 500)" ${remainingGrams < 500 ? 'disabled' : ''}>+500g</button>`;
+                        html += `<button class="matrix-btn" onclick="addMatrixAllocation(${coffee.id}, ${p.id}, 1000)" ${remainingGrams < 1000 ? 'disabled' : ''}>+1kg</button>`;
+                    }
+                    html += `</td>`;
+                });
+
+                html += `</tr>`;
+            });
+
+            html += `</tbody></table>`;
+            allocationMatrixDiv.innerHTML = html;
+        }
+
+        function addMatrixAllocation(coffeeId, participantId, grams) {
+            const coffee = coffees.find(c => c.id === coffeeId);
+            if (!coffee) return;
+
+            const totalGrams = (coffee.weight || 0) * 1000;
+            const currentAllocated = getAllocatedGrams(coffeeId);
+
+            if (currentAllocated + grams > totalGrams) {
+                alert('Not enough coffee available');
+                return;
+            }
+
+            const fraction = grams / totalGrams;
+            const allocationKg = grams / 1000;
+            const value = coffee.cost * allocationKg;
+
+            allocations.push({
+                id: nextAllocationId++,
+                coffeeId: coffeeId,
+                participantId: participantId,
+                grams: grams,
+                fraction: fraction,
+                value: value
+            });
+
+            saveToStorage();
+            renderAllocationList();
+            renderMarkupSummary();
+            renderSettlementSummary();
+            renderAllocationMatrix();
+        }
+
+        function removeMatrixAllocation(coffeeId, participantId) {
+            allocations = allocations.filter(a => !(a.coffeeId === coffeeId && a.participantId === participantId));
+            saveToStorage();
+            renderAllocationList();
+            renderMarkupSummary();
+            renderSettlementSummary();
+            renderAllocationMatrix();
+        }
+
+        // Dashboard render
+        const dashboardDiv = document.getElementById('dashboard');
+
+        function renderDashboard() {
+            const totalCoffeeValue = coffees.reduce((sum, c) => sum + (c.cost * (c.weight || 0)), 0);
+            const totalAllocatedValue = getTotalAllocationValue();
+            const markupAmount = getMarkupAmount();
+            const grandTotal = totalAllocatedValue + freightTotal + markupAmount;
+
+            dashboardDiv.innerHTML = `
+                <div class="dashboard-card">
+                    <div class="label">Coffee Value</div>
+                    <div class="value">R$${totalCoffeeValue.toFixed(0)}</div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="label">Freight</div>
+                    <div class="value">R$${freightTotal.toFixed(0)}</div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="label">Markup</div>
+                    <div class="value">R$${markupAmount.toFixed(0)}</div>
+                </div>
+                <div class="dashboard-card highlight">
+                    <div class="label">Grand Total</div>
+                    <div class="value">R$${grandTotal.toFixed(0)}</div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="label">Participants</div>
+                    <div class="value">${participants.length}</div>
+                </div>
+            `;
+        }
+
+        // Initial render
+        renderAll();
+    </script>
+</body>
+
+</html>
