@@ -864,8 +864,12 @@
         // Purchase management
         const PURCHASES_KEY = 'coffee_settlement_purchases';
         const ACTIVE_PURCHASE_KEY = 'coffee_settlement_active';
+        const WINDOW_SIDEBAR_STATUS_KEY = 'window_sidebar_status';
         let purchases = [];
         let activePurchaseId = null;
+
+        // Sidebar status
+        let sidebarOpened = true;
 
         // Current purchase data
         let coffees = [];
@@ -899,6 +903,7 @@
         function savePurchasesList() {
             localStorage.setItem(PURCHASES_KEY, JSON.stringify(purchases));
             localStorage.setItem(ACTIVE_PURCHASE_KEY, activePurchaseId);
+            localStorage.setItem(WINDOW_SIDEBAR_STATUS_KEY, sidebarOpened);
         }
 
         // Save current purchase data
@@ -918,6 +923,7 @@
                     markup
                 };
                 purchase.updatedAt = new Date().toISOString();
+                localStorage.setItem(WINDOW_SIDEBAR_STATUS_KEY, sidebarOpened);
                 savePurchasesList();
             }
         }
@@ -1029,6 +1035,11 @@
         // Toggle sidebar
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('collapsed');
+            sidebarOpened = !sidebarOpened;
+
+            console.log('new status, sidebar open?', sidebarOpened);
+
+            saveToStorage();
         }
 
         // Export current purchase to base64 string
@@ -1208,6 +1219,19 @@
         const markupError = document.getElementById('markupError');
         const markupSummaryDiv = document.getElementById('markupSummary');
         const settlementSummaryDiv = document.getElementById('settlementSummary');
+        const sidebarElement = document.getElementById('sidebar');
+
+
+        console.log('checking sidebar...');
+        console.log('status loaded: ', localStorage.getItem(WINDOW_SIDEBAR_STATUS_KEY));
+        if (localStorage.getItem(WINDOW_SIDEBAR_STATUS_KEY) === "true") {
+            console.log('Keep it open...');
+            document.getElementById('sidebar').classList.remove('collapsed');
+        } else {
+            console.log('Keep it closed');
+            document.getElementById('sidebar').classList.add('collapsed');
+        }
+
 
         // Add coffee product
         coffeeForm.addEventListener('submit', function(e) {
