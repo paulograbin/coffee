@@ -23,9 +23,18 @@ export const useParticipantsStore = defineStore('participants', () => {
     participants.value.push({ id: nextId++, name: trimmed })
   }
 
+  function renameParticipant(id: number, newName: string) {
+    const trimmed = newName.trim()
+    if (!trimmed) return
+    const participant = participants.value.find(p => p.id === id)
+    if (participant) {
+      participant.name = trimmed
+    }
+  }
+
   function removeParticipant(id: number) {
     participants.value = participants.value.filter(p => p.id !== id)
   }
 
-  return { participants, addParticipant, removeParticipant }
+  return { participants, addParticipant, renameParticipant, removeParticipant }
 })
