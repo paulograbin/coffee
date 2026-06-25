@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 
 export interface Participant {
@@ -7,15 +7,17 @@ export interface Participant {
 }
 
 export const useParticipantsStore = defineStore('participants', () => {
-  const participants = ref<Participant[]>([])
+  const storedParticipantString = localStorage.getItem('participants');
+  const storedParticipants = storedParticipantString ? JSON.parse(storedParticipantString) : []
+
+  console.log(`Found ${storedParticipants.length} stored participants`)
+
+  const participants = ref<Participant[]>(storedParticipants)
   let nextId = 1
 
-  addParticipant("Paulo")
-  addParticipant("Spiga")
-  addParticipant("Maicon")
-  addParticipant("Jackon")
-
-
+  watch(participants, (val) => {
+    localStorage.setItem('participants', JSON.stringify(val))
+  }, { deep: true })
 
   function addParticipant(name: string) {
     const trimmed = name.trim()
