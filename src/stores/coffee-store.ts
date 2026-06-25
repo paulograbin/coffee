@@ -13,7 +13,7 @@ export const useCoffeeStore = defineStore('coffees', () => {
   const storedCoffeeString = localStorage.getItem('coffees')
   const storedCoffee = storedCoffeeString ? JSON.parse(storedCoffeeString) : []
 
-  console.log(`Found ${storedCoffee.length} stored participants`)
+  console.log(`Found ${storedCoffee.length} stored coffees`)
 
   const coffees = ref<Coffee[]>(storedCoffee)
   let nextId = 1
@@ -21,7 +21,7 @@ export const useCoffeeStore = defineStore('coffees', () => {
   watch(coffees, (val) => {
     console.log(`Saving coffee to local storage...`)
     localStorage.setItem('coffees', JSON.stringify(val))
-  })
+  }, { deep: true})
 
   function addCoffee(name: string, weight: number, priceInCents: number) {
     console.log(`Adding coffee ${name} to ${nextId}`)
