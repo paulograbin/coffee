@@ -105,20 +105,6 @@ button {
   padding: 0.4rem 0.6rem;
 }
 
-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.4rem 0;
-  border-bottom: 1px solid #eee;
-}
-
 .name {
   cursor: pointer;
   padding: 0.2rem 0.4rem;
