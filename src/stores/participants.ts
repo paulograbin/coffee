@@ -7,35 +7,37 @@ export interface Participant {
 }
 
 export const useParticipantsStore = defineStore('participants', () => {
-  const storedParticipantString = localStorage.getItem('participants');
+  const storedParticipantString = localStorage.getItem('participants')
   const storedParticipants = storedParticipantString ? JSON.parse(storedParticipantString) : []
 
   console.log(`Found ${storedParticipants.length} stored participants`)
 
   const participants = ref<Participant[]>(storedParticipants)
-  let nextId = 1
+  let nextId = participants.value
+    .reduce((acc, cur) => Math.max(acc, cur.id), 0) + 1;
 
   watch(participants, (val) => {
     localStorage.setItem('participants', JSON.stringify(val))
-  }, { deep: true })
+  })
 
   function addParticipant(name: string) {
     const trimmed = name.trim()
     if (!trimmed) return
-    participants.value.push({ id: nextId++, name: trimmed })
+
+    participants.value = [...participants.value, { id: nextId++, name: trimmed }]
   }
 
   function renameParticipant(id: number, newName: string) {
     const trimmed = newName.trim()
     if (!trimmed) return
-    const participant = participants.value.find(p => p.id === id)
-    if (participant) {
-      participant.name = trimmed
-    }
+
+    participants.value = participants.value.map((p) =>
+      p.id === id ? { ...p, name: trimmed } : p,
+    )
   }
 
   function removeParticipant(id: number) {
-    participants.value = participants.value.filter(p => p.id !== id)
+    participants.value = participants.value.filter((p) => p.id !== id)
   }
 
   return { participants, addParticipant, renameParticipant, removeParticipant }
