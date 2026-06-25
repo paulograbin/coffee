@@ -1,4 +1,4 @@
-import {ref} from 'vue'
+import { ref, watch } from 'vue'
 import {defineStore} from 'pinia'
 
 export interface Coffee {
@@ -10,14 +10,18 @@ export interface Coffee {
 }
 
 export const useCoffeeStore = defineStore('coffees', () => {
-  const coffees = ref<Coffee[]>([])
+  const storedCoffeeString = localStorage.getItem('coffees')
+  const storedCoffee = storedCoffeeString ? JSON.parse(storedCoffeeString) : []
+
+  console.log(`Found ${storedCoffee.length} stored participants`)
+
+  const coffees = ref<Coffee[]>(storedCoffee)
   let nextId = 1
 
-  addCoffee("dadaa", 2, 6599);
-  addCoffee("dadab", 2, 6599);
-  addCoffee("dadac", 2, 6599);
-  addCoffee("dadad", 2, 6599);
-
+  watch(coffees, (val) => {
+    console.log(`Saving coffee to local storage...`)
+    localStorage.setItem('coffees', JSON.stringify(val))
+  })
 
   function addCoffee(name: string, weight: number, priceInCents: number) {
     console.log(`Adding coffee ${name} to ${nextId}`)
