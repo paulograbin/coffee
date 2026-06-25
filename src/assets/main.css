@@ -1,5 +1,46 @@
 @import './base.css';
 
+.coffee-table {
+
+}
+
+.participant-table {
+  padding: 1rem;
+}
+
+.card {
+  background-color: white;
+  border-style: solid;
+}
+
+.cardDescription {
+  border-bottom: 2px solid #d4a574;
+}
+
+th {
+  background: #f8f4f0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+th,
+td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background: #f8f4f0;
+  color: #4a2c2a;
+}
+
+
 #app {
   max-width: 1280px;
   margin: 0 auto;

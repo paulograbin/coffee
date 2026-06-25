@@ -38,7 +38,6 @@ function cancelEdit() {
 <template>
   <div class="participant-table card">
     <h2 class="cardDescription">Participants</h2>
-
     <h2>Names</h2>
 
     <form @submit.prevent="addParticipant" class="add-form">
@@ -84,22 +83,6 @@ function cancelEdit() {
 </template>
 
 <style scoped>
-.participant-table {
-  padding: 1rem;
-}
-
-.card {
-  background-color: white;
-  border-style: solid;
-}
-.cardDescription {
-  border-bottom: 2px solid #d4a574;
-}
-
-th {
-  background: #f8f4f0;
-}
-
 button {
   background: #6b4423;
   color: white;
@@ -110,24 +93,6 @@ button {
   cursor: pointer;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  font-size: 13px;
-}
-
-th,
-td {
-  padding: 8px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-
-th {
-  background: #f8f4f0;
-  color: #4a2c2a;
-}
 
 .add-form {
   display: flex;
