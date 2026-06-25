@@ -47,12 +47,12 @@ function cancelEdit() {
     </form>
 
     <table v-if="store.participants.length">
-      <th>
+      <thead>
         <tr>
-          <td>Name</td>
-          <td>Actions</td>
+          <th>Name</th>
+          <th>Actions</th>
         </tr>
-      </th>
+      </thead>
       <tbody>
         <tr v-for="p in store.participants" :key="p.id">
           <td v-if="editingId === p.id">
@@ -73,7 +73,9 @@ function cancelEdit() {
         </tr>
       </tbody>
       <tfoot>
-        <th>Total {{ store.participants.length }} participants(s)</th>
+        <tr>
+          <th colspan="2">Total {{ store.participants.length }} participant(s)</th>
+        </tr>
       </tfoot>
     </table>
 
