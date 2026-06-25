@@ -8,7 +8,10 @@ const editingId = ref<number | null>(null)
 const editingName = ref('')
 
 function addParticipant() {
-  newName.value.trim().split(',').forEach(name => store.addParticipant(name))
+  newName.value
+    .trim()
+    .split(',')
+    .forEach((name) => store.addParticipant(name))
   newName.value = ''
 }
 
@@ -43,23 +46,37 @@ function cancelEdit() {
       <button type="submit">Add</button>
     </form>
 
-    <ul v-if="store.participants.length">
-      <li v-for="p in store.participants" :key="p.id">
-        <template v-if="editingId === p.id">
-          <input
-            v-model="editingName"
-            class="edit-inline"
-            @keyup.enter="saveEdit(p.id)"
-            @keyup.escape="cancelEdit"
-            @blur="saveEdit(p.id)"
-          />
-        </template>
-        <template v-else>
-          <span class="name" @click="startEditing(p.id, p.name)">{{ p.name }}</span>
-        </template>
-        <button @click="store.removeParticipant(p.id)">Remove</button>
-      </li>
-    </ul>
+    <table v-if="store.participants.length">
+      <th>
+        <tr>
+          <td>Name</td>
+          <td>Actions</td>
+        </tr>
+      </th>
+      <tbody>
+        <tr v-for="p in store.participants" :key="p.id">
+          <td v-if="editingId === p.id">
+            <input
+              v-model="editingName"
+              class="edit-inline"
+              @keyup.enter="saveEdit(p.id)"
+              @keyup.escape="cancelEdit"
+              @blur="saveEdit(p.id)"
+            />
+          </td>
+          <td v-else>
+            <span class="name" @click="startEditing(p.id, p.name)">{{ p.name }}</span>
+          </td>
+          <td>
+            <button @click="store.removeParticipant(p.id)">Remove</button>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <th>Total {{ store.participants.length }} participants(s)</th>
+      </tfoot>
+    </table>
+
     <p v-else class="empty">No participants yet.</p>
   </div>
 </template>
@@ -75,6 +92,39 @@ function cancelEdit() {
 }
 .cardDescription {
   border-bottom: 2px solid #d4a574;
+}
+
+th {
+  background: #f8f4f0;
+}
+
+button {
+  background: #6b4423;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+th,
+td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background: #f8f4f0;
+  color: #4a2c2a;
 }
 
 .add-form {
