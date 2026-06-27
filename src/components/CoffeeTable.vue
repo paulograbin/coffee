@@ -4,12 +4,16 @@ import { ref } from 'vue'
 
 const store = useCoffeeStore()
 
-const newCoffee = ref('')
+const newCoffeeName = ref('')
+const newCoffeeWeight = ref<number | null>(null)
+const newCoffeePrice = ref<number | null>(null)
 
 function addCoffee() {
-  const random = crypto.randomUUID()
+  if (!newCoffeeName.value || !newCoffeeName.value.trim()) return
+  if (!newCoffeeWeight.value || newCoffeeWeight.value <= 0) return
+  if (!newCoffeePrice.value || newCoffeePrice.value <= 0) return
 
-  store.addCoffee(random, 5353, 34343)
+  store.addCoffee(newCoffeeName.value, newCoffeeWeight.value, newCoffeePrice.value)
 }
 </script>
 
@@ -18,7 +22,9 @@ function addCoffee() {
     <h2 class="cardDescription">Cafés - ({{ store.coffees.length }})</h2>
 
     <form @submit.prevent="addCoffee" class="add-form">
-      <input v-model="newCoffee" placeholder="Coffee" type="text" />
+      <input v-model="newCoffeeName" placeholder="Alpendre" type="text" />
+      <input v-model="newCoffeeWeight" placeholder="0.00" type="number" />
+      <input v-model="newCoffeePrice" placeholder="0.00" type="number" />
       <button type="submit">Add Coffee</button>
     </form>
 
