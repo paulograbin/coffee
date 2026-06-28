@@ -19,7 +19,6 @@ function addCoffee() {
 function removeCoffee(coffeeId: number) {
   store.removeCoffee(coffeeId)
 }
-
 </script>
 
 <template>
@@ -33,7 +32,7 @@ function removeCoffee(coffeeId: number) {
       <button type="submit">Add Coffee</button>
     </form>
 
-    <table>
+    <table v-if="store.coffees.length > 0">
       <thead>
         <tr>
           <th>Name</th>
@@ -61,6 +60,7 @@ function removeCoffee(coffeeId: number) {
         </tr>
       </tfoot>
     </table>
+    <p v-else class="empty">No coffee products added yet.</p>
   </div>
 </template>
 
@@ -74,5 +74,10 @@ function removeCoffee(coffeeId: number) {
 .add-form input {
   flex: 1;
   padding: 0.4rem 0.6rem;
+}
+
+.empty {
+  color: #999;
+  font-style: italic;
 }
 </style>
