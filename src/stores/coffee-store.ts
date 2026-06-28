@@ -7,6 +7,7 @@ export interface Coffee {
   weight: number
   priceInCents: number
   price: number
+  itemTotal: number
 }
 
 export const useCoffeeStore = defineStore('coffees', () => {
@@ -36,6 +37,7 @@ export const useCoffeeStore = defineStore('coffees', () => {
       weight: weight,
       priceInCents: priceInCents,
       price: priceInCents / 100,
+      itemTotal: priceInCents * weight,
     }
 
     coffees.value.push(newCoffee)
