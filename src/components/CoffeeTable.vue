@@ -15,6 +15,11 @@ function addCoffee() {
 
   store.addCoffee(newCoffeeName.value, newCoffeeWeight.value, newCoffeePrice.value)
 }
+
+function removeCoffee(coffeeId: number) {
+  store.removeCoffee(coffeeId)
+}
+
 </script>
 
 <template>
@@ -46,13 +51,13 @@ function addCoffee() {
           <td>{{ c.price }}</td>
           <td>
             <button class="edit-btn">Edit</button>
-            <button class="delete-btn">Delete</button>
+            <button class="delete-btn" @click="removeCoffee(c.id)">Delete</button>
           </td>
         </tr>
       </tbody>
       <tfoot>
         <tr>
-          <th colspan="6">Total {{ store.coffees.length }} coffee items</th>
+          <th colspan="6">Total: {{ store.coffees.length }} coffee items</th>
         </tr>
       </tfoot>
     </table>
