@@ -83,15 +83,6 @@ function cancelEdit() {
 </template>
 
 <style scoped>
-button {
-  background: #6b4423;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-}
 
 
 .add-form {
