@@ -37,23 +37,25 @@ function cancelEdit() {
 
 <template>
   <div class="participant-table card">
-    <h2 class="cardDescription">Participants</h2>
-    <h2>Names</h2>
+    <h2 class="cardDescription">Participants ({{ store.participants.length }})</h2>
+    <h2>Names (Comma-separated)</h2>
 
     <form @submit.prevent="addParticipant" class="add-form">
-      <input v-model="newName" placeholder="Participant name" type="text" />
+      <input v-model="newName" placeholder="Peter, Tony, Bruce" type="text" />
       <button type="submit">Add</button>
     </form>
 
     <table v-if="store.participants.length">
       <thead>
         <tr>
+          <th>ID</th>
           <th>Name</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="p in store.participants" :key="p.id">
+          <td>{{ p.id }}</td>
           <td v-if="editingId === p.id">
             <input
               v-model="editingName"
@@ -73,7 +75,7 @@ function cancelEdit() {
       </tbody>
       <tfoot>
         <tr>
-          <th colspan="2">Total {{ store.participants.length }} participant(s)</th>
+          <th colspan="3">Total: {{ store.participants.length }} participant(s)</th>
         </tr>
       </tfoot>
     </table>
