@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useParticipantsStore } from '@/stores/participants.ts'
 import { usePurchaseStore } from '@/stores/purchase-store.ts'
 
@@ -16,11 +16,6 @@ function setFreight() {
 function setMarkup() {
   purchaseStore.setMarkupCost(markupCost.value)
 }
-
-watch(() => purchaseStore.purchase, (p) => {
-  freightCost.value = p?.freightCost ?? 0
-  markupCost.value = p?.markupCost ?? 0
-}, { deep: true })
 </script>
 
 <template>
@@ -41,6 +36,7 @@ watch(() => purchaseStore.purchase, (p) => {
         />
         <button type="button" @click="setFreight">Set</button>
       </div>
+
       <div class="markupForm">
         <label for="markup">Markup (R$ / kg)</label>
         <input
@@ -68,7 +64,6 @@ watch(() => purchaseStore.purchase, (p) => {
       </div>
     </div>
   </div>
-
 </template>
 
 <style scoped>
