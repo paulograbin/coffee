@@ -78,18 +78,20 @@ function importCoffeeCsv() {
       <thead>
         <tr>
           <th>Name</th>
-          <th>Kgs</th>
+          <th>Weight</th>
           <th>Price in cents</th>
-          <th>Price</th>
+          <th>R$/kg</th>
+          <th>Total</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="c in store.coffees" :key="c.id">
           <td>{{ c.name }}</td>
-          <td>{{ c.weight }}</td>
-          <td>{{ c.priceInCents }}</td>
-          <td>{{ c.price }}</td>
+          <td>{{ c.weight }} kg</td>
+          <td>{{ c.priceInCents }} cents</td>
+          <td>R$ {{ c.price }}</td>
+          <td>R$ {{ c.weight * c.price }}</td>
           <td>
             <button class="edit-btn">Edit</button>
             <button class="delete-btn" @click="removeCoffee(c.id)">Delete</button>
