@@ -4,6 +4,7 @@ import { ref } from 'vue'
 
 const store = useCoffeeStore()
 
+const multipleCoffeeCsv = ref('')
 const newCoffeeName = ref('')
 const newCoffeeWeight = ref<number | null>(null)
 const newCoffeePrice = ref<number | null>(null)
@@ -19,11 +20,40 @@ function addCoffee() {
 function removeCoffee(coffeeId: number) {
   store.removeCoffee(coffeeId)
 }
+
+function importCoffeeCsv() {
+  multipleCoffeeCsv.value
+    .trim()
+    .split('\n')
+    .forEach((line) => {
+      if (!line.trim()) {
+        return
+      }
+
+      const parts = line.split(',')
+      if (parts.length !== 3) {
+        return
+      }
+
+      const name = parts[0]!.trim()
+      const weight = parseFloat(parts[1]!.trim())
+      const priceInCents = parseFloat(parts[2]!.trim())
+
+      if (!name || isNaN(weight) || weight <= 0 || isNaN(priceInCents) || priceInCents <= 0) {
+        return
+      }
+
+      store.addCoffee(name, weight, priceInCents)
+    })
+
+  multipleCoffeeCsv.value = ''
+}
 </script>
 
 <template>
   <div class="coffee-table card">
     <h2 class="cardDescription">Cafés - ({{ store.coffees.length }})</h2>
+    <h2 class="cardDescription">Add coffee</h2>
 
     <form @submit.prevent="addCoffee" class="add-form">
       <input v-model="newCoffeeName" placeholder="Alpendre" type="text" />
@@ -31,6 +61,18 @@ function removeCoffee(coffeeId: number) {
       <input v-model="newCoffeePrice" placeholder="0.00" type="number" />
       <button type="submit">Add Coffee</button>
     </form>
+
+    <div>
+      <textarea
+        class="inputCsv"
+        id="coffeeImport"
+        rows="3"
+        placeholder="Name, Weight in KGs, Price/kg"
+        v-model="multipleCoffeeCsv"
+      >
+      </textarea>
+      <button type="button" @click="importCoffeeCsv()">Import</button>
+    </div>
 
     <table v-if="store.coffees.length > 0">
       <thead>
@@ -74,6 +116,10 @@ function removeCoffee(coffeeId: number) {
 .add-form input {
   flex: 1;
   padding: 0.4rem 0.6rem;
+}
+
+.inputCsv {
+  width: 100%;
 }
 
 .empty {
