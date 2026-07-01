@@ -27,6 +27,7 @@ th {
 
 table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   margin-top: 10px;
   font-size: 13px;
@@ -77,8 +78,6 @@ a,
   }
 
   #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
     padding: 0 2rem;
   }
 }
@@ -91,4 +90,62 @@ button {
   border-radius: 4px;
   font-size: 14px;
   cursor: pointer;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #333;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+
+/* Dashboard Cards */
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.dashboard-card {
+  background: white;
+  border-radius: 8px;
+  padding: 12px 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.dashboard-card .label {
+  font-size: 11px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.dashboard-card .value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #4a2c2a;
+}
+
+.dashboard-card.highlight {
+  background: linear-gradient(135deg, #4a2c2a, #6b4423);
+}
+
+.dashboard-card.highlight .label {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.dashboard-card.highlight .value {
+  color: white;
 }
