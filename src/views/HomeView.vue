@@ -16,7 +16,8 @@ const totalCoffeeCost = coffeeStore.coffees.reduce((acc, coffee) => {
 }, 0)
 
 const totalCost =
-  purchaseStore.purchase?.freightCost + purchaseStore.purchase?.markupCost + totalCoffeeCost
+  (purchaseStore?.purchase?.freightCost || 0) +
+  (purchaseStore?.purchase?.markupCost || 0) + totalCoffeeCost
 </script>
 
 <template>
@@ -25,7 +26,7 @@ const totalCost =
     <CardComponent label="Coffees" :value="coffeeStore.coffees.length" />
     <CardComponent label="Freight" :value="`R$ ${purchaseStore.purchase?.freightCost ?? 0}`" />
     <CardComponent label="Markup" :value="`R$ ${purchaseStore.purchase?.markupCost ?? 0}`" />
-    <CardComponent label="Total" :value="`R$ ${totalCost}`" />
+    <CardComponent label="Total" :value="`R$ ${totalCost ?? 0}`" />
   </div>
 
   <div class="two-columns">
