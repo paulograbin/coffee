@@ -255,3 +255,199 @@ nextTick(() => editInput.value?.focus())
 ### 24. No use of Pinia's `storeToRefs` for destructuring
 
 When you need only reactive state (not actions) from a store, `storeToRefs()` preserves reactivity during destructuring. Currently not an issue since stores are used as `store.coffees`, but if someone later destructures `const { coffees } = useCoffeeStore()`, it loses reactivity silently.
+
+---
+
+## Accessibility
+
+### 25. Buttons without meaningful labels for screen readers
+
+**Files:** `CoffeeTable.vue:130`, `AllocationTable.vue:29`
+
+The "Edit" buttons have no `aria-label` and perform no action. Screen readers announce "button, Edit" with no context about *which* item. Either remove them or add `aria-label`:
+```html
+<button aria-label="Edit Alpendre coffee">Edit</button>
+```
+
+### 26. Dynamic content has no `aria-live` announcements
+
+When coffees or participants are added/removed, there's no feedback for assistive technology. Wrap the count or add an `aria-live="polite"` region:
+```html
+<p aria-live="polite">{{ store.coffees.length }} coffees loaded</p>
+```
+
+### 27. Color contrast on brown theme
+
+The `#6b4423` button background with white text passes WCAG AA, but `#999` on white (used for `.empty` placeholder text) has a contrast ratio of ~2.8:1 — fails AA. Use `#666` or darker.
+
+### 28. No focus management after inline edit
+
+**File:** `ParticipantTable.vue`
+
+After saving or canceling an edit, focus is lost (returns to `<body>`). Move focus back to the name span or the next logical element.
+
+---
+
+## Error Handling & Edge Cases
+
+### 29. No user feedback on CSV import errors
+
+**File:** `CoffeeTable.vue:45-70`
+
+Invalid lines are silently skipped. The user has no idea if 3 out of 5 lines failed. Show a count or highlight the bad lines:
+```ts
+let imported = 0, skipped = 0
+// ... in the loop:
+imported++
+// ... on invalid:
+skipped++
+// after:
+if (skipped > 0) alert(`Imported ${imported}, skipped ${skipped} invalid lines`)
+```
+
+### 30. localStorage might be unavailable or full
+
+**Files:** All stores
+
+In private browsing (Safari) or when quota is exceeded, `localStorage.setItem()` throws. Wrap writes in try/catch:
+```ts
+try {
+  localStorage.setItem(key, JSON.stringify(val))
+} catch (e) {
+  console.warn('Failed to persist to localStorage:', e)
+}
+```
+
+### 31. No confirmation before destructive actions
+
+**Files:** `CoffeeTable.vue:20`, `ParticipantTable.vue:72`
+
+Deleting a coffee or participant is instant and irreversible (no undo, no "Are you sure?"). At minimum, add a `confirm()` dialog.
+
+---
+
+## Responsiveness
+
+### 32. Two-column grid has no mobile breakpoint
+
+**File:** `src/views/HomeView.vue`
+
+On screens below ~768px, both columns are squeezed side-by-side. Add:
+```css
+@media (max-width: 768px) {
+  .two-columns {
+    grid-template-columns: 1fr;
+  }
+}
+```
+
+### 33. Table with 6 columns on narrow viewports
+
+**File:** `CoffeeTable.vue`
+
+`table-layout: fixed` with 6 columns at ~50% viewport width leaves each cell ≈80px. Names and prices get truncated or overlap. Consider hiding less-important columns on mobile or switching to a card layout.
+
+---
+
+## Data Integrity
+
+### 34. Deleting a participant doesn't remove their allocations
+
+**Files:** `participants.ts`, `allocation-store.ts`
+
+If a participant is deleted, their allocations remain orphaned in the allocation store. Add a cascading delete:
+```ts
+function removeParticipant(id: number) {
+  participants.value = participants.value.filter(p => p.id !== id)
+  allocationStore.removeByParticipant(id)
+}
+```
+
+### 35. Deleting a coffee doesn't remove its allocations
+
+Same as above — orphaned allocation records pointing to a deleted coffee.
+
+### 36. No data export/import for full state backup
+
+There's no way to export the current state as JSON or import it back. Useful for sharing setups between sessions or devices.
+
+---
+
+## Performance
+
+### 37. localStorage writes on every single mutation
+
+**Files:** All store watchers
+
+Every keystroke that changes a reactive array triggers a full `JSON.stringify` + write. For large lists this causes UI jank. Debounce the write:
+```ts
+import { watchDebounced } from '@vueuse/core'
+// or manual:
+let timeout: ReturnType<typeof setTimeout>
+watch(coffees, (val) => {
+  clearTimeout(timeout)
+  timeout = setTimeout(() => localStorage.setItem('coffees', JSON.stringify(val)), 300)
+}, { deep: true })
+```
+
+### 38. No `v-for` key optimization or virtual scrolling
+
+Not a problem at current scale, but if the coffee list grows to hundreds of items, rendering all rows in the DOM will degrade performance. Consider `vue-virtual-scroller` at that point.
+
+---
+
+## Dead Code & Scaffolding
+
+### 39. Unused boilerplate components
+
+These are leftover from `create-vue` and should be removed:
+- `src/components/HelloWorld.vue`
+- `src/components/TheWelcome.vue`
+- `src/components/WelcomeItem.vue`
+- `src/components/icons/` (all 5 icon components)
+- `src/components/__tests__/HelloWorld.spec.ts`
+- `src/stores/counter.ts`
+- `src/views/AboutView.vue`
+
+### 40. Unused CSS classes
+
+**File:** `CostsTable.vue`
+
+`.add-form`, `.add-form input` are defined in the scoped style but never used in the template.
+
+---
+
+## Testing
+
+### 41. No tests for store logic
+
+The only test is for the unused `HelloWorld.vue`. Critical paths that should have unit tests:
+- ID generation after reload
+- CSV parsing (valid, invalid, edge cases)
+- Store persistence round-trip
+- Computed totals
+
+### 42. No integration/E2E tests
+
+No Cypress/Playwright tests to verify the full flow: add coffee → set costs → allocate → verify totals.
+
+---
+
+## Type Safety
+
+### 43. `JSON.parse` results are unvalidated
+
+**Files:** All stores
+
+Data from `localStorage` is trusted blindly. If the schema changes (e.g. a new field is added to `Coffee`), old stored data will have missing fields, causing runtime errors. Validate with Zod or a manual check:
+```ts
+import { z } from 'zod'
+const CoffeeSchema = z.object({ id: z.number(), name: z.string(), ... })
+const parsed = CoffeeSchema.array().safeParse(JSON.parse(raw))
+```
+
+### 44. `Coffee.itemTotal` is derived but stored — can drift
+
+**File:** `src/stores/coffee-store.ts:39-40`
+
+`itemTotal` is computed at creation time (`priceInCents * weight`) and stored as a field. If an edit feature is added and only `weight` is updated, `itemTotal` will be stale. Use a getter or compute it on access instead of storing it.
