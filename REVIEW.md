@@ -49,25 +49,6 @@ const freightPerPerson = computed(() =>
 
 "Total Weight" displays `markupCost` (should be total coffee weight), and "Total Markup" multiplies markup by participant count (should be markup × total weight).
 
-### 7. `HomeView.vue` — Dashboard totals are not reactive
-
-**File:** `src/views/HomeView.vue:15-21`
-
-`totalCoffeeCost` and `totalCost` are plain `const` values computed once at setup time. They won't update when coffees or purchase data changes.
-
-**Fix:** Use `computed()`:
-```ts
-const totalCoffeeCost = computed(() =>
-  coffeeStore.coffees.reduce((acc, coffee) => acc + coffee.itemTotal, 0)
-)
-
-const totalCost = computed(() =>
-  (purchaseStore.purchase?.freightCost ?? 0) +
-  (purchaseStore.purchase?.markupCost ?? 0) +
-  totalCoffeeCost.value
-)
-```
-
 ### 8. `CoffeeTable.vue` — `itemTotal` calculation is inconsistent
 
 **File:** `src/stores/coffee-store.ts:39-40`
