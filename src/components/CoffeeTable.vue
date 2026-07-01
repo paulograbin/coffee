@@ -38,7 +38,7 @@ function getTotalPrice() {
 }
 function getTotalAmount() {
   return store.coffees.reduce((acc, coffee) => {
-    return acc + coffee.itemTotal
+    return acc + coffee.itemTotal / 100
   }, 0)
 }
 
@@ -74,12 +74,25 @@ function importCoffeeCsv() {
 <template>
   <div class="coffee-table card">
     <h2 class="cardDescription">Cafés - ({{ store.coffees.length }})</h2>
-    <h2 class="cardDescription">Add coffee</h2>
+    <label class="cardDescription">Add coffee</label>
 
     <form @submit.prevent="addCoffee" class="add-form">
-      <input v-model="newCoffeeName" placeholder="Alpendre" type="text" />
-      <input v-model="newCoffeeWeight" placeholder="0.00" type="number" />
-      <input v-model="newCoffeePrice" placeholder="0.00" type="number" />
+      <div class="inline-form">
+        <div class="form-group">
+          <label for="coffeeName">Name</label>
+          <input id="coffeeName" v-model="newCoffeeName" placeholder="Alpendre" type="text" />
+        </div>
+
+        <div class="form-group">
+          <label for="coffeeWeight">Weight (Kg)</label>
+          <input id="coffeeWeight" v-model="newCoffeeWeight" placeholder="0.00" type="number" />
+        </div>
+
+        <div class="form-group">
+          <label for="coffeePrice">R$/Kg</label>
+          <input id="coffeePrice" v-model="newCoffeePrice" placeholder="0.00" type="number" />
+        </div>
+      </div>
       <button type="submit">Add Coffee</button>
     </form>
 
@@ -153,5 +166,19 @@ function importCoffeeCsv() {
 .empty {
   color: #999;
   font-style: italic;
+}
+.inline-form {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.inline-form .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.form-group {
+  margin-bottom: 10px;
 }
 </style>

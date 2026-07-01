@@ -38,7 +38,7 @@ function cancelEdit() {
 <template>
   <div class="participant-table card">
     <h2 class="cardDescription">Participants ({{ store.participants.length }})</h2>
-    <h2>Names (Comma-separated)</h2>
+    <label>Names (Comma-separated)</label>
 
     <form @submit.prevent="addParticipant" class="add-form">
       <input v-model="newName" placeholder="Peter, Tony, Bruce" type="text" />
