@@ -17,7 +17,7 @@ export const useCoffeeStore = defineStore('coffees', () => {
   console.log(`Found ${storedCoffee.length} stored coffees`)
 
   const coffees = ref<Coffee[]>(storedCoffee)
-  let nextId = 1
+  let nextId = coffees.value.reduce((acc, cur) => Math.max(acc, cur.id), 0) + 1
 
   watch(coffees, (val) => {
     console.log(`Saving coffee to local storage...`)

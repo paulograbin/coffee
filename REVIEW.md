@@ -2,16 +2,6 @@
 
 ## Bugs
 
-### 1. `coffee-store.ts` — `nextId` doesn't account for existing data
-
-**File:** `src/stores/coffee-store.ts:22`
-
-`nextId` starts at 1 regardless of what's loaded from localStorage. After a page reload, new coffees will get duplicate IDs with existing ones.
-
-**Fix:** Derive `nextId` from the stored data like `participants.ts` does:
-```ts
-let nextId = coffees.value.reduce((acc, c) => Math.max(acc, c.id), 0) + 1
-```
 
 ### 2. `coffee-store.ts` — Watcher missing `{ deep: true }`
 
