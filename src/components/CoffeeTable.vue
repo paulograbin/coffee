@@ -21,6 +21,27 @@ function removeCoffee(coffeeId: number) {
   store.removeCoffee(coffeeId)
 }
 
+function getTotalWeight() {
+  return store.coffees.reduce((acc, coffee) => {
+    return acc + coffee.weight
+  }, 0)
+}
+function getTotalPriceInCents() {
+  return store.coffees.reduce((acc, coffee) => {
+    return acc + coffee.priceInCents
+  }, 0)
+}
+function getTotalPrice() {
+  return store.coffees.reduce((acc, coffee) => {
+    return acc + coffee.price
+  }, 0)
+}
+function getTotalAmount() {
+  return store.coffees.reduce((acc, coffee) => {
+    return acc + coffee.itemTotal
+  }, 0)
+}
+
 function importCoffeeCsv() {
   multipleCoffeeCsv.value
     .trim()
@@ -82,7 +103,7 @@ function importCoffeeCsv() {
           <th>Price in cents</th>
           <th>R$/kg</th>
           <th>Total</th>
-          <th>Actions</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
@@ -100,7 +121,12 @@ function importCoffeeCsv() {
       </tbody>
       <tfoot>
         <tr>
-          <th colspan="6">Total: {{ store.coffees.length }} coffee items</th>
+          <th>Total: {{ store.coffees.length }} coffee items</th>
+          <th>{{ getTotalWeight() }} kg</th>
+          <th>R$ {{ getTotalPriceInCents() }} kg</th>
+          <th>R$ {{ getTotalPrice() }} kg</th>
+          <th>R$ {{ getTotalAmount() }}</th>
+          <th></th>
         </tr>
       </tfoot>
     </table>
