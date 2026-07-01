@@ -7,18 +7,22 @@ import { useParticipantsStore } from '@/stores/participants.ts'
 import { usePurchaseStore } from '@/stores/purchase-store.ts'
 import { useCoffeeStore } from '@/stores/coffee-store.ts'
 import AllocationTable from '@/components/AllocationTable.vue'
+import { computed } from 'vue'
 
 const participantStore = useParticipantsStore()
 const purchaseStore = usePurchaseStore()
 const coffeeStore = useCoffeeStore()
 
-const totalCoffeeCost = coffeeStore.coffees.reduce((acc, coffee) => {
+const totalCoffeeCost = computed(() => coffeeStore.coffees.reduce((acc, coffee) => {
   return acc + coffee.itemTotal
-}, 0)
+}, 0))
 
-const totalCost =
-  (purchaseStore?.purchase?.freightCost || 0) +
-  (purchaseStore?.purchase?.markupCost || 0) + totalCoffeeCost
+const totalCost = computed(
+  () =>
+    (purchaseStore?.purchase?.freightCost || 0) +
+    (purchaseStore?.purchase?.markupCost || 0) +
+    totalCoffeeCost.value
+)
 </script>
 
 <template>
@@ -37,7 +41,7 @@ const totalCost =
     </div>
     <div class="column">
       <CoffeeTable />
-      <AllocationTable/>
+      <AllocationTable />
     </div>
   </div>
 </template>
