@@ -1,13 +1,14 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+defineProps<{
+  label: string
+  value: string | number
+  highlight?: boolean
+}>()
+</script>
 
 <template>
-  <div class="dashboard-card">
-    <div class="label">Coffee value</div>
-    <div class="label">Freight</div>
-    <div class="label">Markup</div>
-    <div class="label">Participants</div>
-    <div class="label">Total</div>
+  <div class="dashboard-card" :class="{ highlight }">
+    <div class="label">{{ label }}</div>
+    <div class="value">{{ value }}</div>
   </div>
 </template>
-
-<style scoped></style>

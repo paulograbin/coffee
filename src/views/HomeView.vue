@@ -3,14 +3,29 @@ import ParticipantTable from '@/components/ParticipantTable.vue'
 import CoffeeTable from '@/components/CoffeeTable.vue'
 import CostsTable from '@/components/CostsTable.vue'
 import CardComponent from '@/components/CardComponent.vue'
+import { useParticipantsStore } from '@/stores/participants.ts'
+import { usePurchaseStore } from '@/stores/purchase-store.ts'
+import { useCoffeeStore } from '@/stores/coffee-store.ts'
+
+const participantStore = useParticipantsStore()
+const purchaseStore = usePurchaseStore()
+const coffeeStore = useCoffeeStore()
+
+const totalCoffeeCost = coffeeStore.coffees.reduce((acc, coffee) => {
+  return acc + coffee.itemTotal
+}, 0)
+
+const totalCost =
+  purchaseStore.purchase?.freightCost + purchaseStore.purchase?.markupCost + totalCoffeeCost
 </script>
 
 <template>
   <div class="dashboard">
-    <CardComponent/>
-    <CardComponent/>
-    <CardComponent/>
-    <CardComponent/>
+    <CardComponent label="Participants" :value="participantStore.participants.length" />
+    <CardComponent label="Coffees" :value="coffeeStore.coffees.length" />
+    <CardComponent label="Freight" :value="`R$ ${purchaseStore.purchase?.freightCost ?? 0}`" />
+    <CardComponent label="Markup" :value="`R$ ${purchaseStore.purchase?.markupCost ?? 0}`" />
+    <CardComponent label="Total" :value="`R$ ${totalCost}`" />
   </div>
 
   <div class="two-columns">
