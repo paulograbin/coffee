@@ -150,3 +150,108 @@ td { overflow-wrap: break-word; }
 ### 16. CardComponent could accept a `prefix` prop
 
 Several cards use `R$ ${value}` in the template string from HomeView. A `prefix` prop (or `format` prop) would keep formatting logic in the component.
+
+---
+
+## Vue / Pinia Framework Misuse
+
+### 17. Functions in template instead of `computed`
+
+**File:** `src/components/CoffeeTable.vue:138-141`
+
+The footer calls `getTotalWeight()`, `getTotalPriceInCents()`, etc. directly in the template. These are plain functions — Vue re-executes them on **every render**, even if the data hasn't changed. Use `computed()` for derived values:
+
+```ts
+const totalWeight = computed(() => store.coffees.reduce((acc, c) => acc + c.weight, 0))
+const totalPrice = computed(() => store.coffees.reduce((acc, c) => acc + c.price, 0))
+```
+
+`computed` caches the result and only recalculates when its dependencies change.
+
+### 18. HomeView dashboard values are not reactive (`const` instead of `computed`)
+
+**File:** `src/views/HomeView.vue:15-21`
+
+```ts
+const totalCoffeeCost = coffeeStore.coffees.reduce(...)
+const totalCost = ...
+```
+
+This calculates once during setup and never updates. In Vue 3 + Composition API, derived state must use `computed()` to stay reactive. The dashboard cards will show stale numbers until a page refresh.
+
+### 19. Store logic executed at import time (not inside `setup`)
+
+**Files:** All stores
+
+```ts
+const storedString = localStorage.getItem('purchase')
+const stored = storedString ? JSON.parse(storedString) : null
+```
+
+This runs inside `defineStore`'s setup function, which is correct for Pinia's composition-style stores. However, `console.log` side effects and `let nextId = 1` assignments at module scope make the stores harder to test (no way to reset state without clearing localStorage and re-importing).
+
+**Better pattern:** Use Pinia's `$reset()` or encapsulate initialization.
+
+### 20. Mutating store state directly via `.push()` without deep watcher
+
+**File:** `src/stores/coffee-store.ts:43`
+
+```ts
+coffees.value.push(newCoffee)
+```
+
+Pinia's `ref` with a watcher requires `{ deep: true }` to detect mutations on array items. Without it, the localStorage persistence silently stops working after the first add. The participants store avoids this by always reassigning the array (`participants.value = [...participants.value, item]`), which is the safer pattern.
+
+**Recommendation:** Either always reassign (immutable pattern):
+```ts
+coffees.value = [...coffees.value, newCoffee]
+```
+Or ensure `{ deep: true }` on the watcher.
+
+### 21. `v-model` on number inputs without `.number` modifier
+
+**File:** `src/components/CoffeeTable.vue:88-89`
+
+```html
+<input v-model="newCoffeeWeight" placeholder="0.00" type="number" />
+```
+
+`v-model` on `<input type="number">` returns a **string** in Vue 3. Use `v-model.number` to get an actual number, or you'll need `parseFloat()` every time you use the value:
+
+```html
+<input v-model.number="newCoffeeWeight" placeholder="0.00" type="number" />
+```
+
+Same applies to `CostsTable.vue` freight/markup inputs.
+
+### 22. Pinia store returns misnamed actions (violation of composable convention)
+
+**File:** `src/stores/allocation-store.ts:42`
+
+```ts
+return { allocations, addCoffee: registerNewAllocation, removeCoffee: removeAllocation }
+```
+
+Renaming store methods on export to unrelated domain names (`addCoffee` for an allocation) breaks Vue DevTools inspection and confuses consumers. Export with their real names.
+
+### 23. Using `document.querySelector` instead of template refs
+
+**File:** `src/components/ParticipantTable.vue:22`
+
+```ts
+const input = document.querySelector('.edit-inline') as HTMLInputElement
+```
+
+This is a vanilla JS escape hatch that bypasses Vue's reactivity and scoping. If multiple rows are being edited (or the class appears elsewhere), it grabs the wrong element. Use a template ref:
+
+```vue
+<input ref="editInput" ... />
+```
+```ts
+const editInput = ref<HTMLInputElement | null>(null)
+nextTick(() => editInput.value?.focus())
+```
+
+### 24. No use of Pinia's `storeToRefs` for destructuring
+
+When you need only reactive state (not actions) from a store, `storeToRefs()` preserves reactivity during destructuring. Currently not an issue since stores are used as `store.coffees`, but if someone later destructures `const { coffees } = useCoffeeStore()`, it loses reactivity silently.
