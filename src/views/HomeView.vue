@@ -6,6 +6,7 @@ import CardComponent from '@/components/CardComponent.vue'
 import { useParticipantsStore } from '@/stores/participants.ts'
 import { usePurchaseStore } from '@/stores/purchase-store.ts'
 import { useCoffeeStore } from '@/stores/coffee-store.ts'
+import AllocationTable from '@/components/AllocationTable.vue'
 
 const participantStore = useParticipantsStore()
 const purchaseStore = usePurchaseStore()
@@ -36,6 +37,7 @@ const totalCost =
     </div>
     <div class="column">
       <CoffeeTable />
+      <AllocationTable/>
     </div>
   </div>
 </template>
