@@ -85,12 +85,12 @@ function importCoffeeCsv() {
 
         <div class="form-group">
           <label for="coffeeWeight">Weight (Kg)</label>
-          <input id="coffeeWeight" v-model="newCoffeeWeight" placeholder="0.00" type="number" />
+          <input id="coffeeWeight" v-model.number="newCoffeeWeight" placeholder="0.00" type="number" />
         </div>
 
         <div class="form-group">
           <label for="coffeePrice">R$/Kg</label>
-          <input id="coffeePrice" v-model="newCoffeePrice" placeholder="0.00" type="number" />
+          <input id="coffeePrice" v-model.number="newCoffeePrice" placeholder="0.00" type="number" />
         </div>
       </div>
       <button type="submit">Add Coffee</button>

@@ -179,22 +179,6 @@ coffees.value = [...coffees.value, newCoffee]
 ```
 Or ensure `{ deep: true }` on the watcher.
 
-### 21. `v-model` on number inputs without `.number` modifier
-
-**File:** `src/components/CoffeeTable.vue:88-89`
-
-```html
-<input v-model="newCoffeeWeight" placeholder="0.00" type="number" />
-```
-
-`v-model` on `<input type="number">` returns a **string** in Vue 3. Use `v-model.number` to get an actual number, or you'll need `parseFloat()` every time you use the value:
-
-```html
-<input v-model.number="newCoffeeWeight" placeholder="0.00" type="number" />
-```
-
-Same applies to `CostsTable.vue` freight/markup inputs.
-
 ### 22. Pinia store returns misnamed actions (violation of composable convention)
 
 **File:** `src/stores/allocation-store.ts:42`
