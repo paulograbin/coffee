@@ -215,26 +215,6 @@ When you need only reactive state (not actions) from a store, `storeToRefs()` pr
 
 ## Accessibility
 
-### 25. Buttons without meaningful labels for screen readers
-
-**Files:** `CoffeeTable.vue:130`, `AllocationTable.vue:29`
-
-The "Edit" buttons have no `aria-label` and perform no action. Screen readers announce "button, Edit" with no context about *which* item. Either remove them or add `aria-label`:
-```html
-<button aria-label="Edit Alpendre coffee">Edit</button>
-```
-
-### 26. Dynamic content has no `aria-live` announcements
-
-When coffees or participants are added/removed, there's no feedback for assistive technology. Wrap the count or add an `aria-live="polite"` region:
-```html
-<p aria-live="polite">{{ store.coffees.length }} coffees loaded</p>
-```
-
-### 27. Color contrast on brown theme
-
-The `#6b4423` button background with white text passes WCAG AA, but `#999` on white (used for `.empty` placeholder text) has a contrast ratio of ~2.8:1 — fails AA. Use `#666` or darker.
-
 ### 28. No focus management after inline edit
 
 **File:** `ParticipantTable.vue`
