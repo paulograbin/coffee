@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useCoffeeStore } from '@/stores/coffee-store.ts'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 const store = useCoffeeStore()
 
@@ -21,11 +21,12 @@ function removeCoffee(coffeeId: number) {
   store.removeCoffee(coffeeId)
 }
 
-function getTotalWeight() {
-  return store.coffees.reduce((acc, coffee) => {
+const totalWeight = computed(() =>
+  store.coffees.reduce((acc, coffee) => {
     return acc + coffee.weight
-  }, 0)
-}
+  }, 0),
+)
+
 function getTotalPriceInCents() {
   return store.coffees.reduce((acc, coffee) => {
     return acc + coffee.priceInCents
@@ -135,7 +136,7 @@ function importCoffeeCsv() {
       <tfoot>
         <tr>
           <th>Total: {{ store.coffees.length }} coffee items</th>
-          <th>{{ getTotalWeight() }} kg</th>
+          <th>{{ totalWeight }} kg</th>
           <th>R$ {{ getTotalPriceInCents() }} kg</th>
           <th>R$ {{ getTotalPrice() }} kg</th>
           <th>R$ {{ getTotalAmount() }}</th>
