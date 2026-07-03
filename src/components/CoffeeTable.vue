@@ -122,6 +122,7 @@ function importCoffeeCsv() {
       </thead>
       <tbody>
         <tr v-for="c in store.coffees" :key="c.id">
+          <td>{{ c.id }}</td>
           <td>{{ c.name }}</td>
           <td>{{ c.weight }} kg</td>
           <td>{{ c.priceInCents }} cents</td>
