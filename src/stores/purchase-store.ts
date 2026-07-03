@@ -34,6 +34,58 @@ export const usePurchaseStore = defineStore('purchase', () => {
     return purchase.value
   }
 
+
+  function makeStandardPurchase() {
+
+    const purchase = {
+      date: new Date().toISOString(),
+      paid: false,
+      name: "Template #1",
+      markupCost: 0,
+      freightCost: 0,
+      coffees: [
+        {
+          id: 1,
+          name: 'Alpendre',
+          weight: 2,
+          priceInCents: 20000,
+          price: 200,
+          itemTotal: 400,
+        },
+        {
+          id: 2,
+          name: 'Baixadão',
+          weight: 1,
+          priceInCents: 10000,
+          price: 100,
+          itemTotal: 100,
+        },
+      ],
+      participants: [
+        {
+          id: 1,
+          name: 'Tony',
+        },
+        {
+          id: 1,
+          name: 'Bruce',
+        },
+        {
+          id: 3,
+          name: 'Peter',
+        },
+      ],
+      allocations: [
+        {
+          participantId: 1,
+          coffeeId: 1,
+          amount: 500
+        },
+      ],
+    }
+
+  }
+
   function setFreightCost(value: number) {
     ensurePurchase().freightCost = value
   }
