@@ -1,0 +1,182 @@
+[
+  {
+    "id": "1772421726635",
+    "name": "Migrated Purchase",
+    "createdAt": "2026-03-02T03:22:06.635Z",
+    "updatedAt": "2026-07-03T00:40:12.762Z",
+    "data": {
+      "coffees": [
+        {
+          "id": 8,
+          "name": "Bem-nascido",
+          "weight": 1,
+          "cost": 149
+        },
+        {
+          "id": 9,
+          "name": "Alpendre",
+          "weight": 2,
+          "cost": 219
+        },
+        {
+          "id": 10,
+          "name": "Maria da Fe",
+          "weight": 2,
+          "cost": 149
+        },
+        {
+          "id": 11,
+          "name": "Sitio das Cabras",
+          "weight": 2,
+          "cost": 183
+        }
+      ],
+      "nextCoffeeId": 12,
+      "participants": [
+        {
+          "id": 1,
+          "name": "Paulo"
+        },
+        {
+          "id": 2,
+          "name": "Gabriel"
+        },
+        {
+          "id": 3,
+          "name": "Diego"
+        },
+        {
+          "id": 4,
+          "name": "Eduardo"
+        }
+      ],
+      "nextParticipantId": 12,
+      "allocations": [
+        {
+          "id": 34,
+          "coffeeId": 9,
+          "participantId": 1,
+          "grams": 1000,
+          "fraction": 0.5,
+          "value": 219
+        },
+        {
+          "id": 35,
+          "coffeeId": 11,
+          "participantId": 2,
+          "grams": 1000,
+          "fraction": 0.5,
+          "value": 183
+        },
+        {
+          "id": 36,
+          "coffeeId": 9,
+          "participantId": 2,
+          "grams": 1000,
+          "fraction": 0.5,
+          "value": 219
+        },
+        {
+          "id": 37,
+          "coffeeId": 10,
+          "participantId": 3,
+          "grams": 1000,
+          "fraction": 0.5,
+          "value": 149
+        },
+        {
+          "id": 38,
+          "coffeeId": 8,
+          "participantId": 3,
+          "grams": 1000,
+          "fraction": 1,
+          "value": 149
+        },
+        {
+          "id": 39,
+          "coffeeId": 11,
+          "participantId": 3,
+          "grams": 1000,
+          "fraction": 0.5,
+          "value": 183
+        },
+        {
+          "id": 40,
+          "coffeeId": 10,
+          "participantId": 1,
+          "grams": 500,
+          "fraction": 0.25,
+          "value": 74.5
+        },
+        {
+          "id": 41,
+          "coffeeId": 10,
+          "participantId": 2,
+          "grams": 500,
+          "fraction": 0.25,
+          "value": 74.5
+        }
+      ],
+      "nextAllocationId": 42,
+      "freightTotal": 67.74,
+      "markup": {
+        "type": "perkg",
+        "value": 10
+      }
+    }
+  },
+  {
+    "id": "1782582842415",
+    "name": "Purchase 2026-06-27",
+    "createdAt": "2026-06-27T17:54:02.415Z",
+    "updatedAt": "2026-07-03T00:40:14.275Z",
+    "data": {
+      "coffees": [
+        {
+          "id": 1,
+          "name": "aaaaa",
+          "weight": 2,
+          "cost": 100
+        },
+        {
+          "id": 2,
+          "name": "bbbb",
+          "weight": 3,
+          "cost": 100
+        }
+      ],
+      "nextCoffeeId": 3,
+      "participants": [
+        {
+          "id": 4,
+          "name": "Peter"
+        },
+        {
+          "id": 5,
+          "name": "Tony"
+        },
+        {
+          "id": 6,
+          "name": "Bruce"
+        }
+      ],
+      "nextParticipantId": 7,
+      "allocations": [
+        {
+          "id": 1,
+          "coffeeId": 1,
+          "participantId": 4,
+          "grams": 500,
+          "fraction": 0.25,
+          "value": 50
+        }
+      ],
+      "nextAllocationId": 2,
+      "freightTotal": 10,
+      "markup": {
+        "type": "perkg",
+        "value": 10
+      }
+    }
+  }
+]
