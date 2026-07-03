@@ -14,8 +14,6 @@ export const useCoffeeStore = defineStore('coffees', () => {
   const storedCoffeeString = localStorage.getItem('coffees')
   const storedCoffee = storedCoffeeString ? JSON.parse(storedCoffeeString) : []
 
-  console.log(`Found ${storedCoffee.length} stored coffees`)
-
   const coffees = ref<Coffee[]>(storedCoffee)
   let nextId = coffees.value.reduce((acc, cur) => Math.max(acc, cur.id), 0) + 1
 
