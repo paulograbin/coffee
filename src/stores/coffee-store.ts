@@ -38,7 +38,7 @@ export const useCoffeeStore = defineStore('coffees', () => {
       itemTotal: priceInCents * weight,
     }
 
-    coffees.value.push(newCoffee)
+    coffees.value = [...coffees.value, newCoffee]
   }
 
   function removeCoffee(id: number) {
