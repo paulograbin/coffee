@@ -7,7 +7,7 @@ import { useParticipantsStore } from '@/stores/participants.ts'
 import { usePurchaseStore } from '@/stores/purchase-store.ts'
 import { useCoffeeStore } from '@/stores/coffee-store.ts'
 import AllocationTable from '@/components/AllocationTable.vue'
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 
 const participantStore = useParticipantsStore()
 const purchaseStore = usePurchaseStore()
@@ -23,6 +23,20 @@ const totalCost = computed(
     (purchaseStore?.purchase?.markupCost || 0) +
     totalCoffeeCost.value
 )
+
+onMounted(() => {
+  console.log('[HomeView] mounted — stores loaded', {
+    participants: participantStore.participants.length,
+    coffees: coffeeStore.coffees.length,
+    freight: purchaseStore.purchase?.freightCost,
+    markUp: purchaseStore.purchase?.markupCost,
+  })
+  document.title = 'Settlement Coffee'
+})
+
+onUnmounted(() => {
+  console.log('[HomeView] unmounted')
+})
 </script>
 
 <template>
