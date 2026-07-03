@@ -10,8 +10,6 @@ export const useParticipantsStore = defineStore('participants', () => {
   const storedParticipantString = localStorage.getItem('participants')
   const storedParticipants = storedParticipantString ? JSON.parse(storedParticipantString) : []
 
-  console.log(`Found ${storedParticipants.length} stored participants`)
-
   const participants = ref<Participant[]>(storedParticipants)
   let nextId = participants.value
     .reduce((acc, cur) => Math.max(acc, cur.id), 0) + 1;
