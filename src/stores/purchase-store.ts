@@ -2,7 +2,13 @@ import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 
 export interface Purchase {
-  date: string
+  createdDate: Date
+  updatedDate: Date
+  paidDate: Date
+  name: string
+  coffees: Coffee[]
+  participants: Participant[]
+  allocations: Allocation[]
   paid: boolean
   markupCost: number
   freightCost: number
@@ -35,12 +41,13 @@ export const usePurchaseStore = defineStore('purchase', () => {
   }
 
 
-  function makeStandardPurchase() {
-
-    const purchase = {
-      date: new Date().toISOString(),
+  function makeStandardPurchase(): Purchase {
+    const pur : Purchase = {
+      createdDate: new Date(),
+      updatedDate: new Date(),
       paid: false,
-      name: "Template #1",
+      paidDate: new Date(),
+      name: 'Template #1',
       markupCost: 0,
       freightCost: 0,
       coffees: [
@@ -77,13 +84,15 @@ export const usePurchaseStore = defineStore('purchase', () => {
       ],
       allocations: [
         {
+          id: 1,
           participantId: 1,
           coffeeId: 1,
-          amount: 500
+          amount: 500,
         },
       ],
     }
 
+    return pur;
   }
 
   function setFreightCost(value: number) {
