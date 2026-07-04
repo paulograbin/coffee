@@ -4,6 +4,20 @@
   "graph": {
     "hyperedges": [
       {
+        "id": "ci_cd_pipeline",
+        "label": "CI/CD Build and Deploy Pipeline",
+        "nodes": [
+          "workflows_static_deploy_workflow",
+          "workflows_static_npm_build",
+          "workflows_static_github_pages_deployment",
+          "settlementcoffee_index_vue_app_entry"
+        ],
+        "relation": "form",
+        "confidence": "INFERRED",
+        "confidence_score": 0.85,
+        "source_file": ".github/workflows/static.yml"
+      },
+      {
         "id": "coffee_settlement_core_domain",
         "label": "Coffee Settlement Core Domain Model",
         "nodes": [
@@ -19,20 +33,6 @@
         "source_file": "old/REQUIREMENTS.md"
       },
       {
-        "id": "ci_cd_pipeline",
-        "label": "CI/CD Build and Deploy Pipeline",
-        "nodes": [
-          "workflows_static_deploy_workflow",
-          "workflows_static_npm_build",
-          "workflows_static_github_pages_deployment",
-          "settlementcoffee_index_vue_app_entry"
-        ],
-        "relation": "form",
-        "confidence": "INFERRED",
-        "confidence_score": 0.85,
-        "source_file": ".github/workflows/static.yml"
-      },
-      {
         "id": "legacy_to_modern_migration",
         "label": "Legacy to Vue 3 App Migration",
         "nodes": [
@@ -45,6 +45,47 @@
         "confidence": "INFERRED",
         "confidence_score": 0.75,
         "source_file": "old/REQUIREMENTS.md"
+      },
+      {
+        "id": "review_vue_reactivity_issues",
+        "label": "Vue Reactivity and State Management Issues",
+        "nodes": [
+          "review_deep_watcher_pattern",
+          "review_computed_reactivity",
+          "review_localstorage_persistence",
+          "review_item_total_inconsistency"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "REVIEW.md"
+      },
+      {
+        "id": "review_data_integrity_cluster",
+        "label": "Data Integrity and Consistency Concerns",
+        "nodes": [
+          "review_cascading_delete",
+          "review_id_collision_bug",
+          "review_type_safety_validation"
+        ],
+        "relation": "participate_in",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "REVIEW.md"
+      },
+      {
+        "id": "review_store_architecture_issues",
+        "label": "Pinia Store Architecture Anti-Patterns",
+        "nodes": [
+          "review_misnamed_store_exports",
+          "review_deep_watcher_pattern",
+          "review_localstorage_persistence",
+          "review_id_collision_bug"
+        ],
+        "relation": "form",
+        "confidence": "INFERRED",
+        "confidence_score": 0.85,
+        "source_file": "REVIEW.md"
       }
     ]
   },
@@ -56,7 +97,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "oxlintrc",
-      "community": 7,
+      "community": 8,
       "norm_label": ".oxlintrc.json"
     },
     {
@@ -66,7 +107,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "oxlintrc_schema",
-      "community": 7,
+      "community": 8,
       "norm_label": "$schema"
     },
     {
@@ -76,7 +117,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "oxlintrc_plugins",
-      "community": 7,
+      "community": 8,
       "norm_label": "plugins"
     },
     {
@@ -86,7 +127,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "oxlintrc_env",
-      "community": 7,
+      "community": 8,
       "norm_label": "env"
     },
     {
@@ -96,7 +137,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "oxlintrc_env_browser",
-      "community": 7,
+      "community": 8,
       "norm_label": "browser"
     },
     {
@@ -106,7 +147,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "oxlintrc_categories",
-      "community": 7,
+      "community": 8,
       "norm_label": "categories"
     },
     {
@@ -116,7 +157,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "oxlintrc_categories_correctness",
-      "community": 7,
+      "community": 8,
       "norm_label": "correctness"
     },
     {
@@ -126,7 +167,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "prettierrc",
-      "community": 10,
+      "community": 12,
       "norm_label": ".prettierrc.json"
     },
     {
@@ -136,7 +177,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "prettierrc_schema",
-      "community": 10,
+      "community": 12,
       "norm_label": "$schema"
     },
     {
@@ -146,7 +187,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "prettierrc_semi",
-      "community": 10,
+      "community": 12,
       "norm_label": "semi"
     },
     {
@@ -156,7 +197,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "prettierrc_singlequote",
-      "community": 10,
+      "community": 12,
       "norm_label": "singlequote"
     },
     {
@@ -166,7 +207,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "prettierrc_printwidth",
-      "community": 10,
+      "community": 12,
       "norm_label": "printwidth"
     },
     {
@@ -176,7 +217,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "env_d",
-      "community": 21,
+      "community": 26,
       "norm_label": "env.d.ts"
     },
     {
@@ -186,7 +227,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "eslint_config",
-      "community": 22,
+      "community": 27,
       "norm_label": "eslint.config.ts"
     },
     {
@@ -196,7 +237,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "package",
-      "community": 3,
+      "community": 4,
       "norm_label": "package.json"
     },
     {
@@ -206,7 +247,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "package_name",
-      "community": 3,
+      "community": 4,
       "norm_label": "name"
     },
     {
@@ -216,7 +257,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "package_version",
-      "community": 3,
+      "community": 4,
       "norm_label": "version"
     },
     {
@@ -226,7 +267,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "package_private",
-      "community": 3,
+      "community": 4,
       "norm_label": "private"
     },
     {
@@ -236,7 +277,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "package_type",
-      "community": 3,
+      "community": 4,
       "norm_label": "type"
     },
     {
@@ -246,7 +287,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "package_scripts",
-      "community": 4,
+      "community": 5,
       "norm_label": "scripts"
     },
     {
@@ -256,7 +297,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "package_scripts_dev",
-      "community": 4,
+      "community": 5,
       "norm_label": "dev"
     },
     {
@@ -266,7 +307,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "package_scripts_build",
-      "community": 4,
+      "community": 5,
       "norm_label": "build"
     },
     {
@@ -276,7 +317,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "package_scripts_preview",
-      "community": 4,
+      "community": 5,
       "norm_label": "preview"
     },
     {
@@ -286,7 +327,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "package_scripts_test_unit",
-      "community": 4,
+      "community": 5,
       "norm_label": "test:unit"
     },
     {
@@ -296,7 +337,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "package_scripts_build_only",
-      "community": 4,
+      "community": 5,
       "norm_label": "build-only"
     },
     {
@@ -306,7 +347,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "package_scripts_type_check",
-      "community": 4,
+      "community": 5,
       "norm_label": "type-check"
     },
     {
@@ -316,7 +357,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "package_scripts_lint",
-      "community": 4,
+      "community": 5,
       "norm_label": "lint"
     },
     {
@@ -326,7 +367,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "package_scripts_lint_oxlint",
-      "community": 4,
+      "community": 5,
       "norm_label": "lint:oxlint"
     },
     {
@@ -336,7 +377,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "package_scripts_lint_eslint",
-      "community": 4,
+      "community": 5,
       "norm_label": "lint:eslint"
     },
     {
@@ -346,7 +387,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "package_scripts_format",
-      "community": 4,
+      "community": 5,
       "norm_label": "format"
     },
     {
@@ -356,7 +397,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "package_dependencies",
-      "community": 3,
+      "community": 4,
       "norm_label": "dependencies"
     },
     {
@@ -366,7 +407,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "package_dependencies_pinia",
-      "community": 3,
+      "community": 4,
       "norm_label": "pinia"
     },
     {
@@ -376,7 +417,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "package_dependencies_vue",
-      "community": 3,
+      "community": 4,
       "norm_label": "vue"
     },
     {
@@ -386,7 +427,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "package_dependencies_vue_router",
-      "community": 3,
+      "community": 4,
       "norm_label": "vue-router"
     },
     {
@@ -636,7 +677,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "package_engines",
-      "community": 3,
+      "community": 4,
       "norm_label": "engines"
     },
     {
@@ -646,7 +687,7 @@
       "source_location": "L49",
       "_origin": "ast",
       "id": "package_engines_node",
-      "community": 3,
+      "community": 4,
       "norm_label": "node"
     },
     {
@@ -796,8 +837,28 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app",
-      "community": 9,
+      "community": 11,
       "norm_label": "app.vue"
+    },
+    {
+      "label": "AllocationTable.vue",
+      "file_type": "code",
+      "source_file": "src/components/AllocationTable.vue",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "components_allocationtable",
+      "community": 19,
+      "norm_label": "allocationtable.vue"
+    },
+    {
+      "label": "CardComponent.vue",
+      "file_type": "code",
+      "source_file": "src/components/CardComponent.vue",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "components_cardcomponent",
+      "community": 20,
+      "norm_label": "cardcomponent.vue"
     },
     {
       "label": "CoffeeTable.vue",
@@ -806,8 +867,18 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_coffeetable",
-      "community": 17,
+      "community": 21,
       "norm_label": "coffeetable.vue"
+    },
+    {
+      "label": "CostsTable.vue",
+      "file_type": "code",
+      "source_file": "src/components/CostsTable.vue",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "components_coststable",
+      "community": 22,
+      "norm_label": "coststable.vue"
     },
     {
       "label": "HelloWorld.vue",
@@ -816,7 +887,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_helloworld",
-      "community": 14,
+      "community": 15,
       "norm_label": "helloworld.vue"
     },
     {
@@ -826,7 +897,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_participanttable",
-      "community": 18,
+      "community": 23,
       "norm_label": "participanttable.vue"
     },
     {
@@ -836,7 +907,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_thewelcome",
-      "community": 19,
+      "community": 24,
       "norm_label": "thewelcome.vue"
     },
     {
@@ -846,7 +917,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_welcomeitem",
-      "community": 20,
+      "community": 25,
       "norm_label": "welcomeitem.vue"
     },
     {
@@ -856,7 +927,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_helloworld_spec",
-      "community": 14,
+      "community": 15,
       "norm_label": "helloworld.spec.ts"
     },
     {
@@ -866,7 +937,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "icons_iconcommunity",
-      "community": 23,
+      "community": 28,
       "norm_label": "iconcommunity.vue"
     },
     {
@@ -876,7 +947,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "icons_icondocumentation",
-      "community": 24,
+      "community": 29,
       "norm_label": "icondocumentation.vue"
     },
     {
@@ -886,7 +957,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "icons_iconecosystem",
-      "community": 25,
+      "community": 30,
       "norm_label": "iconecosystem.vue"
     },
     {
@@ -896,7 +967,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "icons_iconsupport",
-      "community": 26,
+      "community": 31,
       "norm_label": "iconsupport.vue"
     },
     {
@@ -906,7 +977,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "icons_icontooling",
-      "community": 27,
+      "community": 32,
       "norm_label": "icontooling.vue"
     },
     {
@@ -916,7 +987,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_main",
-      "community": 9,
+      "community": 11,
       "norm_label": "main.ts"
     },
     {
@@ -926,7 +997,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "src_main_app",
-      "community": 9,
+      "community": 11,
       "norm_label": "app"
     },
     {
@@ -936,7 +1007,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "router_index",
-      "community": 9,
+      "community": 11,
       "norm_label": "index.ts"
     },
     {
@@ -946,38 +1017,28 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "router_index_router",
-      "community": 9,
+      "community": 11,
       "norm_label": "router"
     },
     {
-      "label": "coffee-store.ts",
+      "label": "allocation-store.ts",
       "file_type": "code",
-      "source_file": "src/stores/coffee-store.ts",
+      "source_file": "src/stores/allocation-store.ts",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "stores_coffee_store",
-      "community": 11,
-      "norm_label": "coffee-store.ts"
+      "id": "stores_allocation_store",
+      "community": 16,
+      "norm_label": "allocation-store.ts"
     },
     {
-      "label": "Coffee",
+      "label": "useAllocationStore",
       "file_type": "code",
-      "source_file": "src/stores/coffee-store.ts",
-      "source_location": "L4",
+      "source_file": "src/stores/allocation-store.ts",
+      "source_location": "L7",
       "_origin": "ast",
-      "id": "stores_coffee_store_coffee",
-      "community": 11,
-      "norm_label": "coffee"
-    },
-    {
-      "label": "useCoffeeStore",
-      "file_type": "code",
-      "source_file": "src/stores/coffee-store.ts",
-      "source_location": "L12",
-      "_origin": "ast",
-      "id": "stores_coffee_store_usecoffeestore",
-      "community": 11,
-      "norm_label": "usecoffeestore"
+      "id": "stores_allocation_store_useallocationstore",
+      "community": 16,
+      "norm_label": "useallocationstore"
     },
     {
       "label": "counter.ts",
@@ -986,7 +1047,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "stores_counter",
-      "community": 15,
+      "community": 17,
       "norm_label": "counter.ts"
     },
     {
@@ -996,7 +1057,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "stores_counter_usecounterstore",
-      "community": 15,
+      "community": 17,
       "norm_label": "usecounterstore"
     },
     {
@@ -1006,7 +1067,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "stores_participants",
-      "community": 12,
+      "community": 13,
       "norm_label": "participants.ts"
     },
     {
@@ -1016,7 +1077,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "stores_participants_participant",
-      "community": 12,
+      "community": 13,
       "norm_label": "participant"
     },
     {
@@ -1026,8 +1087,78 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "stores_participants_useparticipantsstore",
-      "community": 12,
+      "community": 13,
       "norm_label": "useparticipantsstore"
+    },
+    {
+      "label": "purchase-store.ts",
+      "file_type": "code",
+      "source_file": "src/stores/purchase-store.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "stores_purchase_store",
+      "community": 9,
+      "norm_label": "purchase-store.ts"
+    },
+    {
+      "label": "Purchase",
+      "file_type": "code",
+      "source_file": "src/stores/purchase-store.ts",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "stores_purchase_store_purchase",
+      "community": 9,
+      "norm_label": "purchase"
+    },
+    {
+      "label": "Participant",
+      "file_type": "code",
+      "source_file": "src/stores/purchase-store.ts",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "stores_purchase_store_participant",
+      "community": 9,
+      "norm_label": "participant"
+    },
+    {
+      "label": "Coffee",
+      "file_type": "code",
+      "source_file": "src/stores/purchase-store.ts",
+      "source_location": "L22",
+      "_origin": "ast",
+      "id": "stores_purchase_store_coffee",
+      "community": 9,
+      "norm_label": "coffee"
+    },
+    {
+      "label": "Allocation",
+      "file_type": "code",
+      "source_file": "src/stores/purchase-store.ts",
+      "source_location": "L31",
+      "_origin": "ast",
+      "id": "stores_purchase_store_allocation",
+      "community": 9,
+      "norm_label": "allocation"
+    },
+    {
+      "label": "AllocationCalculated",
+      "file_type": "code",
+      "source_file": "src/stores/purchase-store.ts",
+      "source_location": "L38",
+      "_origin": "ast",
+      "id": "stores_purchase_store_allocationcalculated",
+      "community": 9,
+      "norm_label": "allocationcalculated"
+    },
+    {
+      "label": "usePurchaseStore",
+      "file_type": "code",
+      "source_file": "src/stores/purchase-store.ts",
+      "source_location": "L49",
+      "_origin": "ast",
+      "id": "stores_purchase_store_usepurchasestore",
+      "community": 9,
+      "norm_label": "usepurchasestore"
     },
     {
       "label": "AboutView.vue",
@@ -1036,7 +1167,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "views_aboutview",
-      "community": 28,
+      "community": 36,
       "norm_label": "aboutview.vue"
     },
     {
@@ -1046,7 +1177,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "views_homeview",
-      "community": 9,
+      "community": 11,
       "norm_label": "homeview.vue"
     },
     {
@@ -1056,7 +1187,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tsconfig_app",
-      "community": 5,
+      "community": 6,
       "norm_label": "tsconfig.app.json"
     },
     {
@@ -1066,7 +1197,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "tsconfig_app_extends",
-      "community": 5,
+      "community": 6,
       "norm_label": "extends"
     },
     {
@@ -1076,7 +1207,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "tsconfig_app_include",
-      "community": 5,
+      "community": 6,
       "norm_label": "include"
     },
     {
@@ -1086,7 +1217,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "tsconfig_app_exclude",
-      "community": 5,
+      "community": 6,
       "norm_label": "exclude"
     },
     {
@@ -1096,7 +1227,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "tsconfig_app_compileroptions",
-      "community": 5,
+      "community": 6,
       "norm_label": "compileroptions"
     },
     {
@@ -1106,7 +1237,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "tsconfig_app_compileroptions_nouncheckedindexedaccess",
-      "community": 5,
+      "community": 6,
       "norm_label": "nouncheckedindexedaccess"
     },
     {
@@ -1116,7 +1247,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "tsconfig_app_compileroptions_paths",
-      "community": 5,
+      "community": 6,
       "norm_label": "paths"
     },
     {
@@ -1126,7 +1257,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "tsconfig_app_paths",
-      "community": 5,
+      "community": 6,
       "norm_label": "@/*"
     },
     {
@@ -1136,7 +1267,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "tsconfig_app_compileroptions_tsbuildinfofile",
-      "community": 5,
+      "community": 6,
       "norm_label": "tsbuildinfofile"
     },
     {
@@ -1146,7 +1277,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tsconfig",
-      "community": 13,
+      "community": 14,
       "norm_label": "tsconfig.json"
     },
     {
@@ -1156,7 +1287,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "tsconfig_files",
-      "community": 13,
+      "community": 14,
       "norm_label": "files"
     },
     {
@@ -1166,7 +1297,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "tsconfig_references",
-      "community": 13,
+      "community": 14,
       "norm_label": "references"
     },
     {
@@ -1176,7 +1307,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tsconfig_vitest",
-      "community": 6,
+      "community": 7,
       "norm_label": "tsconfig.vitest.json"
     },
     {
@@ -1186,7 +1317,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "tsconfig_vitest_extends",
-      "community": 6,
+      "community": 7,
       "norm_label": "extends"
     },
     {
@@ -1196,7 +1327,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "tsconfig_vitest_include",
-      "community": 6,
+      "community": 7,
       "norm_label": "include"
     },
     {
@@ -1206,7 +1337,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "tsconfig_vitest_exclude",
-      "community": 6,
+      "community": 7,
       "norm_label": "exclude"
     },
     {
@@ -1216,7 +1347,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "tsconfig_vitest_compileroptions",
-      "community": 6,
+      "community": 7,
       "norm_label": "compileroptions"
     },
     {
@@ -1226,7 +1357,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "tsconfig_vitest_compileroptions_lib",
-      "community": 6,
+      "community": 7,
       "norm_label": "lib"
     },
     {
@@ -1236,7 +1367,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "tsconfig_vitest_compileroptions_types",
-      "community": 6,
+      "community": 7,
       "norm_label": "types"
     },
     {
@@ -1246,7 +1377,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "tsconfig_vitest_compileroptions_tsbuildinfofile",
-      "community": 6,
+      "community": 7,
       "norm_label": "tsbuildinfofile"
     },
     {
@@ -1256,7 +1387,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "vite_config",
-      "community": 16,
+      "community": 18,
       "norm_label": "vite.config.ts"
     },
     {
@@ -1266,7 +1397,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "vitest_config",
-      "community": 16,
+      "community": 18,
       "norm_label": "vitest.config.ts"
     },
     {
@@ -1279,8 +1410,34 @@
       "author": null,
       "contributor": null,
       "id": "workflows_static_deploy_workflow",
-      "community": 8,
+      "community": 10,
       "norm_label": "deploy static content to github pages"
+    },
+    {
+      "label": "GitHub Pages Deployment Target",
+      "file_type": "concept",
+      "source_file": ".github/workflows/static.yml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "workflows_static_github_pages_deployment",
+      "community": 10,
+      "norm_label": "github pages deployment target"
+    },
+    {
+      "label": "npm run build-only Step",
+      "file_type": "code",
+      "source_file": ".github/workflows/static.yml",
+      "source_location": "line 53",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "workflows_static_npm_build",
+      "community": 10,
+      "norm_label": "npm run build-only step"
     },
     {
       "label": "Coffee Settlement Vue 3 + Vite Project",
@@ -1292,7 +1449,7 @@
       "author": null,
       "contributor": null,
       "id": "readme_coffee_settlement_project",
-      "community": 8,
+      "community": 10,
       "norm_label": "coffee settlement vue 3 + vite project"
     },
     {
@@ -1305,7 +1462,7 @@
       "author": null,
       "contributor": null,
       "id": "settlementcoffee_index_vue_app_entry",
-      "community": 8,
+      "community": 10,
       "norm_label": "vue app html entry point"
     },
     {
@@ -1320,32 +1477,6 @@
       "id": "old_requirements_coffee_settlement_calculator",
       "community": 1,
       "norm_label": "coffee settlement calculator requirements"
-    },
-    {
-      "label": "Legacy Single-Page Coffee Settlement App",
-      "file_type": "code",
-      "source_file": "old/index.html",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "id": "old_index_legacy_single_page_app",
-      "community": 1,
-      "norm_label": "legacy single-page coffee settlement app"
-    },
-    {
-      "label": "Vue.js Logo SVG",
-      "file_type": "image",
-      "source_file": "src/assets/logo.svg",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "id": "assets_logo_vue_logo",
-      "community": 8,
-      "norm_label": "vue.js logo svg"
     },
     {
       "label": "Multi-Purchase Management (FR-1)",
@@ -1504,30 +1635,225 @@
       "norm_label": "business rules for coffee settlement"
     },
     {
-      "label": "GitHub Pages Deployment Target",
-      "file_type": "concept",
-      "source_file": ".github/workflows/static.yml",
+      "label": "Legacy Single-Page Coffee Settlement App",
+      "file_type": "code",
+      "source_file": "old/index.html",
       "source_location": null,
       "source_url": null,
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "workflows_static_github_pages_deployment",
-      "community": 8,
-      "norm_label": "github pages deployment target"
+      "id": "old_index_legacy_single_page_app",
+      "community": 1,
+      "norm_label": "legacy single-page coffee settlement app"
     },
     {
-      "label": "npm run build-only Step",
-      "file_type": "code",
-      "source_file": ".github/workflows/static.yml",
-      "source_location": "line 53",
+      "label": "Vue.js Logo SVG",
+      "file_type": "image",
+      "source_file": "src/assets/logo.svg",
+      "source_location": null,
       "source_url": null,
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "id": "workflows_static_npm_build",
-      "community": 8,
-      "norm_label": "npm run build-only step"
+      "id": "assets_logo_vue_logo",
+      "community": 10,
+      "norm_label": "vue.js logo svg"
+    },
+    {
+      "label": "Settlement Coffee Code Review",
+      "file_type": "document",
+      "source_file": "REVIEW.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "review_settlement_coffee_review",
+      "community": 3,
+      "norm_label": "settlement coffee code review"
+    },
+    {
+      "label": "Deep Watcher Missing Bug",
+      "file_type": "rationale",
+      "source_file": "REVIEW.md",
+      "source_location": "sections 2, 11, 20",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "review_deep_watcher_pattern",
+      "community": 3,
+      "norm_label": "deep watcher missing bug"
+    },
+    {
+      "label": "NextId Collision After Reload",
+      "file_type": "rationale",
+      "source_file": "REVIEW.md",
+      "source_location": "section 3",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "review_id_collision_bug",
+      "community": 3,
+      "norm_label": "nextid collision after reload"
+    },
+    {
+      "label": "Misnamed Allocation Store Exports",
+      "file_type": "rationale",
+      "source_file": "REVIEW.md",
+      "source_location": "sections 4, 22",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "review_misnamed_store_exports",
+      "community": 3,
+      "norm_label": "misnamed allocation store exports"
+    },
+    {
+      "label": "CostsTable Division By Zero",
+      "file_type": "rationale",
+      "source_file": "REVIEW.md",
+      "source_location": "section 5",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "review_division_by_zero",
+      "community": 3,
+      "norm_label": "coststable division by zero"
+    },
+    {
+      "label": "LocalStorage Persistence Pattern Issues",
+      "file_type": "rationale",
+      "source_file": "REVIEW.md",
+      "source_location": "sections 9, 30, 37",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "review_localstorage_persistence",
+      "community": 3,
+      "norm_label": "localstorage persistence pattern issues"
+    },
+    {
+      "label": "Computed vs Functions for Reactivity",
+      "file_type": "rationale",
+      "source_file": "REVIEW.md",
+      "source_location": "sections 17, 18",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "review_computed_reactivity",
+      "community": 3,
+      "norm_label": "computed vs functions for reactivity"
+    },
+    {
+      "label": "Cascading Delete for Data Integrity",
+      "file_type": "rationale",
+      "source_file": "REVIEW.md",
+      "source_location": "sections 34, 35",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "review_cascading_delete",
+      "community": 3,
+      "norm_label": "cascading delete for data integrity"
+    },
+    {
+      "label": "Template Refs vs querySelector",
+      "file_type": "rationale",
+      "source_file": "REVIEW.md",
+      "source_location": "section 23",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "review_template_refs_pattern",
+      "community": 35,
+      "norm_label": "template refs vs queryselector"
+    },
+    {
+      "label": "Unused Boilerplate Components",
+      "file_type": "rationale",
+      "source_file": "REVIEW.md",
+      "source_location": "section 39",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "review_dead_code_boilerplate",
+      "community": 33,
+      "norm_label": "unused boilerplate components"
+    },
+    {
+      "label": "Missing Unit and E2E Tests",
+      "file_type": "rationale",
+      "source_file": "REVIEW.md",
+      "source_location": "sections 41, 42",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "review_testing_gaps",
+      "community": 3,
+      "norm_label": "missing unit and e2e tests"
+    },
+    {
+      "label": "Unvalidated JSON Parse and Type Safety",
+      "file_type": "rationale",
+      "source_file": "REVIEW.md",
+      "source_location": "sections 43, 44",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "review_type_safety_validation",
+      "community": 3,
+      "norm_label": "unvalidated json parse and type safety"
+    },
+    {
+      "label": "No User Feedback on CSV Import Errors",
+      "file_type": "rationale",
+      "source_file": "REVIEW.md",
+      "source_location": "section 29",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "review_csv_import_errors",
+      "community": 3,
+      "norm_label": "no user feedback on csv import errors"
+    },
+    {
+      "label": "Missing Mobile Responsive Breakpoints",
+      "file_type": "rationale",
+      "source_file": "REVIEW.md",
+      "source_location": "sections 32, 33",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "review_responsive_design",
+      "community": 34,
+      "norm_label": "missing mobile responsive breakpoints"
+    },
+    {
+      "label": "ItemTotal Calculation Inconsistency",
+      "file_type": "rationale",
+      "source_file": "REVIEW.md",
+      "source_location": "section 8",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "review_item_total_inconsistency",
+      "community": 3,
+      "norm_label": "itemtotal calculation inconsistency"
     }
   ],
   "links": [
@@ -2299,21 +2625,11 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/stores/coffee-store.ts",
-      "source_location": "L4",
+      "source_file": "src/stores/allocation-store.ts",
+      "source_location": "L7",
       "weight": 1.0,
-      "source": "stores_coffee_store",
-      "target": "stores_coffee_store_coffee",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/stores/coffee-store.ts",
-      "source_location": "L12",
-      "weight": 1.0,
-      "source": "stores_coffee_store",
-      "target": "stores_coffee_store_usecoffeestore",
+      "source": "stores_allocation_store",
+      "target": "stores_allocation_store_useallocationstore",
       "confidence_score": 1.0
     },
     {
@@ -2344,6 +2660,66 @@
       "weight": 1.0,
       "source": "stores_participants",
       "target": "stores_participants_useparticipantsstore",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/stores/purchase-store.ts",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "stores_purchase_store",
+      "target": "stores_purchase_store_allocation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/stores/purchase-store.ts",
+      "source_location": "L38",
+      "weight": 1.0,
+      "source": "stores_purchase_store",
+      "target": "stores_purchase_store_allocationcalculated",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/stores/purchase-store.ts",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "stores_purchase_store",
+      "target": "stores_purchase_store_coffee",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/stores/purchase-store.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "stores_purchase_store",
+      "target": "stores_purchase_store_participant",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/stores/purchase-store.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "stores_purchase_store",
+      "target": "stores_purchase_store_purchase",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/stores/purchase-store.ts",
+      "source_location": "L49",
+      "weight": 1.0,
+      "source": "stores_purchase_store",
+      "target": "stores_purchase_store_usepurchasestore",
       "confidence_score": 1.0
     },
     {
@@ -2560,6 +2936,16 @@
     {
       "relation": "conceptually_related_to",
       "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "index.html",
+      "source_location": "entry point built by npm run build-only",
+      "weight": 1.0,
+      "source": "settlementcoffee_index_vue_app_entry",
+      "target": "workflows_static_npm_build"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
       "confidence_score": 0.75,
       "source_file": "src/assets/logo.svg",
       "source_location": null,
@@ -2586,16 +2972,6 @@
       "weight": 1.0,
       "source": "old_index_legacy_single_page_app",
       "target": "settlementcoffee_index_vue_app_entry"
-    },
-    {
-      "relation": "conceptually_related_to",
-      "confidence": "INFERRED",
-      "confidence_score": 0.85,
-      "source_file": "index.html",
-      "source_location": "entry point built by npm run build-only",
-      "weight": 1.0,
-      "source": "settlementcoffee_index_vue_app_entry",
-      "target": "workflows_static_npm_build"
     },
     {
       "relation": "references",
@@ -2702,10 +3078,10 @@
       "confidence": "INFERRED",
       "confidence_score": 0.95,
       "source_file": "old/index.html",
-      "source_location": "addMatrixAllocation, removeMatrixAllocation, renderAllocationMatrix",
+      "source_location": "createNewPurchase, switchToPurchase, deletePurchase functions",
       "weight": 1.0,
       "source": "old_index_legacy_single_page_app",
-      "target": "old_requirements_allocation_system"
+      "target": "old_requirements_multi_purchase_management"
     },
     {
       "relation": "implements",
@@ -2722,10 +3098,40 @@
       "confidence": "INFERRED",
       "confidence_score": 0.95,
       "source_file": "old/index.html",
+      "source_location": "participantForm, deleteParticipant, editParticipantName",
+      "weight": 1.0,
+      "source": "old_index_legacy_single_page_app",
+      "target": "old_requirements_participant_management"
+    },
+    {
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "old/index.html",
       "source_location": "freightForm, markupForm handlers",
       "weight": 1.0,
       "source": "old_index_legacy_single_page_app",
       "target": "old_requirements_cost_management"
+    },
+    {
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "old/index.html",
+      "source_location": "addMatrixAllocation, removeMatrixAllocation, renderAllocationMatrix",
+      "weight": 1.0,
+      "source": "old_index_legacy_single_page_app",
+      "target": "old_requirements_allocation_system"
+    },
+    {
+      "relation": "implements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "old/index.html",
+      "source_location": "renderSettlementSummary function",
+      "weight": 1.0,
+      "source": "old_index_legacy_single_page_app",
+      "target": "old_requirements_settlement_calculation"
     },
     {
       "relation": "implements",
@@ -2748,6 +3154,16 @@
       "target": "old_requirements_data_persistence"
     },
     {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "old/REQUIREMENTS.md",
+      "source_location": "Data Model section",
+      "weight": 1.0,
+      "source": "old_requirements_data_persistence",
+      "target": "old_requirements_localstorage_data_model"
+    },
+    {
       "relation": "implements",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -2756,36 +3172,6 @@
       "weight": 1.0,
       "source": "old_index_legacy_single_page_app",
       "target": "old_requirements_localstorage_data_model"
-    },
-    {
-      "relation": "implements",
-      "confidence": "INFERRED",
-      "confidence_score": 0.95,
-      "source_file": "old/index.html",
-      "source_location": "createNewPurchase, switchToPurchase, deletePurchase functions",
-      "weight": 1.0,
-      "source": "old_index_legacy_single_page_app",
-      "target": "old_requirements_multi_purchase_management"
-    },
-    {
-      "relation": "implements",
-      "confidence": "INFERRED",
-      "confidence_score": 0.95,
-      "source_file": "old/index.html",
-      "source_location": "participantForm, deleteParticipant, editParticipantName",
-      "weight": 1.0,
-      "source": "old_index_legacy_single_page_app",
-      "target": "old_requirements_participant_management"
-    },
-    {
-      "relation": "implements",
-      "confidence": "INFERRED",
-      "confidence_score": 0.95,
-      "source_file": "old/index.html",
-      "source_location": "renderSettlementSummary function",
-      "weight": 1.0,
-      "source": "old_index_legacy_single_page_app",
-      "target": "old_requirements_settlement_calculation"
     },
     {
       "relation": "rationale_for",
@@ -2811,14 +3197,158 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "old/REQUIREMENTS.md",
-      "source_location": "Data Model section",
+      "source_file": "REVIEW.md",
+      "source_location": null,
       "weight": 1.0,
-      "source": "old_requirements_data_persistence",
-      "target": "old_requirements_localstorage_data_model"
+      "source": "review_computed_reactivity",
+      "target": "review_settlement_coffee_review"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "REVIEW.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "review_deep_watcher_pattern",
+      "target": "review_settlement_coffee_review"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "REVIEW.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "review_id_collision_bug",
+      "target": "review_settlement_coffee_review"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "REVIEW.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "review_localstorage_persistence",
+      "target": "review_settlement_coffee_review"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "REVIEW.md",
+      "source_location": null,
+      "weight": 1.0,
+      "source": "review_misnamed_store_exports",
+      "target": "review_settlement_coffee_review"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "REVIEW.md",
+      "source_location": null,
+      "weight": 0.8,
+      "source": "review_computed_reactivity",
+      "target": "review_deep_watcher_pattern"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "REVIEW.md",
+      "source_location": "section 20",
+      "weight": 1.0,
+      "source": "review_deep_watcher_pattern",
+      "target": "review_localstorage_persistence"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "REVIEW.md",
+      "source_location": "section 3",
+      "weight": 1.0,
+      "source": "review_id_collision_bug",
+      "target": "review_localstorage_persistence"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "REVIEW.md",
+      "source_location": "allocation-store.ts references",
+      "weight": 0.8,
+      "source": "review_cascading_delete",
+      "target": "review_misnamed_store_exports"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "REVIEW.md",
+      "source_location": "section 5 fix uses computed",
+      "weight": 0.8,
+      "source": "review_division_by_zero",
+      "target": "review_computed_reactivity"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "REVIEW.md",
+      "source_location": "section 43",
+      "weight": 1.0,
+      "source": "review_type_safety_validation",
+      "target": "review_localstorage_persistence"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "REVIEW.md",
+      "source_location": null,
+      "weight": 0.8,
+      "source": "review_item_total_inconsistency",
+      "target": "review_computed_reactivity"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "REVIEW.md",
+      "source_location": null,
+      "weight": 0.7,
+      "source": "review_testing_gaps",
+      "target": "review_type_safety_validation"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "REVIEW.md",
+      "source_location": null,
+      "weight": 0.7,
+      "source": "review_csv_import_errors",
+      "target": "review_type_safety_validation"
     }
   ],
   "hyperedges": [
+    {
+      "id": "ci_cd_pipeline",
+      "label": "CI/CD Build and Deploy Pipeline",
+      "nodes": [
+        "workflows_static_deploy_workflow",
+        "workflows_static_npm_build",
+        "workflows_static_github_pages_deployment",
+        "settlementcoffee_index_vue_app_entry"
+      ],
+      "relation": "form",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": ".github/workflows/static.yml"
+    },
     {
       "id": "coffee_settlement_core_domain",
       "label": "Coffee Settlement Core Domain Model",
@@ -2835,20 +3365,6 @@
       "source_file": "old/REQUIREMENTS.md"
     },
     {
-      "id": "ci_cd_pipeline",
-      "label": "CI/CD Build and Deploy Pipeline",
-      "nodes": [
-        "workflows_static_deploy_workflow",
-        "workflows_static_npm_build",
-        "workflows_static_github_pages_deployment",
-        "settlementcoffee_index_vue_app_entry"
-      ],
-      "relation": "form",
-      "confidence": "INFERRED",
-      "confidence_score": 0.85,
-      "source_file": ".github/workflows/static.yml"
-    },
-    {
       "id": "legacy_to_modern_migration",
       "label": "Legacy to Vue 3 App Migration",
       "nodes": [
@@ -2861,7 +3377,48 @@
       "confidence": "INFERRED",
       "confidence_score": 0.75,
       "source_file": "old/REQUIREMENTS.md"
+    },
+    {
+      "id": "review_vue_reactivity_issues",
+      "label": "Vue Reactivity and State Management Issues",
+      "nodes": [
+        "review_deep_watcher_pattern",
+        "review_computed_reactivity",
+        "review_localstorage_persistence",
+        "review_item_total_inconsistency"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "REVIEW.md"
+    },
+    {
+      "id": "review_data_integrity_cluster",
+      "label": "Data Integrity and Consistency Concerns",
+      "nodes": [
+        "review_cascading_delete",
+        "review_id_collision_bug",
+        "review_type_safety_validation"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "REVIEW.md"
+    },
+    {
+      "id": "review_store_architecture_issues",
+      "label": "Pinia Store Architecture Anti-Patterns",
+      "nodes": [
+        "review_misnamed_store_exports",
+        "review_deep_watcher_pattern",
+        "review_localstorage_persistence",
+        "review_id_collision_bug"
+      ],
+      "relation": "form",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "REVIEW.md"
     }
   ],
-  "built_at_commit": "39960f62dab6ee737d8b60594bc5fa8784c1c054"
+  "built_at_commit": "4805758c4f498cc558372983225afa3d2ff3fba0"
 }
