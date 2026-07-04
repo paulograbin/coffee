@@ -1,17 +1,19 @@
 <script setup lang="ts">
-import { useCoffeeStore } from '@/stores/coffee-store.ts'
 import { useParticipantsStore } from '@/stores/participants.ts'
-import { type AllocationCalculated, useAllocationStore } from '@/stores/allocation-store.ts'
+import { useAllocationStore } from '@/stores/allocation-store.ts'
+import { type AllocationCalculated, usePurchaseStore } from '@/stores/purchase-store.ts'
 
-const store = useCoffeeStore()
+const purchaseStore = usePurchaseStore()
 const participantStore = useParticipantsStore()
 const allocationStore = useAllocationStore()
 
 function makeCrap(): AllocationCalculated[] {
-  const consolidated : AllocationCalculated[] = []
+  const consolidated: AllocationCalculated[] = []
 
   allocationStore.allocations.forEach((allocation) => {
-    const coffee = store.coffees.find((coffee) => coffee.id === allocation.coffeeId)
+    const coffee = purchaseStore.purchase.coffees.find(
+      (coffee) => coffee.id === allocation.coffeeId,
+    )
     const participant = participantStore.participants.find((p) => p.id === allocation.participantId)
 
     console.log('coffee', coffee?.name)
@@ -19,15 +21,14 @@ function makeCrap(): AllocationCalculated[] {
     console.log('participant', participant?.name)
     console.log('allocation', allocation.amount)
 
-    const percentage =  (allocation?.amount / (coffee?.weight * 1000)) * 100
+    const percentage = (allocation?.amount / (coffee?.weight * 1000)) * 100
     console.log('percentage', percentage)
 
-    const nova : AllocationCalculated = {
+    const nova: AllocationCalculated = {
       coffee: coffee,
       participant: participant,
       id: allocation.id,
-      amount: allocation.amount
-
+      amount: allocation.amount,
     }
     consolidated.push(nova)
   })
@@ -53,7 +54,7 @@ makeCrap()
         </tr>
       </thead>
       <tbody>
-        <tr v-for="c in store.coffees" :key="c.id">
+        <tr v-for="c in purchaseStore.purchase.coffees" :key="c.id">
           <td>{{ c.name }}</td>
           <td>{{ c.weight }} kg</td>
           <td>{{ c.priceInCents }} cents</td>
@@ -77,7 +78,7 @@ makeCrap()
           </tr>
         </thead>
         <tbody>
-          <tr v-for="c in store.coffees" :key="c.id">
+          <tr v-for="c in purchaseStore.purchase.coffees" :key="c.id">
             <td>{{ c.name }}</td>
             <td>{{ c.weight }} kg</td>
             <td>{{ c.priceInCents }} cents</td>
@@ -85,9 +86,9 @@ makeCrap()
         </tbody>
         <tfoot>
           <tr>
-            <th>Total: {{ store.coffees.length }} coffee items</th>
-            <th>Total: {{ store.coffees.length }} coffee items</th>
-            <th>Total: {{ store.coffees.length }} coffee items</th>
+            <th>Total: {{ purchaseStore.purchase.coffees.length }} coffee items</th>
+            <th>Total: {{ purchaseStore.purchase.coffees.length }} coffee items</th>
+            <th>Total: {{ purchaseStore.purchase.coffees.length }} coffee items</th>
           </tr>
         </tfoot>
       </table>

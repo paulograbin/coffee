@@ -1,8 +1,5 @@
 import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
-import type { Coffee } from '@/stores/coffee-store.ts'
-import type { Participant } from '@/stores/participants.ts'
-import type { Allocation } from '@/stores/allocation-store.ts'
 
 export interface Purchase {
   createdDate: Date
@@ -16,6 +13,38 @@ export interface Purchase {
   markupCost: number
   freightCost: number
 }
+
+export interface Participant {
+  id: number
+  name: string
+}
+
+export interface Coffee {
+  id: number
+  name: string
+  weight: number
+  priceInCents: number
+  price: number
+  itemTotal: number
+}
+
+export interface Allocation {
+  id: number
+  coffeeId: number
+  participantId: number
+  amount: number
+}
+
+export interface AllocationCalculated {
+  id: number
+  coffeeName: string
+  participantName: string
+  coffee: Coffee
+  participant: Participant
+  amount: number
+}
+
+
 
 export const usePurchaseStore = defineStore('purchase', () => {
   const storedString = localStorage.getItem('purchase')
@@ -33,19 +62,16 @@ export const usePurchaseStore = defineStore('purchase', () => {
 
   function ensurePurchase(): Purchase {
     if (!purchase.value) {
-      purchase.value = {
-        date: new Date().toISOString(),
-        paid: false,
-        markupCost: 0,
-        freightCost: 0,
-      }
+      console.log('Create the first one...')
+
+      purchase.value = makeStandardPurchase()
     }
     return purchase.value
   }
 
 
   function makeStandardPurchase(): Purchase {
-    const pur : Purchase = {
+    return {
       createdDate: new Date(),
       updatedDate: new Date(),
       paid: false,
@@ -94,8 +120,32 @@ export const usePurchaseStore = defineStore('purchase', () => {
         },
       ],
     }
+  }
 
-    return pur;
+  let nextCoffeeId =
+    purchase.value.coffees.reduce((acc: number, cur: { id: number }) => Math.max(acc, cur.id), 0) + 1
+
+
+  function addCoffee(name: string, weight: number, priceInCents: number) {
+    console.log(`Adding coffee ${name} to ${nextCoffeeId}`)
+
+    const trimmed = name.trim()
+    if (!trimmed) return
+
+    const newCoffee = {
+      id: nextCoffeeId++,
+      name: name,
+      weight: weight,
+      priceInCents: priceInCents,
+      price: priceInCents / 100,
+      itemTotal: priceInCents * weight,
+    }
+
+    purchase.value.coffees = [...purchase.value.coffees, newCoffee]
+  }
+
+  function removeCoffee(id: number) {
+    purchase.value.coffees = purchase.value.coffees.filter((p) => p.id !== id)
   }
 
   function setFreightCost(value: number) {
@@ -106,9 +156,5 @@ export const usePurchaseStore = defineStore('purchase', () => {
     ensurePurchase().markupCost = value
   }
 
-  function clear() {
-    purchase.value = null
-  }
-
-  return { purchase, ensurePurchase, setFreightCost, setMarkupCost, clear }
+  return { purchase, addCoffee, removeCoffee, setFreightCost, setMarkupCost }
 })

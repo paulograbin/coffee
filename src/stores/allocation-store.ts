@@ -1,23 +1,7 @@
 import { ref, watch } from 'vue'
 import {defineStore} from 'pinia'
-import { type Coffee, useCoffeeStore } from '@/stores/coffee-store.ts'
-import { type Participant, useParticipantsStore } from '@/stores/participants.ts'
+import type { Allocation } from '@/stores/purchase-store.ts'
 
-export interface Allocation {
-  id: number
-  coffeeId: number
-  participantId: number
-  amount: number
-}
-
-export interface AllocationCalculated {
-  id: number
-  coffeeName: string
-  participantName: string
-  coffee: Coffee
-  participant: Participant
-  amount: number
-}
 
 
 export const useAllocationStore = defineStore('allocations', () => {
