@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useCoffeeStore } from '@/stores/coffee-store.ts'
 import { computed, ref } from 'vue'
+import { usePurchaseStore } from '@/stores/purchase-store.ts'
 
-const store = useCoffeeStore()
+const purchaseStore = usePurchaseStore()
 
 const multipleCoffeeCsv = ref('')
 const newCoffeeName = ref('')
@@ -14,31 +14,31 @@ function addCoffee() {
   if (!newCoffeeWeight.value || newCoffeeWeight.value <= 0) return
   if (!newCoffeePrice.value || newCoffeePrice.value <= 0) return
 
-  store.addCoffee(newCoffeeName.value, newCoffeeWeight.value, newCoffeePrice.value)
+  purchaseStore.addCoffee(newCoffeeName.value, newCoffeeWeight.value, newCoffeePrice.value)
 }
 
 function removeCoffee(coffeeId: number) {
-  store.removeCoffee(coffeeId)
+  // store.removeCoffee(coffeeId)
 }
 
 const totalWeight = computed(() =>
-  store.coffees.reduce((acc, coffee) => {
+  purchaseStore.purchase.coffees.reduce((acc, coffee) => {
     return acc + coffee.weight
   }, 0),
 )
 
 function getTotalPriceInCents() {
-  return store.coffees.reduce((acc, coffee) => {
+  return purchaseStore.purchase.coffees.reduce((acc, coffee) => {
     return acc + coffee.priceInCents
   }, 0)
 }
 function getTotalPrice() {
-  return store.coffees.reduce((acc, coffee) => {
+  return purchaseStore.purchase.coffees.reduce((acc, coffee) => {
     return acc + coffee.price
   }, 0)
 }
 function getTotalAmount() {
-  return store.coffees.reduce((acc, coffee) => {
+  return purchaseStore.purchase.coffees.reduce((acc, coffee) => {
     return acc + coffee.itemTotal / 100
   }, 0)
 }
@@ -65,7 +65,7 @@ function importCoffeeCsv() {
         return
       }
 
-      store.addCoffee(name, weight, priceInCents)
+      purchaseStore.addCoffee(name, weight, priceInCents)
     })
 
   multipleCoffeeCsv.value = ''
@@ -74,7 +74,7 @@ function importCoffeeCsv() {
 
 <template>
   <div class="coffee-table card">
-    <h2 class="cardDescription">Cafés - ({{ store.coffees.length }})</h2>
+    <h2 class="cardDescription">Cafés - ({{ purchaseStore.purchase?.coffees.length }})</h2>
     <label class="cardDescription">Add coffee</label>
 
     <form @submit.prevent="addCoffee" class="add-form">
@@ -86,12 +86,22 @@ function importCoffeeCsv() {
 
         <div class="form-group">
           <label for="coffeeWeight">Weight (Kg)</label>
-          <input id="coffeeWeight" v-model.number="newCoffeeWeight" placeholder="0.00" type="number" />
+          <input
+            id="coffeeWeight"
+            v-model.number="newCoffeeWeight"
+            placeholder="0.00"
+            type="number"
+          />
         </div>
 
         <div class="form-group">
           <label for="coffeePrice">R$/Kg</label>
-          <input id="coffeePrice" v-model.number="newCoffeePrice" placeholder="0.00" type="number" />
+          <input
+            id="coffeePrice"
+            v-model.number="newCoffeePrice"
+            placeholder="0.00"
+            type="number"
+          />
         </div>
       </div>
       <button type="submit">Add Coffee</button>
@@ -109,7 +119,7 @@ function importCoffeeCsv() {
       <button type="button" @click="importCoffeeCsv()">Import</button>
     </div>
 
-    <table v-if="store.coffees.length > 0">
+    <table v-if="purchaseStore.purchase.coffees.length > 0">
       <thead>
         <tr>
           <th>Name</th>
@@ -121,22 +131,22 @@ function importCoffeeCsv() {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="c in store.coffees" :key="c.id">
+        <tr v-for="c in purchaseStore.purchase.coffees" :key="c.id">
           <td>{{ c.id }}</td>
           <td>{{ c.name }}</td>
           <td>{{ c.weight }} kg</td>
-          <td>{{ c.priceInCents }} cents</td>
           <td>R$ {{ c.price }}</td>
           <td>R$ {{ c.weight * c.price }}</td>
-          <td>
-            <button class="edit-btn">Edit</button>
-            <button class="delete-btn" @click="removeCoffee(c.id)">Delete</button>
-          </td>
+          <td>{{ c.priceInCents }} cents</td>
+          <!--          <td>-->
+          <!--            <button class="edit-btn">Edit</button>-->
+          <!--            <button class="delete-btn" @click="removeCoffee(c.id)">Delete</button>-->
+          <!--          </td>-->
         </tr>
       </tbody>
       <tfoot>
         <tr>
-          <th>Total: {{ store.coffees.length }} coffee items</th>
+          <th>{{ purchaseStore.purchase.coffees.length }} items</th>
           <th>{{ totalWeight }} kg</th>
           <th>R$ {{ getTotalPriceInCents() }} kg</th>
           <th>R$ {{ getTotalPrice() }} kg</th>
