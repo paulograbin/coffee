@@ -1,5 +1,8 @@
 import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
+import type { Coffee } from '@/stores/coffee-store.ts'
+import type { Participant } from '@/stores/participants.ts'
+import type { Allocation } from '@/stores/allocation-store.ts'
 
 export interface Purchase {
   createdDate: Date
@@ -18,7 +21,7 @@ export const usePurchaseStore = defineStore('purchase', () => {
   const storedString = localStorage.getItem('purchase')
   const stored: Purchase | null = storedString ? JSON.parse(storedString) : null
 
-  const purchase = ref<Purchase | null>(stored)
+  const purchase = ref<Purchase>(stored ?? makeStandardPurchase())
 
   watch(purchase, (val) => {
     if (val) {
