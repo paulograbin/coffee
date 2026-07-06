@@ -11,19 +11,12 @@ export const useParticipantsStore = defineStore('participants', () => {
   const storedParticipants = storedParticipantString ? JSON.parse(storedParticipantString) : []
 
   const participants = ref<Participant[]>(storedParticipants)
-  let nextId = participants.value
-    .reduce((acc, cur) => Math.max(acc, cur.id), 0) + 1;
 
   watch(participants, (val) => {
     localStorage.setItem('participants', JSON.stringify(val))
   })
 
-  function addParticipant(name: string) {
-    const trimmed = name.trim()
-    if (!trimmed) return
 
-    participants.value = [...participants.value, { id: nextId++, name: trimmed }]
-  }
 
   function renameParticipant(id: number, newName: string) {
     const trimmed = newName.trim()
@@ -38,5 +31,5 @@ export const useParticipantsStore = defineStore('participants', () => {
     participants.value = participants.value.filter((p) => p.id !== id)
   }
 
-  return { participants, addParticipant, renameParticipant, removeParticipant }
+  return { participants, renameParticipant, removeParticipant }
 })

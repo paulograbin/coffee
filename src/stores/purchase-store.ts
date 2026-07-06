@@ -125,6 +125,9 @@ export const usePurchaseStore = defineStore('purchase', () => {
   let nextCoffeeId =
     purchase.value.coffees.reduce((acc: number, cur: { id: number }) => Math.max(acc, cur.id), 0) + 1
 
+  let nextParticipantId =
+    purchase.value.participants.reduce((acc: number, cur: { id: number }) => Math.max(acc, cur.id), 0) + 1
+
 
   function addCoffee(name: string, weight: number, priceInCents: number) {
     console.log(`Adding coffee ${name} to ${nextCoffeeId}`)
@@ -144,6 +147,15 @@ export const usePurchaseStore = defineStore('purchase', () => {
     purchase.value.coffees = [...purchase.value.coffees, newCoffee]
   }
 
+
+
+  function addParticipant(name: string) {
+    const trimmed = name.trim()
+    if (!trimmed) return
+
+    purchase.value.participants = [...purchase.value.participants, { id: nextParticipantId++, name: trimmed }]
+  }
+
   function removeCoffee(id: number) {
     purchase.value.coffees = purchase.value.coffees.filter((p) => p.id !== id)
   }
@@ -156,5 +168,5 @@ export const usePurchaseStore = defineStore('purchase', () => {
     ensurePurchase().markupCost = value
   }
 
-  return { purchase, addCoffee, removeCoffee, setFreightCost, setMarkupCost }
+  return { purchase, addParticipant, addCoffee, removeCoffee, setFreightCost, setMarkupCost }
 })

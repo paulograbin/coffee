@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import { useParticipantsStore } from '@/stores/participants.ts'
-import { useAllocationStore } from '@/stores/allocation-store.ts'
 import { type AllocationCalculated, usePurchaseStore } from '@/stores/purchase-store.ts'
 
 const purchaseStore = usePurchaseStore()
 const participantStore = useParticipantsStore()
-const allocationStore = useAllocationStore()
 
 function makeCrap(): AllocationCalculated[] {
   const consolidated: AllocationCalculated[] = []
 
-  allocationStore.allocations.forEach((allocation) => {
+  purchaseStore.purchase.allocations.forEach((allocation) => {
     const coffee = purchaseStore.purchase.coffees.find(
       (coffee) => coffee.id === allocation.coffeeId,
     )

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref, nextTick } from 'vue'
 import { useParticipantsStore } from '@/stores/participants'
+import { usePurchaseStore } from '@/stores/purchase-store.ts'
 
 const store = useParticipantsStore()
+const purchaseStore = usePurchaseStore();
 const newName = ref('')
 const editingId = ref<number | null>(null)
 const editingName = ref('')
@@ -11,7 +13,8 @@ function addParticipant() {
   newName.value
     .trim()
     .split(',')
-    .forEach((name) => store.addParticipant(name))
+    .forEach((name) => purchaseStore.addParticipant(name))
+
   newName.value = ''
 }
 

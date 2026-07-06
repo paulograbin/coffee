@@ -171,6 +171,10 @@ function importCoffeeCsv() {
   padding: 0.4rem 0.6rem;
 }
 
+th {
+  font-weight: bold;
+}
+
 .inputCsv {
   width: 100%;
 }
