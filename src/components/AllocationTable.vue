@@ -4,17 +4,28 @@ import { usePurchaseStore } from '@/stores/purchase-store.ts'
 const purchaseStore = usePurchaseStore()
 
 function coffeeName(coffeeId: number): string {
-  return purchaseStore.purchase.coffees.find(c => c.id === coffeeId)?.name ?? `#${coffeeId}`
+  return purchaseStore.purchase.coffees.find((c) => c.id === coffeeId)?.name ?? `#${coffeeId}`
+}
+
+function coffeePrice(coffeeId: number): number {
+  return purchaseStore.purchase.coffees.find((c) => c.id === coffeeId)?.price ?? 0
+}
+
+function coffeePriceInCents(coffeeId: number): number {
+  return purchaseStore.purchase.coffees.find((c) => c.id === coffeeId)?.priceInCents ?? 0
 }
 
 function participantName(participantId: number): string {
-  return purchaseStore.purchase.participants.find(p => p.id === participantId)?.name ?? `#${participantId}`
+  return (
+    purchaseStore.purchase.participants.find((p) => p.id === participantId)?.name ??
+    `#${participantId}`
+  )
 }
 </script>
 
 <template>
   <div class="card card-compact">
-    <h2 class="cardDescription">Allocations ({{purchaseStore.purchase.allocations.length}})</h2>
+    <h2 class="cardDescription">Allocations ({{ purchaseStore.purchase.allocations.length }})</h2>
 
     <table v-if="purchaseStore.purchase.allocations.length > 0">
       <thead>
@@ -29,7 +40,9 @@ function participantName(participantId: number): string {
         <tr v-for="a in purchaseStore.purchase.allocations" :key="a.id">
           <td>{{ participantName(a.participantId) }}</td>
           <td>{{ coffeeName(a.coffeeId) }}</td>
-          <td>{{ a.amount }}</td>
+          <td>{{ a.amount }}g</td>
+          <td>R$ {{ (coffeePrice(a.coffeeId) * a.amount) / 1000 }}</td>
+          <td>R$ {{ (coffeePriceInCents(a.coffeeId) * a.amount) / 1000 / 100 }}</td>
           <td>
             <button class="edit-btn">Edit</button>
           </td>

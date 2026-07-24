@@ -35,16 +35,6 @@ export interface Allocation {
   amount: number
 }
 
-export interface AllocationCalculated {
-  id: number
-  coffeeName: string
-  participantName: string
-  coffee: Coffee
-  participant: Participant
-  amount: number
-}
-
-
 
 export const usePurchaseStore = defineStore('purchase', () => {
   const storedString = localStorage.getItem('purchase')
@@ -116,6 +106,11 @@ export const usePurchaseStore = defineStore('purchase', () => {
           id: 1,
           participantId: 1,
           coffeeId: 1,
+          amount: 500,
+        },{
+          id: 2,
+          participantId: 1,
+          coffeeId: 2,
           amount: 500,
         },
       ],
