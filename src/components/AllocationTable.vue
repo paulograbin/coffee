@@ -39,7 +39,7 @@ makeCrap()
 
 <template>
   <div class="card card-compact">
-    <h2 class="cardDescription">Allocations</h2>
+    <h2 class="cardDescription">Allocations ({{purchaseStore.purchase.allocations.length}})</h2>
 
     <table>
       <thead>

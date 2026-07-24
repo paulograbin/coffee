@@ -74,7 +74,7 @@ function importCoffeeCsv() {
 
 <template>
   <div class="coffee-table card">
-    <h2 class="cardDescription">Cafés - ({{ purchaseStore.purchase?.coffees.length }})</h2>
+    <h2 class="cardDescription">Cafés ({{ purchaseStore.purchase?.coffees.length }})</h2>
     <label class="cardDescription">Add coffee</label>
 
     <form @submit.prevent="addCoffee" class="add-form">
