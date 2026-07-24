@@ -381,6 +381,42 @@ const CoffeeSchema = z.object({ id: z.number(), name: z.string(), ... })
 const parsed = CoffeeSchema.array().safeParse(JSON.parse(raw))
 ```
 
+### 45. `ParticipantTable` reads from wrong store
+
+**File:** `src/components/ParticipantTable.vue:7,43`
+
+The component reads `store.participants` from `useParticipantsStore` (legacy store) but adds participants via `purchaseStore.addParticipant`. The two stores are independent, so the table header count and participant list never show newly added participants. Fix by reading from `purchaseStore.purchase.participants` everywhere.
+
+### 46. `removeCoffee` is commented out — delete button disabled
+
+**File:** `src/components/CoffeeTable.vue:21-22, 141-144`
+
+The `removeCoffee` function body is commented out (`// store.removeCoffee(coffeeId)`) and the entire delete button in the template is also commented out. Coffees cannot be deleted from the UI.
+
+### 47. `AllocationTable` imports non-existent type `AllocationCalculated`
+
+**File:** `src/components/AllocationTable.vue:3`
+
+```ts
+import { type AllocationCalculated, usePurchaseStore } from '@/stores/purchase-store.ts'
+```
+
+`AllocationCalculated` is not exported from `purchase-store.ts`. This is a TypeScript compile error.
+
+### 48. Duplicate participant ID in sample data
+
+**File:** `src/stores/purchase-store.ts:93-98`
+
+In `makeStandardPurchase()`, both "Tony" and "Bruce" are assigned `id: 1`. Any ID-based lookup (rename, remove, allocation) will affect both rows.
+
+### 49. `CoffeeTable` column headers don't match rendered data
+
+**File:** `src/components/CoffeeTable.vue:125-131, 134-145`
+
+The `<thead>` order is: Name / Weight / Price in cents / R$/kg / Total / Action.
+The `<tbody>` renders: `c.id` / `c.name` / `c.weight` / `c.price` / `c.weight * c.price` / `c.priceInCents`.
+The ID is shown under the "Name" header, and "Price in cents" shows R$/kg values. The columns are misaligned.
+
 ### 44. `Coffee.itemTotal` is derived but stored — can drift
 
 **File:** `src/stores/coffee-store.ts:39-40`
