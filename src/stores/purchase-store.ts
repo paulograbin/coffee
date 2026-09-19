@@ -157,6 +157,10 @@ export const usePurchaseStore = defineStore('purchase', () => {
     )
   }
 
+  function removeAllocation(allocationId: number) {
+    purchase.value.allocations = purchase.value.allocations.filter((a) => a.id !== allocationId)
+  }
+
   function removeCoffee(id: number) {
     purchase.value.coffees = purchase.value.coffees.filter((p) => p.id !== id)
   }
@@ -169,5 +173,14 @@ export const usePurchaseStore = defineStore('purchase', () => {
     ensurePurchase().markupCost = value
   }
 
-  return { purchase, addParticipant, removeParticipant, addCoffee, removeCoffee, setFreightCost, setMarkupCost }
+  return {
+    purchase,
+    addParticipant,
+    removeParticipant,
+    addCoffee,
+    removeCoffee,
+    setFreightCost,
+    setMarkupCost,
+    removeAllocation,
+  }
 })

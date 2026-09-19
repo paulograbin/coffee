@@ -17,6 +17,10 @@ function coffeePriceInCents(coffeeId: number): number {
   return purchaseStore.purchase.coffees.find((c) => c.id === coffeeId)?.priceInCents ?? 0
 }
 
+function deleteAllocation(allocationId: number) {
+  return purchaseStore.removeAllocation(allocationId)
+}
+
 function calculateWeightNotAllocated(coffeeId: number) {
   const coffee = purchaseStore.purchase.coffees.find((c) => c.id === coffeeId)
   if (!coffee) {
@@ -111,7 +115,7 @@ function participantName(participantId: number): string {
           <td>R$ {{ (coffeePrice(a.coffeeId) * a.amount) / 1000 }}</td>
           <td>{{ (coffeePriceInCents(a.coffeeId) * a.amount) / 1000 }}</td>
           <td>
-            <button class="edit-btn">Edit</button>
+            <button class="edit-btn" @click="deleteAllocation(a.id)">Remove</button>
           </td>
         </tr>
       </tbody>
@@ -136,12 +140,12 @@ function participantName(participantId: number): string {
           <td>{{ a.name }}</td>
           <td>
             <div class="progress-bar">
+<!--              <span class="progress-text">${54454}g / ${545454}g (50%)</span>-->
               <div
                 class="progress-fill"
                 :class="progressClass(a.id)"
                 :style="{ width: Math.min(calculatePercentageAllocated(a.id), 100) + '%' }"
               ></div>
-              <!--              <span class="progress-text">${54454}g / ${545454}g (50%)</span>-->
             </div>
           </td>
           <td>{{ calculatePercentageAllocated(a.id) }}%</td>
