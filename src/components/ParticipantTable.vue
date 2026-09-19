@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, computed } from 'vue'
 import { usePurchaseStore } from '@/stores/purchase-store.ts'
 
 const purchaseStore = usePurchaseStore()
@@ -26,6 +26,8 @@ function startEditing(id: number, currentName: string) {
   })
 }
 
+const canAddParticipant = computed(() => !!newName.value.trim())
+
 function saveEdit(id: number) {
   console.log("Do nothing on save edit for now", id)
   // store.renameParticipant(id, editingName.value)
@@ -44,7 +46,7 @@ function cancelEdit() {
 
     <form @submit.prevent="addParticipant" class="add-form">
       <input v-model="newName" placeholder="Peter, Tony, Bruce" type="text" />
-      <button type="submit">Add</button>
+      <button type="submit" :disabled="!canAddParticipant">Add</button>
     </form>
 
     <table v-if="purchaseStore.purchase.participants.length">
@@ -72,7 +74,6 @@ function cancelEdit() {
           </td>
           <td>
             <button @click="purchaseStore.removeParticipant(p.id)">Remove</button>
-<!--            <button @click="purchaseStore.purchase.removeParticipant(p.id)">Remove</button>-->
           </td>
         </tr>
       </tbody>

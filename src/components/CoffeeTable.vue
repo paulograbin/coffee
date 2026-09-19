@@ -180,15 +180,6 @@ function importCoffeeCsv() {
   padding: 0.4rem 0.6rem;
 }
 
-.add-form button {
-  transition: opacity 0.2s ease;
-}
-
-.add-form button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 th {
   font-weight: bold;
 }
