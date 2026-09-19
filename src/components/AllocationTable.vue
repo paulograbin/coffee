@@ -18,30 +18,59 @@ function coffeePriceInCents(coffeeId: number): number {
 }
 
 function calculateWeightNotAllocated(coffeeId: number) {
-  console.log(`Calculating how much of coffee ${coffeeId} we still have`)
-
   const coffee = purchaseStore.purchase.coffees.find((c) => c.id === coffeeId)
-
   if (!coffee) {
     return 0
   }
 
-  console.log('Got coffee ' + coffee?.name)
-
   const allocationsForCurrentCoffee = purchaseStore.purchase.allocations
     .filter((a) => a.coffeeId == coffeeId)
     .map((a) => a.amount)
+
   console.log(`Found ${allocationsForCurrentCoffee.length} allocations`)
+  if (allocationsForCurrentCoffee.length == 0) {
+    return coffee.weight * 1000
+  }
 
   allocationsForCurrentCoffee.forEach((coffee) => {
     console.log('Allocated ' + coffee)
   })
 
-  const allocated = allocationsForCurrentCoffee.reduce((acc, amount) => acc + amount, 0)
-
+  const alreadyAllocatedAmount = allocationsForCurrentCoffee.reduce(
+    (acc, amount) => acc + amount,
+    0,
+  )
   const coffeeWeightInGrams = coffee?.weight * 1000
 
-  return coffeeWeightInGrams - allocated
+  return coffeeWeightInGrams - alreadyAllocatedAmount
+}
+
+function calculatePercentageAllocated(coffeeId: number) {
+  const coffee = purchaseStore.purchase.coffees.find((c) => c.id === coffeeId)
+  if (!coffee) {
+    return 0
+  }
+
+  const allocationsForCurrentCoffee = purchaseStore.purchase.allocations
+    .filter((a) => a.coffeeId == coffeeId)
+    .map((a) => a.amount)
+
+  console.log(`Found ${allocationsForCurrentCoffee.length} allocations`)
+  if (allocationsForCurrentCoffee.length == 0) {
+    return 0
+  }
+
+  allocationsForCurrentCoffee.forEach((coffee) => {
+    console.log('Allocated ' + coffee)
+  })
+
+  const alreadyAllocatedAmount = allocationsForCurrentCoffee.reduce(
+    (acc, amount) => acc + amount,
+    0,
+  )
+  const coffeeWeightInGrams = coffee?.weight * 1000
+
+  return (alreadyAllocatedAmount / coffeeWeightInGrams) * 100
 }
 
 function participantName(participantId: number): string {
@@ -87,26 +116,28 @@ function participantName(participantId: number): string {
   <div class="card card-compact">
     <h2 class="cardDescription">Not allocated yet</h2>
 
-    <table v-if="purchaseStore.purchase.allocations.length > 0">
+    <table>
       <thead>
         <tr>
           <th>Coffee</th>
           <th>Progress</th>
-          <th>Remaining Kg.</th>
+          <th>Allocated %</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="a in purchaseStore.purchase.coffees" :key="a.id">
           <td>{{ a.name }}</td>
           <td>
-            <div class="progress-bar">adada</div>
+            <div class="progress-bar">
+              <div class="progress-fill full" style="width: 60%"></div>
+              <!--              <span class="progress-text">${54454}g / ${545454}g (50%)</span>-->
+            </div>
           </td>
+          <td>{{ calculatePercentageAllocated(a.id) }}%</td>
           <td>{{ calculateWeightNotAllocated(a.id) }}</td>
         </tr>
       </tbody>
     </table>
-
-    <p v-else class="empty">No allocations yet.</p>
   </div>
 </template>
 
@@ -114,5 +145,32 @@ function participantName(participantId: number): string {
 .empty {
   color: #999;
   font-style: italic;
+}
+
+.progress-bar {
+  background: #e0e0e0;
+  border-radius: 10px;
+  height: 20px;
+  overflow: hidden;
+  position: relative;
+  min-width: 100px;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.progress-fill.full {
+  background: linear-gradient(90deg, #4caf50, #66bb6a);
+}
+
+.progress-fill.partial {
+  background: linear-gradient(90deg, #ff9800, #ffb74d);
+}
+
+.progress-fill.none {
+  background: #e0e0e0;
 }
 </style>
