@@ -73,6 +73,13 @@ function calculatePercentageAllocated(coffeeId: number) {
   return (alreadyAllocatedAmount / coffeeWeightInGrams) * 100
 }
 
+function progressClass(coffeeId: number): 'full' | 'partial' | 'none' {
+  const pct = calculatePercentageAllocated(coffeeId)
+  if (pct >= 100) return 'full'
+  if (pct > 0) return 'partial'
+  return 'none'
+}
+
 function participantName(participantId: number): string {
   return (
     purchaseStore.purchase.participants.find((p) => p.id === participantId)?.name ??
@@ -129,7 +136,11 @@ function participantName(participantId: number): string {
           <td>{{ a.name }}</td>
           <td>
             <div class="progress-bar">
-              <div class="progress-fill full" style="width: 60%"></div>
+              <div
+                class="progress-fill"
+                :class="progressClass(a.id)"
+                :style="{ width: Math.min(calculatePercentageAllocated(a.id), 100) + '%' }"
+              ></div>
               <!--              <span class="progress-text">${54454}g / ${545454}g (50%)</span>-->
             </div>
           </td>
