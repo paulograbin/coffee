@@ -4,7 +4,7 @@ import { useParticipantsStore } from '@/stores/participants'
 import { usePurchaseStore } from '@/stores/purchase-store.ts'
 
 const store = useParticipantsStore()
-const purchaseStore = usePurchaseStore();
+const purchaseStore = usePurchaseStore()
 const newName = ref('')
 const editingId = ref<number | null>(null)
 const editingName = ref('')
@@ -40,7 +40,7 @@ function cancelEdit() {
 
 <template>
   <div class="participant-table card">
-    <h2 class="cardDescription">Participants ({{ store.participants.length }})</h2>
+    <h2 class="cardDescription">Participants ({{ purchaseStore.purchase.participants.length }})</h2>
     <label>Names (Comma-separated)</label>
 
     <form @submit.prevent="addParticipant" class="add-form">
@@ -48,7 +48,7 @@ function cancelEdit() {
       <button type="submit">Add</button>
     </form>
 
-    <table v-if="store.participants.length">
+    <table v-if="purchaseStore.purchase.participants.length">
       <thead>
         <tr>
           <th>ID</th>
@@ -57,7 +57,7 @@ function cancelEdit() {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="p in store.participants" :key="p.id">
+        <tr v-for="p in purchaseStore.purchase.participants" :key="p.id">
           <td>{{ p.id }}</td>
           <td v-if="editingId === p.id">
             <input
@@ -72,13 +72,16 @@ function cancelEdit() {
             <span class="name" @click="startEditing(p.id, p.name)">{{ p.name }}</span>
           </td>
           <td>
-            <button @click="store.removeParticipant(p.id)">Remove</button>
+            <button @click="purchaseStore.removeParticipant(p.id)">Remove</button>
+<!--            <button @click="purchaseStore.purchase.removeParticipant(p.id)">Remove</button>-->
           </td>
         </tr>
       </tbody>
       <tfoot>
         <tr>
-          <th colspan="3">Total: {{ store.participants.length }} participant(s)</th>
+          <th colspan="3">
+            Total: {{ purchaseStore.purchase.participants.length }} participant(s)
+          </th>
         </tr>
       </tfoot>
     </table>
@@ -88,8 +91,6 @@ function cancelEdit() {
 </template>
 
 <style scoped>
-
-
 .add-form {
   display: flex;
   gap: 0.5rem;
