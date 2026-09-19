@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useParticipantsStore } from '@/stores/participants.ts'
 import { usePurchaseStore } from '@/stores/purchase-store.ts'
 
-const participantStore = useParticipantsStore()
 const purchaseStore = usePurchaseStore()
 
 const freightCost = ref<number>(purchaseStore.purchase?.freightCost ?? 0)
@@ -52,16 +50,15 @@ function setMarkup() {
           <button type="button" @click="setMarkup">Set</button>
         </div>
       </div>
-
       <div class="costs-summary">
         <div v-if="freightCost > 0" class="freight-summary">
           <p>Freight total: R$ {{ freightCost }}</p>
-          <p>Freight per person: R$ {{ freightCost / participantStore.participants.length }}</p>
+          <p>Freight per person: R$ {{ freightCost / purchaseStore.purchase.participants.length }}</p>
         </div>
         <div v-if="markupCost > 0" class="markup-summary">
           <p>Markup: {{ markupCost }}</p>
           <p>Total Weight: {{ markupCost }}</p>
-          <p>Total Markup: {{ markupCost * participantStore.participants.length }}</p>
+          <p>Total Markup: {{ markupCost * purchaseStore.purchase.participants.length }}</p>
         </div>
       </div>
     </div>

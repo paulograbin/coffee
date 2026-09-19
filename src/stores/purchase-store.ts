@@ -67,8 +67,8 @@ export const usePurchaseStore = defineStore('purchase', () => {
       paid: false,
       paidDate: new Date(),
       name: 'Template #1',
-      markupCost: 0,
-      freightCost: 0,
+      markupCost: 10,
+      freightCost: 50,
       coffees: [
         {
           id: 1,
@@ -151,6 +151,12 @@ export const usePurchaseStore = defineStore('purchase', () => {
     purchase.value.participants = [...purchase.value.participants, { id: nextParticipantId++, name: trimmed }]
   }
 
+  function removeParticipant(id: number) {
+    purchase.value.participants = purchase.value.participants = purchase.value.participants.filter(
+      (p) => p.id !== id,
+    )
+  }
+
   function removeCoffee(id: number) {
     purchase.value.coffees = purchase.value.coffees.filter((p) => p.id !== id)
   }
@@ -163,5 +169,5 @@ export const usePurchaseStore = defineStore('purchase', () => {
     ensurePurchase().markupCost = value
   }
 
-  return { purchase, addParticipant, addCoffee, removeCoffee, setFreightCost, setMarkupCost }
+  return { purchase, addParticipant, removeParticipant, addCoffee, removeCoffee, setFreightCost, setMarkupCost }
 })
