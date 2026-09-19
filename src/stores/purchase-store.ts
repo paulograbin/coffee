@@ -93,7 +93,7 @@ export const usePurchaseStore = defineStore('purchase', () => {
           name: 'Tony',
         },
         {
-          id: 1,
+          id: 2,
           name: 'Bruce',
         },
         {
