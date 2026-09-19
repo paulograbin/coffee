@@ -9,6 +9,15 @@ const newCoffeeName = ref('')
 const newCoffeeWeight = ref<number | null>(null)
 const newCoffeePrice = ref<number | null>(null)
 
+const canAddCoffee = computed(
+  () =>
+    !!newCoffeeName.value.trim() &&
+    !!newCoffeeWeight.value &&
+    newCoffeeWeight.value > 0 &&
+    !!newCoffeePrice.value &&
+    newCoffeePrice.value > 0,
+)
+
 function addCoffee() {
   if (!newCoffeeName.value || !newCoffeeName.value.trim()) return
   if (!newCoffeeWeight.value || newCoffeeWeight.value <= 0) return
@@ -104,7 +113,7 @@ function importCoffeeCsv() {
           />
         </div>
       </div>
-      <button type="submit">Add Coffee</button>
+      <button type="submit" :disabled="!canAddCoffee">Add Coffee</button>
     </form>
 
     <div>
@@ -169,6 +178,15 @@ function importCoffeeCsv() {
 .add-form input {
   flex: 1;
   padding: 0.4rem 0.6rem;
+}
+
+.add-form button {
+  transition: opacity 0.2s ease;
+}
+
+.add-form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 th {
