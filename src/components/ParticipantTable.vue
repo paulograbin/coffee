@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { ref, nextTick } from 'vue'
-import { useParticipantsStore } from '@/stores/participants'
 import { usePurchaseStore } from '@/stores/purchase-store.ts'
 
-const store = useParticipantsStore()
 const purchaseStore = usePurchaseStore()
 const newName = ref('')
 const editingId = ref<number | null>(null)
@@ -29,8 +27,9 @@ function startEditing(id: number, currentName: string) {
 }
 
 function saveEdit(id: number) {
-  store.renameParticipant(id, editingName.value)
-  editingId.value = null
+  console.log("Do nothing on save edit for now", id)
+  // store.renameParticipant(id, editingName.value)
+  // editingId.value = null
 }
 
 function cancelEdit() {
