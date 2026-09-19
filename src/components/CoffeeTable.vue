@@ -27,7 +27,7 @@ function addCoffee() {
 }
 
 function removeCoffee(coffeeId: number) {
-  // store.removeCoffee(coffeeId)
+  purchaseStore.removeCoffee(coffeeId)
 }
 
 const totalWeight = computed(() =>
@@ -131,6 +131,7 @@ function importCoffeeCsv() {
     <table v-if="purchaseStore.purchase.coffees.length > 0">
       <thead>
         <tr>
+          <th>Id</th>
           <th>Name</th>
           <th>Weight</th>
           <th>Price in cents</th>
@@ -147,10 +148,10 @@ function importCoffeeCsv() {
           <td>R$ {{ c.price }}</td>
           <td>R$ {{ c.weight * c.price }}</td>
           <td>{{ c.priceInCents }} cents</td>
-          <!--          <td>-->
-          <!--            <button class="edit-btn">Edit</button>-->
-          <!--            <button class="delete-btn" @click="removeCoffee(c.id)">Delete</button>-->
-          <!--          </td>-->
+          <td>
+<!--            <button class="edit-btn">Edit</button>-->
+            <button class="delete-btn" @click="removeCoffee(c.id)">Delete</button>
+          </td>
         </tr>
       </tbody>
       <tfoot>
