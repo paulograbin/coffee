@@ -7,6 +7,7 @@ import { usePurchaseStore } from '@/stores/purchase-store.ts'
 import AllocationTable from '@/components/AllocationTable.vue'
 import { computed, onMounted, onUnmounted } from 'vue'
 import AllocationMatrix from '@/components/AllocationMatrix.vue'
+import SettlementTable from '@/components/SettlementTable.vue'
 
 const purchaseStore = usePurchaseStore()
 
@@ -58,6 +59,7 @@ onUnmounted(() => {
     </div>
   </div>
   <AllocationMatrix />
+  <SettlementTable />
 </template>
 
 <style scoped>
