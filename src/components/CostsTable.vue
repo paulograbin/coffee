@@ -52,8 +52,9 @@ function setMarkup() {
       </div>
       <div class="costs-summary">
         <div v-if="freightCost > 0" class="freight-summary">
-          <p>Freight total: R$ {{ freightCost }}</p>
-          <p>Freight per person: R$ {{ freightCost / purchaseStore.purchase.participants.length }}</p>
+          <p>Freight total: R$ {{ freightCost.toFixed(2) }}</p>
+          <p> Freight per person: R$ {{ (freightCost / purchaseStore.purchase.participants.length).toFixed(2) }}
+          </p>
         </div>
         <div v-if="markupCost > 0" class="markup-summary">
           <p>Markup: {{ markupCost }}</p>
