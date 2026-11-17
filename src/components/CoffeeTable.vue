@@ -48,7 +48,7 @@ function getTotalPrice() {
 }
 function getTotalAmount() {
   return purchaseStore.purchase.coffees.reduce((acc, coffee) => {
-    return acc + coffee.itemTotal / 100
+    return acc + coffee.itemTotal
   }, 0)
 }
 
@@ -134,9 +134,9 @@ function importCoffeeCsv() {
           <th>Id</th>
           <th>Name</th>
           <th>Weight</th>
-          <th>Price in cents</th>
           <th>R$/kg</th>
           <th>Total</th>
+          <th>Price in cents</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -156,11 +156,12 @@ function importCoffeeCsv() {
       </tbody>
       <tfoot>
         <tr>
+          <th></th>
           <th>{{ purchaseStore.purchase.coffees.length }} items</th>
           <th>{{ totalWeight }} kg</th>
-          <th>R$ {{ getTotalPriceInCents() }} kg</th>
           <th>R$ {{ getTotalPrice() }} kg</th>
           <th>R$ {{ getTotalAmount() }}</th>
+          <th>R$ {{ getTotalPriceInCents() }} kg</th>
           <th></th>
         </tr>
       </tfoot>
