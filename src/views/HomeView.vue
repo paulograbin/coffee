@@ -6,6 +6,7 @@ import CardComponent from '@/components/CardComponent.vue'
 import { usePurchaseStore } from '@/stores/purchase-store.ts'
 import AllocationTable from '@/components/AllocationTable.vue'
 import { computed, onMounted, onUnmounted } from 'vue'
+import AllocationMatrix from '@/components/AllocationMatrix.vue'
 
 const purchaseStore = usePurchaseStore()
 
@@ -56,6 +57,7 @@ onUnmounted(() => {
       <AllocationTable />
     </div>
   </div>
+  <AllocationMatrix />
 </template>
 
 <style scoped>
