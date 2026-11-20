@@ -68,50 +68,112 @@ export const usePurchaseStore = defineStore('purchase', () => {
       paidDate: new Date(),
       name: 'Template #1',
       markupCost: 10,
-      freightCost: 50,
+      freightCost: 70.38,
       coffees: [
         {
           id: 1,
-          name: 'Alpendre',
-          weight: 2,
-          priceInCents: 20000,
-          price: 200,
-          itemTotal: 400,
+          name: 'Rancho São Benedito',
+          weight: 1,
+          priceInCents: 17900,
+          price: 179,
+          itemTotal: 179,
         },
         {
           id: 2,
-          name: 'Baixadão',
+          name: 'FW-12 (Lavado do Alvaro)',
+          weight: 2,
+          priceInCents: 16900,
+          price: 169,
+          itemTotal: 338,
+        },
+        {
+          id: 3,
+          name: 'Fazenda Moinho',
           weight: 1,
-          priceInCents: 10000,
-          price: 100,
-          itemTotal: 100,
+          priceInCents: 15500,
+          price: 155,
+          itemTotal: 155,
+        },
+        {
+          id: 4,
+          name: 'Café do Alpendre',
+          weight: 4,
+          priceInCents: 10950,
+          price: 109.50,
+          itemTotal: 438,
         },
       ],
       participants: [
         {
           id: 1,
-          name: 'Tony',
+          name: 'Paulo',
         },
         {
           id: 2,
-          name: 'Bruce',
+          name: 'Eduardo',
         },
         {
           id: 3,
-          name: 'Peter',
+          name: 'Diego',
+        },
+        {
+          id: 4,
+          name: 'Jean',
+        },{
+          id: 5,
+          name: 'Tiago',
+        },{
+          id: 6,
+          name: 'Renan',
         },
       ],
       allocations: [
         {
           id: 1,
           participantId: 1,
-          coffeeId: 1,
-          amount: 500,
-        },{
+          coffeeId: 4,
+          amount: 1000,
+        },
+        {
           id: 2,
           participantId: 1,
           coffeeId: 2,
-          amount: 500,
+          amount: 1000,
+        },
+        {
+          id: 3,
+          participantId: 2,
+          coffeeId: 1,
+          amount: 1000,
+        },{
+          id: 4,
+          participantId: 4,
+          coffeeId: 3,
+          amount: 1000,
+        },{
+          id: 5,
+          participantId: 4,
+          coffeeId: 4,
+          amount: 1000,
+        },
+
+        {
+          id: 6,
+          participantId: 5,
+          coffeeId: 4,
+          amount: 1000,
+        },
+
+        {
+          id: 7,
+          participantId: 6,
+          coffeeId: 4,
+          amount: 1000,
+        },{
+          id: 8,
+          participantId: 3,
+          coffeeId: 2,
+          amount: 1000,
         },
       ],
     }
@@ -161,6 +223,27 @@ export const usePurchaseStore = defineStore('purchase', () => {
     purchase.value.allocations = purchase.value.allocations.filter((a) => a.id !== allocationId)
   }
 
+  function remainingCoffeeGrams(coffeeId: number): number {
+    const coffee = purchase.value.coffees.find((c) => c.id === coffeeId)
+    if (!coffee) return 0
+
+    const allocated = purchase.value.allocations.reduce(
+      (total, allocation) => total + (allocation.coffeeId === coffeeId ? allocation.amount : 0),
+      0,
+    )
+    return Math.max(0, Math.round(coffee.weight * 1000) - allocated)
+  }
+
+  function addAllocation(participantId: number, coffeeId: number, amount: number): boolean {
+    if (amount !== 500 && amount !== 1000) return false
+    if (!purchase.value.participants.some((p) => p.id === participantId)) return false
+    if (remainingCoffeeGrams(coffeeId) < amount) return false
+
+    const id = purchase.value.allocations.reduce((max, allocation) => Math.max(max, allocation.id), 0) + 1
+    purchase.value.allocations.push({ id, participantId, coffeeId, amount })
+    return true
+  }
+
   function removeCoffee(id: number) {
     purchase.value.coffees = purchase.value.coffees.filter((p) => p.id !== id)
   }
@@ -182,5 +265,7 @@ export const usePurchaseStore = defineStore('purchase', () => {
     setFreightCost,
     setMarkupCost,
     removeAllocation,
+    remainingCoffeeGrams,
+    addAllocation,
   }
 })
