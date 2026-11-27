@@ -52,3 +52,42 @@ npm run test:unit
 ```sh
 npm run lint
 ```
+
+## Knowledge Graph (graphify)
+
+This repo has a navigable knowledge graph in `graphify-out/` (interactive `graph.html`,
+raw `graph.json`, and `GRAPH_REPORT.md`). It maps the code (AST) plus the docs/image
+(semantic extraction) into communities, hub nodes and cross-document links.
+
+### Update the graph after changes
+
+Incremental — re-extract only new/changed files (fast, recommended):
+
+```sh
+graphify . --update
+```
+
+Full rebuild (re-extract everything from scratch):
+
+```sh
+graphify .
+```
+
+If a full rebuild produces fewer nodes than the existing graph (e.g. after deleting
+files, or when an older graph holds stale semantic nodes), graphify refuses to shrink
+`graph.json`. Force the clean rebuild with:
+
+```sh
+graphify . --force
+```
+
+Other useful commands:
+
+```sh
+graphify query "how does the settlement math work?"   # ask the graph a question
+graphify explain "usePurchaseStore"                   # explain a single node
+graphify . --no-viz                                   # rebuild report + JSON, skip HTML
+```
+
+> Note: `graphify-out/` lives in the working tree — add it to `.gitignore` if you don't
+> want it committed.
