@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { usePurchaseStore } from '@/stores/purchase-store.ts'
+import { ref } from 'vue'
 
 const purchaseStore = usePurchaseStore()
+
+const markupCost = ref<number>(purchaseStore.purchase?.markupCost ?? 0)
+const freightCost = ref<number>(purchaseStore.purchase?.freightCost ?? 0)
+
+const individualFreight = freightCost.value / purchaseStore.purchase.participants.length
 </script>
 
 <template>
@@ -28,6 +34,14 @@ const purchaseStore = usePurchaseStore()
             <td>
               <p>{{ participant.name }}</p>
             </td>
+            <td>Coffee</td>
+            <td>
+              <p>R$ {{ individualFreight.toFixed(2) }}</p>
+            </td>
+            <td>
+              <p>R$ {{ markupCost }}</p>
+            </td>
+            <td> {{ markupCost + individualFreight.toFixed(2) }}</td>
           </tr>
         </tbody>
       </table>
