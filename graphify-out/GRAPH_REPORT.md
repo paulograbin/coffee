@@ -8,6 +8,12 @@
 - Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 18 edges (avg confidence: 0.88)
 - Token cost: 0 input · 0 output
 
+## Build Notes
+- Hybrid build: 225 nodes from AST (code) + 44 from semantic extraction of the 5 docs + 1 image.
+- Semantic extraction ran without a Gemini key (host agent as LLM); README.md, REVIEW.md and old/REQUIREMENTS.md were (re)extracted, the other docs + image served from cache.
+- Rebuilt with `--force`: an earlier-vintage `graph.json` held semantic nodes absent from this run, so the shrink-guard was intentionally overridden for a clean full rebuild.
+- Health check: 5 dangling + ~17 collapsed edges, all inside `.github/workflows/static.yml` (repeated `contains` edges). Cosmetic; graph is usable.
+
 ## Community Hubs (Navigation)
 - ESLint & Linting Config
 - Reactivity & Allocation Logic
