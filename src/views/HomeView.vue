@@ -49,28 +49,13 @@ onUnmounted(() => {
   </div>
 
   <div class="two-columns">
-    <div class="column">
-      <ParticipantTable />
-      <CostsTable />
-    </div>
-    <div class="column">
-      <CoffeeTable />
-      <AllocationTable />
-    </div>
+    <CoffeeTable />
+    <ParticipantTable />
+    <CostsTable />
+    <AllocationTable />
+    <AllocationMatrix />
+    <SettlementTable />
   </div>
-  <AllocationMatrix />
-  <SettlementTable />
 </template>
 
-<style scoped>
-.two-columns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-.column {
-  min-width: 0;
-  overflow: hidden;
-}
-</style>
+<style scoped></style>
