@@ -9,6 +9,15 @@ const newCoffeeName = ref('')
 const newCoffeeWeight = ref<number | null>(null)
 const newCoffeePrice = ref<number | null>(null)
 
+const canAddCoffee = computed(
+  () =>
+    !!newCoffeeName.value.trim() &&
+    !!newCoffeeWeight.value &&
+    newCoffeeWeight.value > 0 &&
+    !!newCoffeePrice.value &&
+    newCoffeePrice.value > 0,
+)
+
 function addCoffee() {
   if (!newCoffeeName.value || !newCoffeeName.value.trim()) return
   if (!newCoffeeWeight.value || newCoffeeWeight.value <= 0) return
@@ -18,7 +27,7 @@ function addCoffee() {
 }
 
 function removeCoffee(coffeeId: number) {
-  // store.removeCoffee(coffeeId)
+  purchaseStore.removeCoffee(coffeeId)
 }
 
 const totalWeight = computed(() =>
@@ -39,7 +48,7 @@ function getTotalPrice() {
 }
 function getTotalAmount() {
   return purchaseStore.purchase.coffees.reduce((acc, coffee) => {
-    return acc + coffee.itemTotal / 100
+    return acc + coffee.itemTotal
   }, 0)
 }
 
@@ -74,7 +83,7 @@ function importCoffeeCsv() {
 
 <template>
   <div class="coffee-table card">
-    <h2 class="cardDescription">Cafés - ({{ purchaseStore.purchase?.coffees.length }})</h2>
+    <h2 class="cardDescription">Cafés ({{ purchaseStore.purchase?.coffees.length }})</h2>
     <label class="cardDescription">Add coffee</label>
 
     <form @submit.prevent="addCoffee" class="add-form">
@@ -104,7 +113,7 @@ function importCoffeeCsv() {
           />
         </div>
       </div>
-      <button type="submit">Add Coffee</button>
+      <button type="submit" :disabled="!canAddCoffee">Add Coffee</button>
     </form>
 
     <div>
@@ -122,11 +131,12 @@ function importCoffeeCsv() {
     <table v-if="purchaseStore.purchase.coffees.length > 0">
       <thead>
         <tr>
+          <th>Id</th>
           <th>Name</th>
           <th>Weight</th>
-          <th>Price in cents</th>
           <th>R$/kg</th>
           <th>Total</th>
+          <th>Price in cents</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -138,19 +148,20 @@ function importCoffeeCsv() {
           <td>R$ {{ c.price }}</td>
           <td>R$ {{ c.weight * c.price }}</td>
           <td>{{ c.priceInCents }} cents</td>
-          <!--          <td>-->
-          <!--            <button class="edit-btn">Edit</button>-->
-          <!--            <button class="delete-btn" @click="removeCoffee(c.id)">Delete</button>-->
-          <!--          </td>-->
+          <td>
+<!--            <button class="edit-btn">Edit</button>-->
+            <button class="delete-btn" @click="removeCoffee(c.id)">Delete</button>
+          </td>
         </tr>
       </tbody>
       <tfoot>
         <tr>
+          <th></th>
           <th>{{ purchaseStore.purchase.coffees.length }} items</th>
           <th>{{ totalWeight }} kg</th>
-          <th>R$ {{ getTotalPriceInCents() }} kg</th>
           <th>R$ {{ getTotalPrice() }} kg</th>
           <th>R$ {{ getTotalAmount() }}</th>
+          <th>R$ {{ getTotalPriceInCents() }} kg</th>
           <th></th>
         </tr>
       </tfoot>
@@ -169,6 +180,10 @@ function importCoffeeCsv() {
 .add-form input {
   flex: 1;
   padding: 0.4rem 0.6rem;
+}
+
+th {
+  font-weight: bold;
 }
 
 .inputCsv {

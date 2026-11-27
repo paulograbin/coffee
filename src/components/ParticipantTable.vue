@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, nextTick } from 'vue'
-import { useParticipantsStore } from '@/stores/participants'
+import { ref, nextTick, computed } from 'vue'
+import { usePurchaseStore } from '@/stores/purchase-store.ts'
 
-const store = useParticipantsStore()
+const purchaseStore = usePurchaseStore()
 const newName = ref('')
 const editingId = ref<number | null>(null)
 const editingName = ref('')
@@ -11,7 +11,8 @@ function addParticipant() {
   newName.value
     .trim()
     .split(',')
-    .forEach((name) => store.addParticipant(name))
+    .forEach((name) => purchaseStore.addParticipant(name))
+
   newName.value = ''
 }
 
@@ -25,9 +26,12 @@ function startEditing(id: number, currentName: string) {
   })
 }
 
+const canAddParticipant = computed(() => !!newName.value.trim())
+
 function saveEdit(id: number) {
-  store.renameParticipant(id, editingName.value)
-  editingId.value = null
+  console.log("Do nothing on save edit for now", id)
+  // store.renameParticipant(id, editingName.value)
+  // editingId.value = null
 }
 
 function cancelEdit() {
@@ -37,15 +41,15 @@ function cancelEdit() {
 
 <template>
   <div class="participant-table card">
-    <h2 class="cardDescription">Participants ({{ store.participants.length }})</h2>
+    <h2 class="cardDescription">Participants ({{ purchaseStore.purchase.participants.length }})</h2>
     <label>Names (Comma-separated)</label>
 
     <form @submit.prevent="addParticipant" class="add-form">
       <input v-model="newName" placeholder="Peter, Tony, Bruce" type="text" />
-      <button type="submit">Add</button>
+      <button type="submit" :disabled="!canAddParticipant">Add</button>
     </form>
 
-    <table v-if="store.participants.length">
+    <table v-if="purchaseStore.purchase.participants.length">
       <thead>
         <tr>
           <th>ID</th>
@@ -54,7 +58,7 @@ function cancelEdit() {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="p in store.participants" :key="p.id">
+        <tr v-for="p in purchaseStore.purchase.participants" :key="p.id">
           <td>{{ p.id }}</td>
           <td v-if="editingId === p.id">
             <input
@@ -69,13 +73,15 @@ function cancelEdit() {
             <span class="name" @click="startEditing(p.id, p.name)">{{ p.name }}</span>
           </td>
           <td>
-            <button @click="store.removeParticipant(p.id)">Remove</button>
+            <button @click="purchaseStore.removeParticipant(p.id)">Remove</button>
           </td>
         </tr>
       </tbody>
       <tfoot>
         <tr>
-          <th colspan="3">Total: {{ store.participants.length }} participant(s)</th>
+          <th colspan="3">
+            Total: {{ purchaseStore.purchase.participants.length }} participant(s)
+          </th>
         </tr>
       </tfoot>
     </table>
@@ -85,8 +91,6 @@ function cancelEdit() {
 </template>
 
 <style scoped>
-
-
 .add-form {
   display: flex;
   gap: 0.5rem;
