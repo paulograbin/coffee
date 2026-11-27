@@ -1,0 +1,114 @@
+{
+  "markupCost": 10,
+  "freightCost": 70.38,
+  "coffees": [
+    {
+      "id": 1,
+      "name": "Rancho São Benedito",
+      "weight": 1,
+      "priceInCents": 17900,
+      "price": 179,
+      "itemTotal": 179
+    },
+    {
+      "id": 2,
+      "name": "FW-12 (Lavado do Alvaro)",
+      "weight": 2,
+      "priceInCents": 16900,
+      "price": 169,
+      "itemTotal": 338
+    },
+    {
+      "id": 3,
+      "name": "Fazenda Moinho",
+      "weight": 1,
+      "priceInCents": 15500,
+      "price": 155,
+      "itemTotal": 155
+    },
+    {
+      "id": 4,
+      "name": "Café do Alpendre",
+      "weight": 4,
+      "priceInCents": 10950,
+      "price": 109.50,
+      "itemTotal": 438
+    }
+  ],
+  "participants": [
+    {
+      "id": 1,
+      "name": "Paulo"
+    },
+    {
+      "id": 2,
+      "name": "Eduardo"
+    },
+    {
+      "id": 3,
+      "name": "Diego"
+    },
+    {
+      "id": 4,
+      "name": "Jean"
+    },
+    {
+      "id": 5,
+      "name": "Tiago"
+    },
+    {
+      "id": 6,
+      "name": "Renan"
+    }
+  ],
+  "allocations": [
+    {
+      "id": 1,
+      "participantId": 1,
+      "coffeeId": 4,
+      "amount": 1000
+    },
+    {
+      "id": 2,
+      "participantId": 1,
+      "coffeeId": 2,
+      "amount": 1000
+    },
+    {
+      "id": 3,
+      "participantId": 2,
+      "coffeeId": 1,
+      "amount": 1000
+    },
+    {
+      "id": 4,
+      "participantId": 4,
+      "coffeeId": 3,
+      "amount": 1000
+    },
+    {
+      "id": 5,
+      "participantId": 4,
+      "coffeeId": 4,
+      "amount": 1000
+    },
+    {
+      "id": 6,
+      "participantId": 5,
+      "coffeeId": 4,
+      "amount": 1000
+    },
+    {
+      "id": 7,
+      "participantId": 6,
+      "coffeeId": 4,
+      "amount": 1000
+    },
+    {
+      "id": 8,
+      "participantId": 3,
+      "coffeeId": 2,
+      "amount": 1000
+    }
+  ]
+}

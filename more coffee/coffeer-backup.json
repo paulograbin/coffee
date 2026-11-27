@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "activeId": "8819ff1e-3cc8-4f86-951c-4dbd4957f491",
+  "orders": [
+    {
+      "id": "8819ff1e-3cc8-4f86-951c-4dbd4957f491",
+      "name": "November coffee order",
+      "freightCents": 7038,
+      "freightSplit": "equal",
+      "markupMode": "perKg",
+      "markupValue": 1000,
+      "coffees": [
+        {
+          "id": "1",
+          "name": "Rancho São Benedito",
+          "priceCents": 17900,
+          "orderedGrams": 1000
+        },
+        {
+          "id": "2",
+          "name": "FW-12 (Lavado do Alvaro)",
+          "priceCents": 16900,
+          "orderedGrams": 2000
+        },
+        {
+          "id": "3",
+          "name": "Fazenda Moinho",
+          "priceCents": 15500,
+          "orderedGrams": 1000
+        },
+        {
+          "id": "4",
+          "name": "Café do Alpendre",
+          "priceCents": 10950,
+          "orderedGrams": 4000
+        }
+      ],
+      "participants": [
+        {
+          "id": "1",
+          "name": "Paulo",
+          "freightExempt": false,
+          "paidCents": 0
+        },
+        {
+          "id": "2",
+          "name": "Eduardo",
+          "freightExempt": false,
+          "paidCents": 0
+        },
+        {
+          "id": "3",
+          "name": "Diego",
+          "freightExempt": false,
+          "paidCents": 0
+        },
+        {
+          "id": "4",
+          "name": "Jean",
+          "freightExempt": false,
+          "paidCents": 0
+        },
+        {
+          "id": "5",
+          "name": "Tiago",
+          "freightExempt": false,
+          "paidCents": 0
+        },
+        {
+          "id": "6",
+          "name": "Renan",
+          "freightExempt": true,
+          "paidCents": 0
+        }
+      ],
+      "allocations": [
+        {
+          "participantId": "1",
+          "coffeeId": "4",
+          "grams": 1000
+        },
+        {
+          "participantId": "1",
+          "coffeeId": "2",
+          "grams": 1000
+        },
+        {
+          "participantId": "2",
+          "coffeeId": "1",
+          "grams": 1000
+        },
+        {
+          "participantId": "4",
+          "coffeeId": "3",
+          "grams": 1000
+        },
+        {
+          "participantId": "4",
+          "coffeeId": "4",
+          "grams": 1000
+        },
+        {
+          "participantId": "5",
+          "coffeeId": "4",
+          "grams": 1000
+        },
+        {
+          "participantId": "6",
+          "coffeeId": "4",
+          "grams": 1000
+        },
+        {
+          "participantId": "3",
+          "coffeeId": "2",
+          "grams": 1000
+        }
+      ]
+    }
+  ]
+}
